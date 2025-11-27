@@ -26,13 +26,13 @@
             "description": "Number of notifications to fetch (1-50)"
         },
         "showParticipating": {
-            "type": "string",
-            "default": "",
+            "type": "boolean",
+            "default": false,
             "description": "Show participating notifications (@mentions, assignments, etc.)"
         },
         "showAll": {
-            "type": "string",
-            "default": "",
+            "type": "boolean",
+            "default": true,
             "description": "Show all notifications (including repository subscriptions)"
         },
         "notificationTypes": {
