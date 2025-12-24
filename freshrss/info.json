@@ -1,0 +1,43 @@
+{
+    "name": "FreshRSS",
+    "description": "Fetch unread articles from your FreshRSS instance via Google Reader API.",
+    "version": "1.0.0",
+    "author": "Sidefy Team",
+    "min_support_app_version": "2025.11.12",
+    "tags": [
+        "rss",
+        "news",
+        "reader",
+        "freshrss"
+    ],
+    "category": "Social & News",
+    "config_options": {
+        "url": {
+            "type": "string",
+            "default": "",
+            "required": true,
+            "description": "FreshRSS Server URL (e.g. https://rss.example.com/api/greader.php)"
+        },
+        "username": {
+            "type": "string",
+            "default": "",
+            "required": true,
+            "description": "Username"
+        },
+        "password": {
+            "type": "password",
+            "default": "",
+            "required": true,
+            "description": "API Password (Set in FreshRSS Profile -> API Management)"
+        },
+        "limit": {
+            "type": "number",
+            "default": 50,
+            "description": "Number of articles to fetch"
+        }
+    },
+    "requirements": {
+        "network": true,
+        "storage": true
+    }
+}
