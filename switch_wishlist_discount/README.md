@@ -32,7 +32,7 @@ Monitor your Nintendo Switch wishlist games for discount information (Japan eSho
 
 #### Method 1: Get from Japanese eShop Website
 
-1. Visit Nintendo Japan eShop: `https://ec.nintendo.com/JP/ja/`
+1. Visit Nintendo Japan eShop: `https://store-jp.nintendo.com/search`
 2. Search for the game you want to monitor
 3. Go to the game details page and check the URL
 4. The numbers after `/titles/` in the URL are the game ID
