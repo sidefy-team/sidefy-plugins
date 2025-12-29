@@ -37,7 +37,7 @@ function fetchEvents(config) {
         var html = response;
         var pokemonData = extractPokemonData(html, pokemonId, pokemonUrl);
 
-        // --- 创建日历事件 ---
+        // --- 创建时间线事件 ---
         var eventDate = new Date();
         eventDate.setHours(9, 0, 0, 0); // 上午9点显示
 

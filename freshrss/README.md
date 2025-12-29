@@ -1,6 +1,6 @@
 ## FreshRSS
 
-Fetch unread and recent articles from your self-hosted FreshRSS instance, displaying them in Sidefy calendar.
+Fetch unread and recent articles from your self-hosted FreshRSS instance, displaying them in Sidefy timeline.
 
 ### Features
 

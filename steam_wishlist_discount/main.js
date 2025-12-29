@@ -1,6 +1,6 @@
 /**
  * Steam 愿望单打折监听插件
- * 每30分钟检查一次用户的 Steam 愿望单中游戏的打折信息，并在日历中显示打折游戏。
+ * 每30分钟检查一次用户的 Steam 愿望单中游戏的打折信息，并在时间线中显示打折游戏。
  */
 function fetchEvents(config) {
 
@@ -28,8 +28,8 @@ function fetchEvents(config) {
     // 在缓存键中加入日期，确保跨天后缓存自动失效
     var today = new Date();
     var dateKey = today.getFullYear() + "" +
-                  String(today.getMonth() + 1).padStart(2, '0') +
-                  String(today.getDate()).padStart(2, '0');
+        String(today.getMonth() + 1).padStart(2, '0') +
+        String(today.getDate()).padStart(2, '0');
     var cacheKey = "steam_wishlist_discount_v11_" + steamId + "_" + dateKey;
 
     var cachedData = sidefy.storage.get(cacheKey);
@@ -170,7 +170,7 @@ function fetchEvents(config) {
         }
 
 
-        // 3. 创建打折游戏的日历事件
+        // 3. 创建打折游戏的时间线事件
         if (discountedGames.length > 0) {
             // 为每个打折游戏创建事件
             for (var j = 0; j < discountedGames.length; j++) {

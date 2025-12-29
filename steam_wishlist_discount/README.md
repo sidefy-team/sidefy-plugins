@@ -2,7 +2,7 @@
 
 <img width="489" height="255" alt="1Capture_2025-10-03_21 59 33" src="https://github.com/user-attachments/assets/756f4b89-b847-41b3-9a34-1310266beccc" />
 
-Automatically checks your Steam wishlist for game discounts every 30 minutes and reminds you in the calendar when games are on sale.
+Automatically checks your Steam wishlist for game discounts every 30 minutes and reminds you in the timeline when games are on sale.
 
 ### Features
 
@@ -10,7 +10,7 @@ Automatically checks your Steam wishlist for game discounts every 30 minutes and
 - **Real-time Pricing**: Shows original price, current price, and discount percentage
 - **Live Tracking**: Displays current discount status in real-time
 - **Color Coding**: Uses different colors based on discount intensity (dark red 75%+, orange 50%+, yellow 25%+, blue for small discounts)
-- **Calendar Integration**: Directly displays discounted games in your calendar
+- **Timeline Integration**: Directly displays discounted games in your timeline
 
 ### Configuration
 

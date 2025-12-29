@@ -2,7 +2,7 @@
 
 <img width="486" height="370" alt="1Capture_2025-10-03_22 14 53" src="https://github.com/user-attachments/assets/a2b6c7a0-b140-4044-a19c-33fb75ddd807" />
 
-Monitor your Nintendo Switch wishlist games for discount information (Japan eShop only), and get calendar notifications when games are on sale.
+Monitor your Nintendo Switch wishlist games for discount information (Japan eShop only), and get timeline notifications when games are on sale.
 
 ### Features
 
@@ -10,7 +10,7 @@ Monitor your Nintendo Switch wishlist games for discount information (Japan eSho
 - **Real-time Pricing**: Display original price, current price, and discount percentage (Japanese Yen)
 - **Game Information**: Automatically fetch game names and cover images
 - **Color Coding**: Use different colors based on discount intensity (dark red 75%+, orange 50%+, yellow 25%+, blue for small discounts)
-- **Calendar Integration**: Display discounted games directly in calendar, click to jump to Japanese eShop for purchase
+- **Timeline Integration**: Display discounted games directly in timeline, click to jump to Japanese eShop for purchase
 - **Smart Cleanup**: Automatically handle game ID format (remove letter prefixes, etc.)
 
 ### Configuration

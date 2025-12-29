@@ -23,7 +23,7 @@ function fetchEvents(config) {
             if (config[tokenKey]) {
                 var url = "https://api.phantom.app/price/v1/solana:101/address/" + config[tokenKey];
                 var headers = {
-                    "User-Agent": "SideCalendar Solana Price Monitor",
+                    "User-Agent": "Sidefy Solana Price Monitor",
                     "Accept": "application/json"
                 };
 

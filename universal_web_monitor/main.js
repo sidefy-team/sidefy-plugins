@@ -32,11 +32,11 @@ function fetchEvents(config) {
 
         // 1. Crawl the webpage
         var crawlResult = sidefy.crawler(url);
-        
+
         if (!crawlResult || !crawlResult.success) {
             var errorMsg = crawlResult ? crawlResult.error : "Unknown error";
             sidefy.log("Universal Monitor: Crawl failed - " + errorMsg);
-            // We don't throw here to avoid blocking the whole calendar, just return empty
+            // We don't throw here to avoid blocking the whole timeline, just return empty
             // But maybe we should return an error event? 
             // Let's just return empty for now to be safe.
             return [];
@@ -49,7 +49,7 @@ function fetchEvents(config) {
 
         // 2. AI Processing
         var fullPrompt = prompt + "\n\nIMPORTANT: Format your response exactly as follows:\nLine 1: A short, descriptive title for this update (max 20 characters).\nLine 2+: The detailed information you extracted.\nDo not include any other text.\n\nTarget Webpage Content:\n" + contentToAnalyze;
-        
+
         sidefy.log("Universal Monitor: Calling AI");
         var aiResult = sidefy.ai.chat(fullPrompt);
 
@@ -60,7 +60,7 @@ function fetchEvents(config) {
 
         var summary = aiResult.trim();
         var lines = summary.split('\n');
-        
+
         // Parse Title and Content
         var eventTitle = lines[0].replace(/^(Title:|Line 1:)/i, "").trim();
         var eventContent = lines.slice(1).join('\n').trim();
@@ -72,15 +72,15 @@ function fetchEvents(config) {
 
         // 3. Create Event
         var now = new Date();
-        
+
         // Determine color based on keywords
         var color = "#2980B9"; // Default Blue
         var keywords = config.keywords || "";
-        
+
         if (keywords && keywords.trim() !== "") {
-            var keywordList = keywords.split(",").map(function(k) { return k.trim().toLowerCase(); });
+            var keywordList = keywords.split(",").map(function (k) { return k.trim().toLowerCase(); });
             var contentLower = (eventTitle + " " + eventContent).toLowerCase();
-            
+
             for (var i = 0; i < keywordList.length; i++) {
                 if (keywordList[i] && contentLower.includes(keywordList[i])) {
                     color = "#8E44AD"; // Purple if keyword found
@@ -105,7 +105,7 @@ function fetchEvents(config) {
         // Cache duration = intervalHours * 60 minutes
         var cacheDuration = Math.max(intervalHours * 60, 15); // Minimum 15 min cache
         sidefy.storage.set(cacheKey, events, cacheDuration);
-        
+
         sidefy.log("Universal Monitor: Success, cached for " + cacheDuration + " minutes");
 
     } catch (err) {

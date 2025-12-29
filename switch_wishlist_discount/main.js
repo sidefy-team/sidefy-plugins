@@ -1,6 +1,6 @@
 /**
  * Switch 愿望单打折监控插件 (日本区)
- * 监控指定的 Nintendo Switch 游戏打折信息，并在日历中显示打折游戏。
+ * 监控指定的 Nintendo Switch 游戏打折信息，并在时间线中显示打折游戏。
  */
 function fetchEvents(config) {
 
@@ -24,10 +24,10 @@ function fetchEvents(config) {
     // 清理游戏 ID（移除可能的字母前缀和空格），并限制最多10个
     var cleanedIdsArray = gameIds
         .split(',')
-        .map(function(id) {
+        .map(function (id) {
             return id.trim().replace(/^[A-Z]/i, ''); // 移除开头的字母
         })
-        .filter(function(id) {
+        .filter(function (id) {
             return id !== ""; // 过滤空字符串
         })
         .slice(0, 10); // 只取前10个
@@ -38,8 +38,8 @@ function fetchEvents(config) {
     // 在缓存键中加入日期，确保跨天后缓存自动失效
     var today = new Date();
     var dateKey = today.getFullYear() + "" +
-                  String(today.getMonth() + 1).padStart(2, '0') +
-                  String(today.getDate()).padStart(2, '0');
+        String(today.getMonth() + 1).padStart(2, '0') +
+        String(today.getDate()).padStart(2, '0');
     var cacheKey = "switch_wishlist_jp_v4_" + cleanedIds + "_" + dateKey;
     var cachedData = sidefy.storage.get(cacheKey);
     if (cachedData) {
@@ -52,7 +52,7 @@ function fetchEvents(config) {
     try {
         // 1. 查询游戏价格信息（日本区）
         var priceUrl = "https://api.ec.nintendo.com/v1/price?country=JP&ids=" +
-                       cleanedIds + "&lang=ja";
+            cleanedIds + "&lang=ja";
         var priceResponse = sidefy.http.get(priceUrl);
 
         if (!priceResponse) {
@@ -203,7 +203,7 @@ function fetchEvents(config) {
             }
         }
 
-        // 4. 创建日历事件
+        // 4. 创建时间线事件
         for (var k = 0; k < discountedGames.length; k++) {
             var game = discountedGames[k];
 

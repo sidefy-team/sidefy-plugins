@@ -1,6 +1,6 @@
 ## Unsplash Daily Photo Plugin
 
-Brings you one beautiful, popular photo from Unsplash homepage every day, displayed as an all-day event to enhance your calendar view.
+Brings you one beautiful, popular photo from Unsplash homepage every day, displayed as an all-day event to enhance your timeline view.
 
 ### Features
 
@@ -27,7 +27,7 @@ Brings you one beautiful, popular photo from Unsplash homepage every day, displa
     - Click "Your apps".
     - Click "New Application".
     - Accept all API terms of use.
-    - Fill in application name (any name, such as `SideCalendarPlugin`) and description.
+    - Fill in application name (any name, such as `SidefyPlugin`) and description.
     - Click "Create application".
 
 4.  **Get Key**

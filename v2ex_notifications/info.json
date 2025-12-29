@@ -1,6 +1,6 @@
 {
     "name": "V2EX 未读提醒",
-    "description": "获取 V2EX 的未读提醒。支持区分回复、点赞、提及和收藏，并在日历中以不同颜色显示。",
+    "description": "获取 V2EX 的未读提醒。支持区分回复、点赞、提及和收藏，并在时间线中以不同颜色显示。",
     "version": "1.0.1",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.10.7",

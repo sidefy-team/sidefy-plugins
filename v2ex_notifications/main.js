@@ -1,6 +1,6 @@
 /**
  * V2EX 未读提醒插件
- * 解析 V2EX 私有 Atom Feed 并在日历中显示提醒。
+ * 解析 V2EX 私有 Atom Feed 并在时间线中显示提醒。
  */
 function fetchEvents(config) {
     var token = config.token;

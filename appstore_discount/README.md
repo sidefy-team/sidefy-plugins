@@ -2,14 +2,14 @@
 
 ## Description
 
-Monitor App Store app prices and get calendar notifications when prices drop below your configured reference price. Perfect for tracking apps you want to purchase at a lower price.
+Monitor App Store app prices and get timeline notifications when prices drop below your configured reference price. Perfect for tracking apps you want to purchase at a lower price.
 
 ## Features
 
 - Monitor multiple apps across different regions
 - Custom reference prices for precise discount tracking
 - Color-coded discounts (blue for small, yellow for medium, orange for large, red for huge)
-- Creates calendar events when prices drop
+- Creates timeline events when prices drop
 - Multi-region support (US, China, Japan, UK, etc.)
 - Smart caching reduces API calls (refreshes daily)
 - Full internationalization support
@@ -59,7 +59,7 @@ This will monitor:
 
 1. The plugin checks configured app prices every 30 minutes
 2. Compares current price with your configured reference price
-3. If current price < reference price: Creates a calendar event with discount percentage
+3. If current price < reference price: Creates a timeline event with discount percentage
 4. Events include app screenshots (randomly selected), price details, and direct App Store links
 5. Cache expires daily to ensure fresh data
 

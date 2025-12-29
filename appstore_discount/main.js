@@ -1,6 +1,6 @@
 /**
  * AppStore 折扣监听插件
- * 监控 App Store 应用的价格变化,并在日历中显示打折应用。
+ * 监控 App Store 应用的价格变化,并在时间线中显示打折应用。
  */
 function fetchEvents(config) {
     // 检查必填参数
@@ -24,8 +24,8 @@ function fetchEvents(config) {
     // 在缓存键中加入日期,确保跨天后缓存自动失效
     var today = new Date();
     var dateKey = today.getFullYear() + "" +
-                  String(today.getMonth() + 1).padStart(2, '0') +
-                  String(today.getDate()).padStart(2, '0');
+        String(today.getMonth() + 1).padStart(2, '0') +
+        String(today.getDate()).padStart(2, '0');
     var cacheKey = "appstore_discount_v6_" + appData.replace(/[,\s]/g, '_').substring(0, 50) + "_" + dateKey;
 
     var cachedData = sidefy.storage.get(cacheKey);
@@ -140,7 +140,7 @@ function fetchEvents(config) {
             }
         }
 
-        // 创建折扣应用的日历事件
+        // 创建折扣时间线事件
         if (discountedApps.length > 0) {
             for (var j = 0; j < discountedApps.length; j++) {
                 var app = discountedApps[j];

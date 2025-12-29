@@ -1,9 +1,9 @@
-# SideCalendar 插件贡献指南
+# Sidefy 插件贡献指南
 
 [English](README.md) | [中文](README_ZH.md)
 
 >[!WARNING] 
->免责声明：社区插件由第三方提供，SideCalendar不对其安全性承担责任，请用户自行校验与甄别。
+>免责声明：社区插件由第三方提供，Sidefy不对其安全性承担责任，请用户自行校验与甄别。
 
 ## 📁 文件结构
 
@@ -24,7 +24,7 @@ your-plugin-name/
   //插件版本，更新后客户端会显示更新提醒
   "version": "0.1.0",
   "author": "sha2kyou",
-  //限制最低适配的 SideCalendar 版本，比该版本低的客户端无法下载该插件
+  //限制最低适配的 Sidefy 版本，比该版本低的客户端无法下载该插件
   "min_support_app_version": "2025.3.0",
   "tags": ["bilibili", "哔哩哔哩", "视频", "UP主", "动态", "社交媒体"],
   "category": "社交媒体",
@@ -55,7 +55,7 @@ your-plugin-name/
 
 ## main.js
 
-必须包含 fetchEvents 函数（可参考 [bilibili_user_videos](https://github.com/sha2kyou/SideCalendarPlugins/tree/main/bilibili_user_videos)）：
+必须包含 fetchEvents 函数（可参考 [bilibili_user_videos](https://github.com/sha2kyou/sidefy-plugins/tree/main/bilibili_user_videos)）：
 
 ```javascript
 function fetchEvents(config) {
@@ -84,17 +84,17 @@ function fetchEvents(config) {
 ## 提交步骤
 
 1. Fork 本仓库
-2. 在 SideCanlendar 自定义插件代码编辑器编辑代码
-3. 在 SideCanlendar 测试插件功能
+2. 在 Sidefy 自定义插件代码编辑器编辑代码
+3. 在 Sidefy 测试插件功能
 4. 在仓库目录创建插件文件夹和文件
 5. 提交 Pull Request
 
 >[!WARNING] 
->更多 API 说明请查看 SideCalendar 应用内的自定义插件编辑器文档页面
+>更多 API 说明请查看 Sidefy 应用内的自定义插件编辑器文档页面
 
 ## 检查清单
 
-- 插件在 SideCalendar 中测试通过
+- 插件在 Sidefy 中测试通过
 - 包含完整的错误处理
 - 提交插件目录结构正确
 - info.json 信息完整准确

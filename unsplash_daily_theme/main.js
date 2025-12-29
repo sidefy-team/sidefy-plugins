@@ -75,7 +75,7 @@ function fetchEvents(config) {
             }));
         }
 
-        // --- 创建日历事件 ---
+        // --- 创建时间线事件 ---
         var eventDate = new Date();
         eventDate.setHours(0, 0, 0, 0); // 设置为0点
 

@@ -1,9 +1,9 @@
-# SideCalendar Plugin Contribution Guide
+# Sidefy Plugin Contribution Guide
 
 [English](README.md) | [中文](README_ZH.md)
 
 >[!WARNING]
->Disclaimer: Community plugins are provided by third parties. SideCalendar is not responsible for their security. Users should verify and evaluate plugins themselves.
+>Disclaimer: Community plugins are provided by third parties. Sidefy is not responsible for their security. Users should verify and evaluate plugins themselves.
 
 ## 📁 File Structure
 
@@ -24,7 +24,7 @@ your-plugin-name/
   // Plugin version, client will show update notification after updates
   "version": "0.1.0",
   "author": "sha2kyou",
-  // Minimum supported SideCalendar version, clients below this version cannot download the plugin
+  // Minimum supported Sidefy version, clients below this version cannot download the plugin
   "min_support_app_version": "2025.3.0",
   "tags": ["bilibili", "video", "content creator", "social media"],
   "category": "Social Media",
@@ -55,7 +55,7 @@ your-plugin-name/
 
 ## main.js
 
-Must include the `fetchEvents` function (see [bilibili_user_videos](https://github.com/sha2kyou/SideCalendarPlugins/tree/main/bilibili_user_videos) for reference):
+Must include the `fetchEvents` function (see [bilibili_user_videos](https://github.com/sha2kyou/sidefy-plugins/tree/main/bilibili_user_videos) for reference):
 
 ```javascript
 function fetchEvents(config) {
@@ -84,17 +84,17 @@ function fetchEvents(config) {
 ## Submission Steps
 
 1. Fork this repository
-2. Edit code in SideCalendar's custom plugin code editor
-3. Test plugin functionality in SideCalendar
+2. Edit code in Sidefy's custom plugin code editor
+3. Test plugin functionality in Sidefy
 4. Create plugin folder and files in the repository
 5. Submit a Pull Request
 
 >[!WARNING]
->For more API documentation, please check the custom plugin editor documentation page within the SideCalendar app
+>For more API documentation, please check the custom plugin editor documentation page within the Sidefy app
 
 ## Checklist
 
-- Plugin tested successfully in SideCalendar
+- Plugin tested successfully in Sidefy
 - Includes complete error handling
 - Submitted plugin directory structure is correct
 - info.json information is complete and accurate
