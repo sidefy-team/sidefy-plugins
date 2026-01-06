@@ -132,28 +132,12 @@ function fetchEvents(config) {
                         image: gameImage,
                         device: deviceInfo
                     };
-                    continue;
                 }
             } catch (fetchErr) {
-                // 抓取失败，使用默认值
+                // 抓取失败，跳过该游戏 ID
             }
 
-            // 如果都失败，使用游戏 ID 作为名称
-            gameInfoMap[gameId] = {
-                name: sidefy.i18n({
-                    "zh": "游戏 ID: " + gameId,
-                    "en": "Game ID: " + gameId,
-                    "ja": "ゲーム ID: " + gameId,
-                    "ko": "게임 ID: " + gameId,
-                    "de": "Spiele-ID: " + gameId,
-                    "es": "ID del juego: " + gameId,
-                    "fr": "ID du jeu: " + gameId,
-                    "pt": "ID do jogo: " + gameId,
-                    "ru": "ID игры: " + gameId
-                }),
-                image: "",
-                device: ""
-            };
+            // 如果抓取失败，不添加到 gameInfoMap，直接跳过
         }
 
         // 3. 处理价格数据，检查打折信息
@@ -170,25 +154,16 @@ function fetchEvents(config) {
 
             // 检查是否有折扣
             if (priceInfo.discount_price && priceInfo.regular_price) {
+                // 跳过未成功抓取到信息的游戏 ID
+                if (!gameInfoMap[gameId]) {
+                    continue;
+                }
+
                 var regularPrice = parseFloat(priceInfo.regular_price.raw_value);
                 var discountPrice = parseFloat(priceInfo.discount_price.raw_value);
                 var discountPercent = Math.round((1 - discountPrice / regularPrice) * 100);
 
-                var gameInfo = gameInfoMap[gameId] || {
-                    name: sidefy.i18n({
-                        "zh": "游戏 ID: " + gameId,
-                        "en": "Game ID: " + gameId,
-                        "ja": "ゲーム ID: " + gameId,
-                        "ko": "게임 ID: " + gameId,
-                        "de": "Spiele-ID: " + gameId,
-                        "es": "ID del juego: " + gameId,
-                        "fr": "ID du jeu: " + gameId,
-                        "pt": "ID do jogo: " + gameId,
-                        "ru": "ID игры: " + gameId
-                    }),
-                    image: "",
-                    device: ""
-                };
+                var gameInfo = gameInfoMap[gameId];
                 discountedGames.push({
                     id: gameId,
                     name: gameInfo.name,
