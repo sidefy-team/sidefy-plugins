@@ -40,7 +40,7 @@ function fetchEvents(config) {
     var dateKey = today.getFullYear() + "" +
         String(today.getMonth() + 1).padStart(2, '0') +
         String(today.getDate()).padStart(2, '0');
-    var cacheKey = "switch_wishlist_jp_v4_" + cleanedIds + "_" + dateKey;
+    var cacheKey = "switch_wishlist_jp_v5_" + cleanedIds + "_" + dateKey;
     var cachedData = sidefy.storage.get(cacheKey);
     if (cachedData) {
         return cachedData;
@@ -98,46 +98,35 @@ function fetchEvents(config) {
                 var storePage = sidefy.http.get(storeUrl);
 
                 if (storePage) {
-                    var gameName = sidefy.i18n({
-                        "zh": "游戏 ID: " + gameId,
-                        "en": "Game ID: " + gameId,
-                        "ja": "ゲーム ID: " + gameId,
-                        "ko": "게임 ID: " + gameId,
-                        "de": "Spiele-ID: " + gameId,
-                        "es": "ID del juego: " + gameId,
-                        "fr": "ID du jeu: " + gameId,
-                        "pt": "ID do jogo: " + gameId,
-                        "ru": "ID игры: " + gameId
-                    });
                     var gameImage = "";
                     var deviceInfo = "";
 
                     // 从 og:title meta 标签提取游戏名称
                     var titleMatch = storePage.match(/property="og:title"\s+content="([^"]*)"/);
+
+                    // 只有成功提取到游戏名称时才添加到 gameInfoMap
                     if (titleMatch && titleMatch[1]) {
-                        gameName = titleMatch[1];
+                        var gameName = titleMatch[1];
+
+                        // 从 og:image meta 标签提取封面图
+                        var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
+                        if (imageMatch && imageMatch[1]) {
+                            gameImage = imageMatch[1];
+                        }
+
+                        // 提取设备兼容性信息
+                        deviceInfo = extractDeviceInfo(storePage);
+
+                        gameInfoMap[gameId] = {
+                            name: gameName,
+                            image: gameImage,
+                            device: deviceInfo
+                        };
                     }
-
-                    // 从 og:image meta 标签提取封面图
-                    var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
-                    if (imageMatch && imageMatch[1]) {
-                        gameImage = imageMatch[1];
-                    }
-
-                    // 提取设备兼容性信息
-                    deviceInfo = extractDeviceInfo(storePage);
-
-                    gameInfoMap[gameId] = {
-                        name: gameName,
-                        image: gameImage,
-                        device: deviceInfo
-                    };
                 }
             } catch (fetchErr) {
                 // 抓取失败，跳过该游戏 ID
             }
-
-            // 如果抓取失败，不添加到 gameInfoMap，直接跳过
         }
 
         // 3. 处理价格数据，检查打折信息
