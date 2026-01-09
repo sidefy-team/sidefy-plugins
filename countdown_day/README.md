@@ -10,7 +10,7 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
   - **Upcoming**: Shows "X days until [Name]".
   - **Today**: Highlights in red "Today is [Name]!".
   - **Past**: Shows "[Name] was X days ago" in gray.
-- **Multilingual Support**: Supports English, Chinese, Japanese, Korean, German, Spanish, French, Portuguese, and Russian.
+- **Multilingual Support**: Supports English and Chinese.
 
 ## Configuration
 
@@ -27,9 +27,14 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
 
 ## Changelog
 
+### v0.1.1
+
+- Updated to use native `date` type for `target_date` parameter
+- Improved configuration experience with date picker
+
 ### v0.1.0
 
 - Initial release
 - Support for target date and event name
-- Multi-language support (9 languages)
+- Multi-language support (English and Chinese)
 - Color-coded status (Blue for upcoming, Red for today, Gray for past)
