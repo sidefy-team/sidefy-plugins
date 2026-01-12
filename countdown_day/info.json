@@ -22,6 +22,12 @@
             "default": "Important Day",
             "required": true,
             "description": "Event name (e.g., Wedding Anniversary, Project Launch)"
+        },
+        "warning_days": {
+            "type": "number",
+            "default": 3,
+            "required": false,
+            "description": "Number of days before the event to show orange warning color"
         }
     },
     "requirements": {

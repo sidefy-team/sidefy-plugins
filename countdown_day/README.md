@@ -18,6 +18,7 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
 |-----------|------|---------|-------------|---------|
 | `target_date` | date | (Required) | The target date to count down to | `2026-01-01` |
 | `event_name` | string | `Important Day` | The name of the event | `Market Launch` |
+| `warning_days` | number | `3` | Number of days before the event to show orange warning color | `7` |
 
 ## Installation
 
@@ -29,8 +30,9 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
 
 ### v0.1.3
 
-- Added orange color indicator for approaching dates (within 3 days)
+- Added customizable `warning_days` parameter to control when orange warning appears
 - Enhanced visual feedback with 4-tier color system: Blue (distant) → Orange (approaching) → Red (today) → Gray (past)
+- Default warning threshold is 3 days, but can be customized by users
 
 ### v0.1.0
 

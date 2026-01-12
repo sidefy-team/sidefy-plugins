@@ -8,6 +8,7 @@ function fetchEvents(config) {
         "en": "Important Day",
         "zh": "重要日子"
     });
+    var warningDays = config.warning_days || 3; // Default to 3 days if not specified
 
     if (!targetDateStr) {
         return [];
@@ -34,8 +35,8 @@ function fetchEvents(config) {
                 "en": diffDays + " days until " + eventName,
                 "zh": "距离 " + eventName + " 还有 " + diffDays + " 天"
             });
-            // Change color to orange when approaching (within 3 days)
-            if (diffDays <= 3) {
+            // Change color to orange when approaching (within warning_days)
+            if (diffDays <= warningDays) {
                 color = "#f39c12"; // Orange for approaching dates
             }
         } else if (diffDays === 0) {
