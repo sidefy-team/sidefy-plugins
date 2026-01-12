@@ -27,10 +27,10 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
 
 ## Changelog
 
-### v0.1.1
+### v0.1.3
 
-- Updated to use native `date` type for `target_date` parameter
-- Improved configuration experience with date picker
+- Added orange color indicator for approaching dates (within 3 days)
+- Enhanced visual feedback with 4-tier color system: Blue (distant) → Orange (approaching) → Red (today) → Gray (past)
 
 ### v0.1.0
 

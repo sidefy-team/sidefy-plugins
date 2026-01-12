@@ -34,6 +34,10 @@ function fetchEvents(config) {
                 "en": diffDays + " days until " + eventName,
                 "zh": "距离 " + eventName + " 还有 " + diffDays + " 天"
             });
+            // Change color to orange when approaching (within 3 days)
+            if (diffDays <= 3) {
+                color = "#f39c12"; // Orange for approaching dates
+            }
         } else if (diffDays === 0) {
             message = sidefy.i18n({
                 "en": "Today is " + eventName + "!",
