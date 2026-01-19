@@ -25,11 +25,6 @@ function fetchEvents(config) {
     var cacheKey = "freshrss_auth_token_" + config.username;
     var articlesCacheKey = "freshrss_articles_" + config.username + "_" + limit + "_" + (config.onlyUnread ? "unread" : "all");
 
-    // 根据字符串生成稳定的颜色
-    function stringToColor(str) {
-        return sidefy.color.hash(str || "FreshRSS");
-    }
-
     // Helper to perform login
     function login() {
         // 将参数直接拼接到 URL 后面
@@ -185,7 +180,7 @@ function fetchEvents(config) {
             href: link,
             isAllDay: false,
             isPointInTime: true,
-            color: stringToColor(item.origin.htmlUrl || feedTitle)
+            color: sidefy.color.hash(item.origin.htmlUrl || feedTitle)
         };
     });
 
