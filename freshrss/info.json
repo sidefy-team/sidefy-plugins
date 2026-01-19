@@ -1,9 +1,9 @@
 {
     "name": "FreshRSS",
     "description": "Fetch unread articles from your FreshRSS instance via Google Reader API.",
-    "version": "1.0.1",
+    "version": "1.2.0",
     "author": "Sidefy Team",
-    "min_support_app_version": "2025.11.12",
+    "min_support_app_version": "2026.1.15",
     "tags": [
         "rss",
         "news",

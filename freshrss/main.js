@@ -27,28 +27,7 @@ function fetchEvents(config) {
 
     // 根据字符串生成稳定的颜色
     function stringToColor(str) {
-        if (!str) return "#FFA500"; // 默认橙色
-
-        // 简单的哈希函数
-        var hash = 0;
-        for (var i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            hash = hash & hash; // Convert to 32bit integer
-        }
-
-        // 标准的 7 种颜色
-        var colors = [
-            "#FF0000", // 红
-            "#FFA500", // 橙
-            "#FFFF00", // 黄
-            "#00FF00", // 绿
-            "#00FFFF", // 青
-            "#0000FF", // 蓝
-            "#800080"  // 紫
-        ];
-
-        // 根据哈希值选择颜色
-        return colors[Math.abs(hash) % colors.length];
+        return sidefy.color.hash(str || "FreshRSS");
     }
 
     // Helper to perform login

@@ -35,19 +35,14 @@ Fetch unread and recent articles from your self-hosted FreshRSS instance, displa
 
 ### Color Coding
 
-Each RSS feed source is automatically assigned one of 7 standard colors based on its URL for easy identification:
-
-- Red
-- Orange
-- Yellow
-- Green
-- Cyan
-- Blue
-- Purple
-
-Multiple feeds may share the same color if they have similar URLs (same hash value).
+Each RSS feed source is automatically assigned a unique color based on its URL using Sidefy's built-in color hash algorithm.
 
 ### Changelog
+
+#### v1.2.0
+
+- **Adopted Sidefy's color system**: Now uses `sidefy.color.hash()` for color assignment instead of custom color selection
+- Simplified color generation logic
 
 #### v1.1.0
 
