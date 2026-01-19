@@ -36,43 +36,19 @@ function fetchEvents(config) {
             hash = hash & hash; // Convert to 32bit integer
         }
 
-        // 将哈希值转换为 HSL 颜色,保持饱和度和亮度在合适范围
-        var hue = Math.abs(hash % 360);
-        var saturation = 65 + (Math.abs(hash >> 8) % 20); // 65-85%
-        var lightness = 50 + (Math.abs(hash >> 16) % 15); // 50-65%
+        // 标准的 7 种颜色
+        var colors = [
+            "#FF0000", // 红
+            "#FFA500", // 橙
+            "#FFFF00", // 黄
+            "#00FF00", // 绿
+            "#00FFFF", // 青
+            "#0000FF", // 蓝
+            "#800080"  // 紫
+        ];
 
-        return hslToHex(hue, saturation, lightness);
-    }
-
-    // HSL 转 HEX
-    function hslToHex(h, s, l) {
-        s /= 100;
-        l /= 100;
-
-        var c = (1 - Math.abs(2 * l - 1)) * s;
-        var x = c * (1 - Math.abs((h / 60) % 2 - 1));
-        var m = l - c / 2;
-        var r = 0, g = 0, b = 0;
-
-        if (h >= 0 && h < 60) {
-            r = c; g = x; b = 0;
-        } else if (h >= 60 && h < 120) {
-            r = x; g = c; b = 0;
-        } else if (h >= 120 && h < 180) {
-            r = 0; g = c; b = x;
-        } else if (h >= 180 && h < 240) {
-            r = 0; g = x; b = c;
-        } else if (h >= 240 && h < 300) {
-            r = x; g = 0; b = c;
-        } else if (h >= 300 && h < 360) {
-            r = c; g = 0; b = x;
-        }
-
-        var rHex = Math.round((r + m) * 255).toString(16).padStart(2, '0');
-        var gHex = Math.round((g + m) * 255).toString(16).padStart(2, '0');
-        var bHex = Math.round((b + m) * 255).toString(16).padStart(2, '0');
-
-        return "#" + rHex + gHex + bHex;
+        // 根据哈希值选择颜色
+        return colors[Math.abs(hash) % colors.length];
     }
 
     // Helper to perform login
@@ -230,7 +206,7 @@ function fetchEvents(config) {
             href: link,
             isAllDay: false,
             isPointInTime: true,
-            color: stringToColor(feedTitle)
+            color: stringToColor(item.origin.htmlUrl || feedTitle)
         };
     });
 

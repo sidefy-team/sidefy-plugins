@@ -35,9 +35,26 @@ Fetch unread and recent articles from your self-hosted FreshRSS instance, displa
 
 ### Color Coding
 
-Each RSS feed source is automatically assigned a unique color based on its name for easy identification.
+Each RSS feed source is automatically assigned one of 7 standard colors based on its URL for easy identification:
+
+- Red
+- Orange
+- Yellow
+- Green
+- Cyan
+- Blue
+- Purple
+
+Multiple feeds may share the same color if they have similar URLs (same hash value).
 
 ### Changelog
+
+#### v1.1.0
+
+- **Simplified color system**: Now uses 7 standard colors (Red, Orange, Yellow, Green, Cyan, Blue, Purple) instead of complex HSL generation
+- **Changed color source**: Now uses RSS feed URL instead of feed title for color assignment
+- Removed unused HSL to HEX conversion code
+- Updated color assignment documentation
 
 #### v1.0.0
 
