@@ -35,7 +35,7 @@ function fetchEvents(config) {
                 var contentRaw = extractTagContent(entry, "content").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
                 var authorName = extractTagContent(entry, "name", "<author>", "<\/author>");
 
-                var type = detectType(title, contentRaw);
+                var type = detectType(title, contentRaw, link);
                 var color = getTypeColor(type);
 
                 // Construct a meaningful title if the original is empty
@@ -43,6 +43,8 @@ function fetchEvents(config) {
                 if (!displayTitle) {
                     if (type.id === "thanks") {
                         displayTitle = (authorName || "有人") + " 感谢了你的回复";
+                    } else if (type.id === "reward") {
+                        displayTitle = (authorName || "有人") + " 打赏了你";
                     } else if (type.id === "favorite") {
                         displayTitle = (authorName || "有人") + " 收藏了你的主题";
                     } else {
@@ -133,17 +135,31 @@ function mergeAndDeduplicateEvents(cachedEvents, newEvents) {
  * 基于 V2EX RSS 样例:
  * - 回复/提及: 标题不为空
  * - 点赞 (感谢): 标题为空, 内容不为空
- * - 收藏: 标题为空, 内容为空
+ * - 打赏: 标题为空, 内容为空, 且链接为 token 形式
+ * - 收藏: 标题为空, 内容为空, 且链接为主题链接
  */
-function detectType(title, content) {
+function detectType(title, content, link) {
     if (!title || title.trim() === "") {
-        // If title is empty, check content to distinguish between Thanks and Favorite
+        // If title is empty, check content first.
         var cleanTxt = cleanContent(content);
         if (cleanTxt && cleanTxt.length > 0) {
             return { id: "thanks", label: "点赞" };
-        } else {
+        }
+
+        // Empty title/content + token-style link is treated as reward.
+        // Example: https://www.v2ex.com2GcVra...
+        var lowerLink = (link || "").toLowerCase();
+        if (isTokenStyleV2exLink(lowerLink)) {
+            return { id: "reward", label: "打赏" };
+        }
+
+        // Empty title/content + topic link is usually "favorite".
+        if (lowerLink.indexOf("/t/") !== -1 || lowerLink.indexOf("/topic/") !== -1) {
             return { id: "favorite", label: "收藏" };
         }
+
+        // Opaque/non-topic links with empty title/content are usually thanks/reward notifications.
+        return { id: "thanks", label: "点赞" };
     }
 
     var text = title.toLowerCase();
@@ -169,11 +185,21 @@ function getTypeColor(type) {
     var colors = {
         "reply": "#4ECDC4",    // 青色
         "thanks": "#FFD93D",   // 金色
+        "reward": "#8E44AD",   // 紫色
         "mention": "#FF6B6B",  // 红色
         "favorite": "#FF8B13", // 橙色
         "other": "#95A5A6"     // 灰色
     };
     return colors[type.id] || colors.other;
+}
+
+/**
+ * 判断是否为 V2EX 的 token 形式链接（域名后没有 "/"）
+ * 例如: https://www.v2ex.com2GcVra...
+ */
+function isTokenStyleV2exLink(link) {
+    if (!link) return false;
+    return /^https:\/\/www\.v2ex\.com[^\/].+/.test(link);
 }
 
 /**
