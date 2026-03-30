@@ -1,5 +1,5 @@
 function fetchEvents(config) {
-    var lang = normalizeWikiLang(config.language);
+    var lang = String(config.language || "en").trim().toLowerCase() || "en";
 
     var now = new Date();
     var yyyy = now.getFullYear();
@@ -46,8 +46,8 @@ function fetchEvents(config) {
     if (!response) {
         throw new Error(
             sidefy.i18n({
-                "zh": "维基百科返回空响应，请检查网络（仅支持 en / zh）。",
-                "en": "Empty response from Wikipedia. Check network (supported: en, zh)."
+                "zh": "维基百科返回空响应，请检查网络或语言配置。",
+                "en": "Empty response from Wikipedia. Check network or language setting."
             })
         );
     }
@@ -88,21 +88,6 @@ function fetchEvents(config) {
 
     sidefy.storage.set(cacheKey, events, remainingMinutes);
     return events;
-}
-
-function normalizeWikiLang(raw) {
-    var s = String(raw || "en").trim().toLowerCase();
-    if (
-        s === "zh" ||
-        s === "zh-cn" ||
-        s === "zh-hans" ||
-        s === "zh-tw" ||
-        s === "zh-hant" ||
-        s === "zh-hk"
-    ) {
-        return "zh";
-    }
-    return "en";
 }
 
 function buildCardTitle(mm, dd) {
