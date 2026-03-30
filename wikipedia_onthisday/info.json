@@ -3,7 +3,7 @@
     "description": "Wikipedia “On this day” selected anniversaries (en/zh only): one card per day; Markdown links in details and popup.",
     "version": "0.0.1",
     "author": "Sidefy Community",
-    "min_support_app_version": "2025.9.8",
+    "min_support_app_version": "2026.3.25",
     "tags": [
         "wikipedia",
         "history",
