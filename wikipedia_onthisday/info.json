@@ -1,6 +1,6 @@
 {
     "name": "Wikipedia On This Day",
-    "description": "Wikipedia “On this day” selected anniversaries (en/zh only): one card per day; Markdown links in details and popup.",
+    "description": "Wikipedia “On this day” selected anniversaries: one card per day; plain-text details, HTML popup with separate “open article” link.",
     "version": "0.0.1",
     "author": "Sidefy Community",
     "min_support_app_version": "2026.3.25",
@@ -18,7 +18,7 @@
         "language": {
             "type": "string",
             "default": "en",
-            "description": "Wikipedia edition: en or zh only (default en)"
+            "description": "Wikipedia edition(default en)"
         }
     },
     "requirements": {

@@ -7,8 +7,8 @@ A Sidefy plugin that adds **one all-day event per day** with Wikipedia’s featu
 - **Selected only**: Uses [`/feed/onthisday/selected/`](https://wikitech.wikimedia.org/wiki/Understanding_Entry_points#On_this_day), not events / births / deaths / holidays.
 - **English or Chinese Wikipedia**: Configure `en` or `zh` (see table below for aliases).
 - **Full list**: Shows every item returned for that day (no limit).
-- **Markdown lines**: Each line is `• [(year) description](article URL)` so titles can open the article where Sidefy renders Markdown.
-- **Popup**: Card tap uses `sidefy.popup.build(title, content)` with the same text as details (`notes`).
+- **Details (`notes`)**: Plain text — title line with a bullet, URL on the next indented line (no link styling).
+- **Popup**: HTML list; **titles are normal text**, a second line **「查看条目 / Open article」** is a link with minimal styling (no fixed colors; follows light/dark context).
 - **Caching**: Fetched data is cached until local midnight.
 
 ## Configuration

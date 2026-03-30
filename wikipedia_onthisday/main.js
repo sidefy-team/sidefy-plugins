@@ -6,7 +6,7 @@ function fetchEvents(config) {
     var mm = String(now.getMonth() + 1).padStart(2, "0");
     var dd = String(now.getDate()).padStart(2, "0");
     var dateKey = yyyy + "-" + mm + "-" + dd;
-    var cacheKey = "wikipedia_onthisday_v5_" + lang + "_" + dateKey;
+    var cacheKey = "wikipedia_onthisday_v8_" + lang + "_" + dateKey;
 
     var cached = sidefy.storage.get(cacheKey);
     if (cached) {
@@ -65,8 +65,9 @@ function fetchEvents(config) {
     }
 
     var notes = buildSelectedNotes(data);
-    var cardTitle = buildCardTitle(lang, now, mm, dd);
-    var href = sidefy.popup.build(cardTitle, notes, "markdown");
+    var cardTitle = buildCardTitle(mm, dd);
+    var popupHtml = buildSelectedHtml(data);
+    var href = sidefy.popup.build(cardTitle, popupHtml, "html");
 
     var eventDate = new Date(now);
     eventDate.setHours(0, 0, 0, 0);
@@ -104,7 +105,7 @@ function normalizeWikiLang(raw) {
     return "en";
 }
 
-function buildCardTitle(lang, date, mm, dd) {
+function buildCardTitle(mm, dd) {
     var monthDay = mm + "-" + dd;
     return sidefy.i18n({
         "zh": "维基历史上的今天 · " + monthDay,
@@ -123,23 +124,68 @@ function buildSelectedNotes(data) {
 
     var lines = [];
     for (var i = 0; i < list.length; i++) {
-        lines.push(selectedLineMarkdown(list[i]));
+        lines.push(selectedLineText(list[i]));
     }
 
     return lines.join("\n").trim();
 }
 
-function escapeMdLinkText(s) {
-    return String(s).replace(/\\/g, "\\\\").replace(/\]/g, "\\]");
+function buildSelectedHtml(data) {
+    var list = data.selected;
+    if (!list || !list.length) {
+        return "<p>" + escapeHtml(buildSelectedNotes(data)) + "</p>";
+    }
+
+    var parts = ["<ul>"];
+    for (var i = 0; i < list.length; i++) {
+        parts.push(selectedLineHtml(list[i]));
+    }
+    parts.push("</ul>");
+    return parts.join("");
 }
 
-function selectedLineMarkdown(item) {
+function selectedLineText(item) {
     var label = formatItemLabel(item);
     var link = primaryArticleUrl(item);
     if (!link) {
         return "• " + label;
     }
-    return "• [" + escapeMdLinkText(label) + "](" + link + ")";
+    return "• " + label + "\n  " + link;
+}
+
+function popupLinkLabel() {
+    return sidefy.i18n({
+        "zh": "查看条目",
+        "en": "Open article"
+    });
+}
+
+function selectedLineHtml(item) {
+    var label = formatItemLabel(item);
+    var link = primaryArticleUrl(item);
+    var titleRow = "<div>• " + escapeHtml(label) + "</div>";
+    if (!link) {
+        return "<li>" + titleRow + "</li>";
+    }
+    var aStyle = "color:inherit;text-decoration:underline;";
+    var action =
+        '<a href="' +
+        escapeHtml(link) +
+        '" style="' +
+        aStyle +
+        '">' +
+        escapeHtml(popupLinkLabel()) +
+        "</a>";
+    return "<li>" + titleRow + "<div>" + action + "</div></li>";
+}
+
+function escapeHtml(s) {
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
 
 function formatItemLabel(item) {
