@@ -6,7 +6,7 @@ function fetchEvents(config) {
     var mm = String(now.getMonth() + 1).padStart(2, "0");
     var dd = String(now.getDate()).padStart(2, "0");
     var dateKey = yyyy + "-" + mm + "-" + dd;
-    var cacheKey = "wikipedia_onthisday_v8_" + lang + "_" + dateKey;
+    var cacheKey = "wikipedia_onthisday_v9_" + lang + "_" + dateKey;
 
     var cached = sidefy.storage.get(cacheKey);
     if (cached) {
@@ -79,7 +79,6 @@ function fetchEvents(config) {
             endDate: sidefy.date.format(eventDate.getTime() / 1000),
             color: "#3366CC",
             notes: notes,
-            icon: "https://" + lang + ".wikipedia.org/static/favicon/wikipedia.ico",
             href: href,
             isAllDay: true,
             isPointInTime: false
