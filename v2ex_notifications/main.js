@@ -31,6 +31,7 @@ function fetchEvents(config) {
             entries.forEach(function (entry) {
                 var title = extractTagContent(entry, "title");
                 var link = extractTagAttribute(entry, "link", "href");
+                var entryId = extractTagContent(entry, "id");
                 var published = extractTagContent(entry, "published");
                 var contentRaw = extractTagContent(entry, "content").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
                 var authorName = extractTagContent(entry, "name", "<author>", "<\/author>");
@@ -57,6 +58,7 @@ function fetchEvents(config) {
                 var endDate = sidefy.date.format((pubDate.getTime() + 30 * 60 * 1000) / 1000);
 
                 newEvents.push({
+                    id: buildEventId(entryId, published, link, authorName),
                     title: displayTitle,
                     startDate: startDate,
                     endDate: endDate,
@@ -94,22 +96,24 @@ function fetchEvents(config) {
 
 /**
  * 合并并去重事件
- * 使用 href 作为唯一标识
+ * 使用 Atom entry id + published 作为唯一标识
  */
 function mergeAndDeduplicateEvents(cachedEvents, newEvents) {
     var eventMap = {};
 
     // 先添加缓存的事件
     cachedEvents.forEach(function (event) {
-        if (event.href) {
-            eventMap[event.href] = event;
+        var eventId = getEventUniqueId(event);
+        if (eventId) {
+            eventMap[eventId] = event;
         }
     });
 
     // 添加或更新新事件
     newEvents.forEach(function (event) {
-        if (event.href) {
-            eventMap[event.href] = event;
+        var eventId = getEventUniqueId(event);
+        if (eventId) {
+            eventMap[eventId] = event;
         }
     });
 
@@ -127,6 +131,22 @@ function mergeAndDeduplicateEvents(cachedEvents, newEvents) {
     });
 
     return mergedArray;
+}
+
+function getEventUniqueId(event) {
+    if (!event) return "";
+    return event.id || buildFallbackEventId(event.href, event.startDate, event.title);
+}
+
+function buildEventId(entryId, published, href, suffix) {
+    if (entryId || published) {
+        return [entryId || "", published || ""].join("|");
+    }
+    return buildFallbackEventId(href, published, suffix);
+}
+
+function buildFallbackEventId(href, published, suffix) {
+    return [href || "", published || "", suffix || ""].join("|");
 }
 
 
