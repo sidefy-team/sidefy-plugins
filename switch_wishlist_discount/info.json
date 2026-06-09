@@ -1,7 +1,7 @@
 {
-    "name": "Switch Discount Tracker (Japan)",
-    "description": "Monitor your Nintendo Switch wishlist game discounts (Japan eShop only) and get reminded in the timeline when games go on sale, displaying original price, current price, and discount details.",
-    "version": "0.1.1",
+    "name": "Switch Discount Tracker",
+    "description": "Monitor Nintendo Switch eShop discounts across multiple regions. Add game NSUIDs and region codes; get a separate timeline event for each region where a watched game is on sale, with original price, sale price, and discount percentage.",
+    "version": "1.0.1",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.10.7",
     "tags": [
@@ -12,7 +12,8 @@
         "game",
         "sale",
         "tracker",
-        "japan"
+        "multi-region",
+        "eshop"
     ],
     "category": "Gaming & Entertainment",
     "config_options": {
@@ -20,11 +21,18 @@
             "type": "string",
             "default": "",
             "required": true,
-            "description": "List of game IDs (NSUID) to monitor, separated by commas. Maximum 10 games supported. Example: 70010000063514,70010000027619"
+            "description": "Comma-separated list of Nintendo Switch game NSUIDs to watch (up to 20). Use the NSUID for the region you are monitoring — the same title may have different NSUIDs in Japan vs. Americas eShops. Letter prefixes such as D are stripped automatically. Example: 70010000077806,70010000020840,70010000065090"
+        },
+        "regions": {
+            "type": "string",
+            "default": "JP,US,CA,MX,BR,GB,DE,FR,AU",
+            "required": false,
+            "description": "Comma-separated eShop region codes. Code reference: JP=Japan, US=United States, CA=Canada, MX=Mexico, BR=Brazil, GB=United Kingdom, DE=Germany, FR=France, AU=Australia. Example: US,BR,JP (United States, Brazil, Japan). Defaults to all nine regions if empty or invalid."
         }
     },
     "requirements": {
         "network": true,
         "storage": true
-    }
+    },
+    "breaking_changes": ["1.0.0"]
 }

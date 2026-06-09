@@ -1,256 +1,394 @@
 /**
- * Switch 愿望单打折监控插件 (日本区)
- * 监控指定的 Nintendo Switch 游戏打折信息，并在时间线中显示打折游戏。
+ * Switch 多区打折监控插件
  */
-function fetchEvents(config) {
+var REGION_PROFILES = {
+    JP: {
+        country: "JP",
+        lang: "ja",
+        storeType: "jp",
+        icon: "https://store-jp.nintendo.com/mobify/bundle/1763/static/img/head/favicon.ico",
+        label: { zh: "日本", en: "Japan", ja: "日本", pt: "Japão" }
+    },
+    US: {
+        country: "US",
+        lang: "en",
+        storeType: "americas",
+        locale: "en",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "美国", en: "United States", ja: "アメリカ", pt: "Estados Unidos" }
+    },
+    CA: {
+        country: "CA",
+        lang: "en",
+        storeType: "americas",
+        locale: "en",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "加拿大", en: "Canada", ja: "カナダ", pt: "Canadá" }
+    },
+    MX: {
+        country: "MX",
+        lang: "es",
+        storeType: "americas",
+        locale: "es",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "墨西哥", en: "Mexico", ja: "メキシコ", pt: "México" }
+    },
+    BR: {
+        country: "BR",
+        lang: "pt",
+        storeType: "americas",
+        locale: "pt",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "巴西", en: "Brazil", ja: "ブラジル", pt: "Brasil" }
+    },
+    GB: {
+        country: "GB",
+        lang: "en",
+        storeType: "americas",
+        locale: "en",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "英国", en: "United Kingdom", ja: "イギリス", pt: "Reino Unido" }
+    },
+    DE: {
+        country: "DE",
+        lang: "de",
+        storeType: "americas",
+        locale: "de",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "德国", en: "Germany", ja: "ドイツ", pt: "Alemanha" }
+    },
+    FR: {
+        country: "FR",
+        lang: "fr",
+        storeType: "americas",
+        locale: "fr",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "法国", en: "France", ja: "フランス", pt: "França" }
+    },
+    AU: {
+        country: "AU",
+        lang: "en",
+        storeType: "americas",
+        locale: "en",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: { zh: "澳大利亚", en: "Australia", ja: "オーストラリア", pt: "Austrália" }
+    }
+};
 
-    // 检查游戏 ID 列表是否存在
+function fetchEvents(config) {
     var gameIds = config.game_ids;
+    var regionsRaw = config.regions || "JP,US,CA,MX,BR,GB,DE,FR,AU";
 
     if (!gameIds || gameIds.trim() === "") {
         throw new Error(sidefy.i18n({
-            "zh": "游戏 ID 列表不能为空，请在插件配置中填入要监控的游戏 ID。",
-            "en": "Game ID list cannot be empty. Please enter the game IDs you want to monitor in the plugin configuration.",
-            "ja": "ゲーム ID リストを空にすることはできません。プラグイン設定で監視するゲーム ID を入力してください。",
-            "ko": "게임 ID 목록은 비워둘 수 없습니다. 플러그인 설정에서 모니터링할 게임 ID를 입력하세요.",
-            "de": "Die Spiele-ID-Liste darf nicht leer sein. Bitte geben Sie die zu überwachenden Spiele-IDs in der Plugin-Konfiguration ein.",
-            "es": "La lista de ID de juegos no puede estar vacía. Por favor, ingrese los ID de juegos que desea monitorear en la configuración del complemento.",
-            "fr": "La liste des ID de jeux ne peut pas être vide. Veuillez entrer les ID de jeux que vous souhaitez surveiller dans la configuration du plugin.",
-            "pt": "A lista de IDs de jogos não pode estar vazia. Por favor, insira os IDs dos jogos que deseja monitorar na configuração do plugin.",
-            "ru": "Список ID игр не может быть пустым. Пожалуйста, введите ID игр, которые вы хотите отслеживать, в настройках плагина."
+            zh: "游戏 ID 列表不能为空，请在插件配置中填入要监控的游戏 NSUID。",
+            en: "Game ID list cannot be empty. Please enter the game NSUIDs you want to monitor.",
+            ja: "ゲーム ID リストを空にすることはできません。監視するゲーム ID を入力してください。",
+            pt: "A lista de IDs de jogos não pode estar vazia. Insira os NSUIDs dos jogos."
         }));
     }
 
-    // 清理游戏 ID（移除可能的字母前缀和空格），并限制最多10个
-    var cleanedIdsArray = gameIds
-        .split(',')
-        .map(function (id) {
-            return id.trim().replace(/^[A-Z]/i, ''); // 移除开头的字母
-        })
-        .filter(function (id) {
-            return id !== ""; // 过滤空字符串
-        })
-        .slice(0, 10); // 只取前10个
-
-    var cleanedIds = cleanedIdsArray.join(',');
-
-    // --- 缓存逻辑 ---
-    // 在缓存键中加入日期，确保跨天后缓存自动失效
-    var today = new Date();
-    var dateKey = today.getFullYear() + "" +
-        String(today.getMonth() + 1).padStart(2, '0') +
-        String(today.getDate()).padStart(2, '0');
-    var cacheKey = "switch_wishlist_jp_v5_" + cleanedIds + "_" + dateKey;
-    var cachedData = sidefy.storage.get(cacheKey);
-    if (cachedData) {
-        return cachedData;
+    if (!sidefy.http || !sidefy.http.get) {
+        sidefy.log("Network permission is required for this plugin.");
+        return [];
     }
 
-    // --- Switch 愿望单打折检查逻辑 ---
+    var cleanedIdsArray = gameIds
+        .split(",")
+        .map(function (id) {
+            return id.trim().replace(/^[A-Z]/i, "");
+        })
+        .filter(function (id) {
+            return id !== "";
+        })
+        .slice(0, 20);
+
+    if (cleanedIdsArray.length === 0) {
+        throw new Error(sidefy.i18n({
+            zh: "未找到有效的游戏 NSUID。",
+            en: "No valid game NSUIDs found.",
+            ja: "有効なゲーム ID が見つかりません。",
+            pt: "Nenhum NSUID de jogo válido encontrado."
+        }));
+    }
+
+    var regionCodes = regionsRaw
+        .split(",")
+        .map(function (code) {
+            return code.trim().toUpperCase();
+        })
+        .filter(function (code) {
+            return REGION_PROFILES[code];
+        });
+
+    if (regionCodes.length === 0) {
+        regionCodes = ["JP", "US", "CA", "MX", "BR", "GB", "DE", "FR", "AU"];
+    }
+
+    var cleanedIds = cleanedIdsArray.join(",");
+    var today = new Date();
+    var dateKey = today.getFullYear() + "" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        String(today.getDate()).padStart(2, "0");
+    var cacheKey = "switch_wishlist_multi_v3_" + regionCodes.join("-") + "_" + cleanedIds + "_" + dateKey;
+
+    if (sidefy.storage && sidefy.storage.get) {
+        var cachedData = sidefy.storage.get(cacheKey);
+        if (cachedData) {
+            return cachedData;
+        }
+    }
+
     var events = [];
 
     try {
-        // 1. 查询游戏价格信息（日本区）
-        var priceUrl = "https://api.ec.nintendo.com/v1/price?country=JP&ids=" +
-            cleanedIds + "&lang=ja";
-        var priceResponse = sidefy.http.get(priceUrl);
-
-        if (!priceResponse) {
-            throw new Error(sidefy.i18n({
-                "zh": "无法获取游戏价格信息，请检查网络连接。",
-                "en": "Unable to retrieve game price information. Please check your network connection.",
-                "ja": "ゲーム価格情報を取得できません。ネットワーク接続を確認してください。",
-                "ko": "게임 가격 정보를 가져올 수 없습니다. 네트워크 연결을 확인하세요.",
-                "de": "Spielpreisinformationen können nicht abgerufen werden. Bitte überprüfen Sie Ihre Netzwerkverbindung.",
-                "es": "No se puede obtener la información de precios del juego. Por favor, verifique su conexión de red.",
-                "fr": "Impossible de récupérer les informations de prix du jeu. Veuillez vérifier votre connexion réseau.",
-                "pt": "Não foi possível obter as informações de preço do jogo. Por favor, verifique sua conexão de rede.",
-                "ru": "Не удалось получить информацию о ценах на игры. Пожалуйста, проверьте подключение к сети."
-            }));
-        }
-
-        var priceData = JSON.parse(priceResponse);
-
-        if (!priceData.prices || priceData.prices.length === 0) {
-            throw new Error(sidefy.i18n({
-                "zh": "未找到游戏价格信息，请检查游戏 ID 是否正确。",
-                "en": "Game price information not found. Please check if the game IDs are correct.",
-                "ja": "ゲーム価格情報が見つかりません。ゲーム ID が正しいか確認してください。",
-                "ko": "게임 가격 정보를 찾을 수 없습니다. 게임 ID가 올바른지 확인하세요.",
-                "de": "Spielpreisinformationen nicht gefunden. Bitte überprüfen Sie, ob die Spiele-IDs korrekt sind.",
-                "es": "No se encontró información de precios del juego. Por favor, verifique si los ID de juegos son correctos.",
-                "fr": "Informations de prix du jeu introuvables. Veuillez vérifier si les ID de jeux sont corrects.",
-                "pt": "Informações de preço do jogo não encontradas. Por favor, verifique se os IDs dos jogos estão corretos.",
-                "ru": "Информация о ценах на игры не найдена. Пожалуйста, проверьте правильность ID игр."
-            }));
-        }
-
-        // 2. 获取游戏信息（优先使用用户配置，否则从日本商店抓取）
-        var gameIdsArray = cleanedIdsArray; // 使用已经限制数量的数组
-        var gameInfoMap = {};
-
-        for (var i = 0; i < gameIdsArray.length; i++) {
-            var gameId = gameIdsArray[i].trim();
-
-            // 从日本商店页面抓取游戏信息
-            try {
-                var storeUrl = "https://store-jp.nintendo.com/item/software/D" + gameId;
-                var storePage = sidefy.http.get(storeUrl);
-
-                if (storePage) {
-                    var gameImage = "";
-                    var deviceInfo = "";
-
-                    // 从 og:title meta 标签提取游戏名称
-                    var titleMatch = storePage.match(/property="og:title"\s+content="([^"]*)"/);
-
-                    // 只有成功提取到游戏名称时才添加到 gameInfoMap
-                    if (titleMatch && titleMatch[1]) {
-                        var gameName = titleMatch[1];
-
-                        // 从 og:image meta 标签提取封面图
-                        var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
-                        if (imageMatch && imageMatch[1]) {
-                            gameImage = imageMatch[1];
-                        }
-
-                        // 提取设备兼容性信息
-                        deviceInfo = extractDeviceInfo(storePage);
-
-                        gameInfoMap[gameId] = {
-                            name: gameName,
-                            image: gameImage,
-                            device: deviceInfo
-                        };
-                    }
-                }
-            } catch (fetchErr) {
-                // 抓取失败，跳过该游戏 ID
+        for (var r = 0; r < regionCodes.length; r++) {
+            var regionCode = regionCodes[r];
+            var profile = REGION_PROFILES[regionCode];
+            var regionEvents = fetchRegionDiscountEvents(profile, regionCode, cleanedIdsArray, cleanedIds);
+            for (var e = 0; e < regionEvents.length; e++) {
+                events.push(regionEvents[e]);
             }
         }
 
-        // 3. 处理价格数据，检查打折信息
-        var discountedGames = [];
-
-        for (var j = 0; j < priceData.prices.length; j++) {
-            var priceInfo = priceData.prices[j];
-            var gameId = String(priceInfo.title_id);
-
-            // 跳过未找到的游戏
-            if (priceInfo.sales_status === "not_found") {
-                continue;
-            }
-
-            // 检查是否有折扣
-            if (priceInfo.discount_price && priceInfo.regular_price) {
-                // 跳过未成功抓取到信息的游戏 ID
-                if (!gameInfoMap[gameId]) {
-                    continue;
-                }
-
-                var regularPrice = parseFloat(priceInfo.regular_price.raw_value);
-                var discountPrice = parseFloat(priceInfo.discount_price.raw_value);
-                var discountPercent = Math.round((1 - discountPrice / regularPrice) * 100);
-
-                var gameInfo = gameInfoMap[gameId];
-                discountedGames.push({
-                    id: gameId,
-                    name: gameInfo.name,
-                    image: gameInfo.image,
-                    device: gameInfo.device,
-                    discountPercent: discountPercent,
-                    regularPrice: priceInfo.regular_price.amount,
-                    discountPrice: priceInfo.discount_price.amount,
-                    currency: priceInfo.regular_price.currency,
-                    url: "https://store-jp.nintendo.com/item/software/D" + gameId
-                });
-            }
-        }
-
-        // 4. 创建时间线事件
-        for (var k = 0; k < discountedGames.length; k++) {
-            var game = discountedGames[k];
-
-            // 设置为当天的全天事件（本地时间）
-            var eventDate = new Date();
-            eventDate.setHours(0, 0, 0, 0);
-            var timestamp = eventDate.getTime() / 1000;
-
-            var discountColor = getDiscountColor(game.discountPercent);
-            var notes = sidefy.i18n({
-                "zh": "原价: " + game.regularPrice + "\n现价: " + game.discountPrice + "\n折扣: -" + game.discountPercent + "%",
-                "en": "Original Price: " + game.regularPrice + "\nCurrent Price: " + game.discountPrice + "\nDiscount: -" + game.discountPercent + "%",
-                "ja": "元の価格: " + game.regularPrice + "\n現在の価格: " + game.discountPrice + "\n割引: -" + game.discountPercent + "%",
-                "ko": "원가: " + game.regularPrice + "\n현재 가격: " + game.discountPrice + "\n할인: -" + game.discountPercent + "%",
-                "de": "Originalpreis: " + game.regularPrice + "\nAktueller Preis: " + game.discountPrice + "\nRabatt: -" + game.discountPercent + "%",
-                "es": "Precio Original: " + game.regularPrice + "\nPrecio Actual: " + game.discountPrice + "\nDescuento: -" + game.discountPercent + "%",
-                "fr": "Prix d'origine: " + game.regularPrice + "\nPrix actuel: " + game.discountPrice + "\nRéduction: -" + game.discountPercent + "%",
-                "pt": "Preço Original: " + game.regularPrice + "\nPreço Atual: " + game.discountPrice + "\nDesconto: -" + game.discountPercent + "%",
-                "ru": "Исходная цена: " + game.regularPrice + "\nТекущая цена: " + game.discountPrice + "\nСкидка: -" + game.discountPercent + "%"
-            });
-
-            // 添加设备兼容性信息
-            if (game.device) {
-                notes += "\n" + sidefy.i18n({
-                    "zh": "对应本体: " + game.device,
-                    "en": "Compatible Device: " + game.device,
-                    "ja": "対応本体: " + game.device,
-                    "ko": "호환 기기: " + game.device,
-                    "de": "Kompatibles Gerät: " + game.device,
-                    "es": "Dispositivo Compatible: " + game.device,
-                    "fr": "Appareil compatible: " + game.device,
-                    "pt": "Dispositivo Compatível: " + game.device,
-                    "ru": "Совместимое устройство: " + game.device
-                });
-            }
-
-            var gameEvent = {
-                title: game.name + " (-" + game.discountPercent + "%)",
-                startDate: sidefy.date.format(timestamp),
-                endDate: sidefy.date.format(timestamp),
-                color: discountColor,
-                notes: notes,
-                icon: "https://store-jp.nintendo.com/mobify/bundle/1763/static/img/head/favicon.ico",
-                href: game.url,
-                imageURL: game.image,
-                isAllDay: true,
-                isPointInTime: true
-            };
-
-            events.push(gameEvent);
-        }
-
-        // 将成功获取的事件缓存 2 小时
-        if (events.length > 0) {
+        if (events.length > 0 && sidefy.storage && sidefy.storage.set) {
             sidefy.storage.set(cacheKey, events, 120);
         }
-
     } catch (err) {
         throw new Error(sidefy.i18n({
-            "zh": "Switch 愿望单插件执行失败: " + err.message,
-            "en": "Switch Wishlist plugin execution failed: " + err.message,
-            "ja": "Switch ウィッシュリストプラグインの実行に失敗しました: " + err.message,
-            "ko": "Switch 위시리스트 플러그인 실행 실패: " + err.message,
-            "de": "Switch-Wunschlisten-Plugin-Ausführung fehlgeschlagen: " + err.message,
-            "es": "Falló la ejecución del complemento de lista de deseos de Switch: " + err.message,
-            "fr": "Échec de l'exécution du plugin de liste de souhaits Switch: " + err.message,
-            "pt": "Falha na execução do plugin da lista de desejos do Switch: " + err.message,
-            "ru": "Ошибка выполнения плагина списка желаний Switch: " + err.message
+            zh: "Switch 多区折扣插件执行失败: " + err.message,
+            en: "Switch multi-region discount plugin failed: " + err.message,
+            ja: "Switch マルチリージョン割引プラグインの実行に失敗しました: " + err.message,
+            pt: "Falha no plugin de desconto multi-região do Switch: " + err.message
         }));
     }
 
     return events;
 }
 
-/**
- * 提取设备兼容性信息
- */
-function extractDeviceInfo(pageHtml) {
+function fetchRegionDiscountEvents(profile, regionCode, cleanedIdsArray, cleanedIds) {
+    var events = [];
+    var priceUrl = "https://api.ec.nintendo.com/v1/price?country=" + profile.country +
+        "&ids=" + cleanedIds + "&lang=" + profile.lang;
+    var priceResponse = sidefy.http.get(priceUrl);
+
+    if (!priceResponse) {
+        sidefy.log("Price fetch failed for region: " + regionCode);
+        return events;
+    }
+
+    var priceData = JSON.parse(priceResponse);
+    if (!priceData.prices || priceData.prices.length === 0) {
+        return events;
+    }
+
+    var gameInfoMap = {};
+
+    for (var i = 0; i < cleanedIdsArray.length; i++) {
+        var gameId = cleanedIdsArray[i].trim();
+        var gameInfo = fetchGameInfo(profile, gameId);
+        if (gameInfo) {
+            gameInfoMap[gameId] = gameInfo;
+        }
+    }
+
+    var eventDate = new Date();
+    eventDate.setHours(0, 0, 0, 0);
+    var timestamp = eventDate.getTime() / 1000;
+    var regionLabel = sidefy.i18n(profile.label);
+
+    for (var j = 0; j < priceData.prices.length; j++) {
+        var priceInfo = priceData.prices[j];
+        var titleId = String(priceInfo.title_id);
+
+        if (priceInfo.sales_status === "not_found") {
+            continue;
+        }
+
+        if (!priceInfo.discount_price || !priceInfo.regular_price) {
+            continue;
+        }
+
+        var gameMeta = gameInfoMap[titleId];
+        if (!gameMeta) {
+            continue;
+        }
+
+        var regularPrice = parseFloat(priceInfo.regular_price.raw_value);
+        var discountPrice = parseFloat(priceInfo.discount_price.raw_value);
+        var discountPercent = Math.round((1 - discountPrice / regularPrice) * 100);
+        var notes = sidefy.i18n({
+            zh: "区域: " + regionLabel + "\n原价: " + priceInfo.regular_price.amount +
+                "\n现价: " + priceInfo.discount_price.amount + "\n折扣: -" + discountPercent + "%",
+            en: "Region: " + regionLabel + "\nOriginal: " + priceInfo.regular_price.amount +
+                "\nCurrent: " + priceInfo.discount_price.amount + "\nDiscount: -" + discountPercent + "%",
+            ja: "地域: " + regionLabel + "\n通常価格: " + priceInfo.regular_price.amount +
+                "\n現在価格: " + priceInfo.discount_price.amount + "\n割引: -" + discountPercent + "%",
+            pt: "Região: " + regionLabel + "\nOriginal: " + priceInfo.regular_price.amount +
+                "\nAtual: " + priceInfo.discount_price.amount + "\nDesconto: -" + discountPercent + "%"
+        });
+
+        if (gameMeta.device) {
+            notes += "\n" + sidefy.i18n({
+                zh: "对应本体: " + gameMeta.device,
+                en: "Compatible Device: " + gameMeta.device,
+                ja: "対応本体: " + gameMeta.device,
+                pt: "Dispositivo: " + gameMeta.device
+            });
+        }
+
+        events.push({
+            title: "[" + regionLabel + "] " + gameMeta.name + " (-" + discountPercent + "%)",
+            startDate: sidefy.date.format(timestamp),
+            endDate: sidefy.date.format(timestamp),
+            color: getDiscountColor(discountPercent),
+            notes: notes,
+            icon: profile.icon,
+            href: gameMeta.url,
+            imageURL: gameMeta.image,
+            isAllDay: true,
+            isPointInTime: true
+        });
+    }
+
+    return events;
+}
+
+function fetchGameInfo(profile, gameId) {
     try {
-        // 查找所有支持的设备
+        if (profile.storeType === "jp") {
+            return fetchJapanGameInfo(gameId);
+        }
+        return fetchAmericasGameInfo(profile, gameId);
+    } catch (err) {
+        return null;
+    }
+}
+
+function fetchJapanGameInfo(gameId) {
+    var storeUrl = "https://store-jp.nintendo.com/item/software/D" + gameId;
+    var storePage = sidefy.http.get(storeUrl);
+    if (!storePage) {
+        return null;
+    }
+
+    var gameName = "";
+    var gameImage = "";
+    var titleMatch = storePage.match(/property="og:title"\s+content="([^"]*)"/);
+    if (titleMatch && titleMatch[1]) {
+        gameName = titleMatch[1];
+    }
+
+    var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
+    if (imageMatch && imageMatch[1]) {
+        gameImage = imageMatch[1];
+    }
+
+    if (!gameName) {
+        return null;
+    }
+
+    return {
+        name: gameName,
+        image: gameImage,
+        device: extractJapanDeviceInfo(storePage),
+        url: storeUrl
+    };
+}
+
+function fetchAmericasGameInfo(profile, gameId) {
+    var storeUrl = "https://www.nintendo.com/pos-redirect/" + gameId +
+        "?l=" + profile.locale + "&c=" + profile.country;
+    var storePage = sidefy.http.get(storeUrl);
+    if (!storePage) {
+        return null;
+    }
+
+    var gameName = "";
+    var gameImage = "";
+    var storeHref = storeUrl;
+    var schemaMatch = storePage.match(/"@type":\["VideoGame","Product"\],"name":"([^"]+)"/);
+    if (schemaMatch && schemaMatch[1]) {
+        gameName = schemaMatch[1];
+    } else {
+        var titleMatch = storePage.match(/property="og:title"[^>]*content="([^"]*)"/);
+        if (titleMatch && titleMatch[1]) {
+            gameName = cleanStoreGameTitle(titleMatch[1], profile);
+        }
+    }
+
+    var imageMatch = storePage.match(/property="og:image"[^>]*content="([^"]*)"/);
+    if (imageMatch && imageMatch[1]) {
+        gameImage = imageMatch[1];
+    }
+
+    var canonicalMatch = storePage.match(/rel="canonical" href="([^"]*)"/);
+    if (canonicalMatch && canonicalMatch[1]) {
+        storeHref = canonicalMatch[1];
+    }
+
+    if (!gameName) {
+        return null;
+    }
+
+    return {
+        name: gameName,
+        image: gameImage,
+        device: extractAmericasDeviceInfo(storePage),
+        url: storeHref
+    };
+}
+
+function cleanStoreGameTitle(rawTitle, profile) {
+    if (!rawTitle) {
+        return "";
+    }
+
+    if (profile.lang === "pt") {
+        var brMatch = rawTitle.match(/^(.+?)\s+para Nintendo Switch/i);
+        if (brMatch && brMatch[1]) {
+            return brMatch[1].trim();
+        }
+        return rawTitle.replace(/\s*-\s*Site Oficial da Nintendo para Brasil/i, "").trim();
+    }
+
+    if (profile.lang === "es") {
+        var esMatch = rawTitle.match(/^(.+?)\s+para Nintendo Switch/i);
+        if (esMatch && esMatch[1]) {
+            return esMatch[1].trim();
+        }
+        return rawTitle.replace(/\s*-\s*Sitio oficial de Nintendo/i, "").trim();
+    }
+
+    if (profile.lang === "de") {
+        var deMatch = rawTitle.match(/^(.+?)\s+für Nintendo Switch/i);
+        if (deMatch && deMatch[1]) {
+            return deMatch[1].trim();
+        }
+    }
+
+    if (profile.lang === "fr") {
+        var frMatch = rawTitle.match(/^(.+?)\s+pour Nintendo Switch/i);
+        if (frMatch && frMatch[1]) {
+            return frMatch[1].trim();
+        }
+    }
+
+    var enMatch = rawTitle.match(/^(.+?)\s+for Nintendo Switch/i);
+    if (enMatch && enMatch[1]) {
+        return enMatch[1].trim();
+    }
+
+    return rawTitle
+        .replace(/\s*-\s*Nintendo Official Site/i, "")
+        .replace(/\s*-\s*Official Nintendo Site/i, "")
+        .trim();
+}
+
+function extractJapanDeviceInfo(pageHtml) {
+    try {
         var switchMatch = pageHtml.match(/"productDetail\.playableHardNotice\.label":\[\{"type":\d+,"value":"Nintendo Switch"\}\]/);
         var switch2Match = pageHtml.match(/"productDetail\.playableHardNotice\.label\.onlySuper":\[\{"type":\d+,"value":"Nintendo Switch 2"\}\]/);
-
         if (switchMatch && switch2Match) {
             return "Switch/Switch 2";
         } else if (switch2Match) {
@@ -259,22 +397,35 @@ function extractDeviceInfo(pageHtml) {
             return "Switch";
         }
     } catch (err) {
-        // 解析失败，返回空字符串
+        // ignore
     }
     return "";
 }
 
-/**
- * 根据折扣百分比获取对应的颜色
- */
+function extractAmericasDeviceInfo(pageHtml) {
+    try {
+        var hasSwitch2 = pageHtml.indexOf("Nintendo Switch 2") !== -1;
+        var hasSwitch = pageHtml.indexOf("Nintendo Switch") !== -1;
+        if (hasSwitch2 && hasSwitch) {
+            return "Switch/Switch 2";
+        } else if (hasSwitch2) {
+            return "Switch 2";
+        } else if (hasSwitch) {
+            return "Switch";
+        }
+    } catch (err) {
+        // ignore
+    }
+    return "";
+}
+
 function getDiscountColor(discountPercent) {
     if (discountPercent >= 75) {
-        return "#E74C3C"; // 深红色 - 超大折扣
+        return "#E74C3C";
     } else if (discountPercent >= 50) {
-        return "#E67E22"; // 橙色 - 大折扣
+        return "#E67E22";
     } else if (discountPercent >= 25) {
-        return "#F39C12"; // 黄色 - 中等折扣
-    } else {
-        return "#3498DB"; // 蓝色 - 小折扣
+        return "#F39C12";
     }
+    return "#3498DB";
 }
