@@ -130,7 +130,7 @@ function fetchEvents(config) {
     var dateKey = today.getFullYear() + "" +
         String(today.getMonth() + 1).padStart(2, "0") +
         String(today.getDate()).padStart(2, "0");
-    var cacheKey = "switch_wishlist_multi_v3_" + regionCodes.join("-") + "_" + cleanedIds + "_" + dateKey;
+    var cacheKey = "switch_wishlist_multi_v4_" + regionCodes.join("-") + "_" + cleanedIds + "_" + dateKey;
 
     if (sidefy.storage && sidefy.storage.get) {
         var cachedData = sidefy.storage.get(cacheKey);
@@ -140,19 +140,25 @@ function fetchEvents(config) {
     }
 
     var events = [];
+    var fetchComplete = true;
 
     try {
         for (var r = 0; r < regionCodes.length; r++) {
             var regionCode = regionCodes[r];
             var profile = REGION_PROFILES[regionCode];
-            var regionEvents = fetchRegionDiscountEvents(profile, regionCode, cleanedIdsArray, cleanedIds);
-            for (var e = 0; e < regionEvents.length; e++) {
-                events.push(regionEvents[e]);
+            var regionResult = fetchRegionDiscountEvents(profile, regionCode, cleanedIds);
+            if (!regionResult.complete) {
+                fetchComplete = false;
+            }
+            for (var e = 0; e < regionResult.events.length; e++) {
+                events.push(regionResult.events[e]);
             }
         }
 
-        if (events.length > 0 && sidefy.storage && sidefy.storage.set) {
+        if (fetchComplete && events.length > 0 && sidefy.storage && sidefy.storage.set) {
             sidefy.storage.set(cacheKey, events, 120);
+        } else if (!fetchComplete) {
+            sidefy.log("Switch discount fetch incomplete, skipping cache.");
         }
     } catch (err) {
         throw new Error(sidefy.i18n({
@@ -166,29 +172,46 @@ function fetchEvents(config) {
     return events;
 }
 
-function fetchRegionDiscountEvents(profile, regionCode, cleanedIdsArray, cleanedIds) {
+function fetchRegionDiscountEvents(profile, regionCode, cleanedIds) {
     var events = [];
+    var complete = true;
     var priceUrl = "https://api.ec.nintendo.com/v1/price?country=" + profile.country +
         "&ids=" + cleanedIds + "&lang=" + profile.lang;
     var priceResponse = sidefy.http.get(priceUrl);
 
     if (!priceResponse) {
         sidefy.log("Price fetch failed for region: " + regionCode);
-        return events;
+        return { events: events, complete: false };
     }
 
     var priceData = JSON.parse(priceResponse);
     if (!priceData.prices || priceData.prices.length === 0) {
-        return events;
+        return { events: events, complete: false };
+    }
+
+    var discountedTitleIds = [];
+
+    for (var j = 0; j < priceData.prices.length; j++) {
+        var priceEntry = priceData.prices[j];
+        if (priceEntry.sales_status === "not_found") {
+            continue;
+        }
+        if (!priceEntry.discount_price || !priceEntry.regular_price) {
+            continue;
+        }
+        discountedTitleIds.push(String(priceEntry.title_id));
     }
 
     var gameInfoMap = {};
 
-    for (var i = 0; i < cleanedIdsArray.length; i++) {
-        var gameId = cleanedIdsArray[i].trim();
+    for (var i = 0; i < discountedTitleIds.length; i++) {
+        var gameId = discountedTitleIds[i];
         var gameInfo = fetchGameInfo(profile, gameId);
         if (gameInfo) {
             gameInfoMap[gameId] = gameInfo;
+        } else {
+            complete = false;
+            sidefy.log("Game info fetch failed for region " + regionCode + ", game: " + gameId);
         }
     }
 
@@ -197,8 +220,8 @@ function fetchRegionDiscountEvents(profile, regionCode, cleanedIdsArray, cleaned
     var timestamp = eventDate.getTime() / 1000;
     var regionLabel = sidefy.i18n(profile.label);
 
-    for (var j = 0; j < priceData.prices.length; j++) {
-        var priceInfo = priceData.prices[j];
+    for (var k = 0; k < priceData.prices.length; k++) {
+        var priceInfo = priceData.prices[k];
         var titleId = String(priceInfo.title_id);
 
         if (priceInfo.sales_status === "not_found") {
@@ -251,7 +274,7 @@ function fetchRegionDiscountEvents(profile, regionCode, cleanedIdsArray, cleaned
         });
     }
 
-    return events;
+    return { events: events, complete: complete };
 }
 
 function fetchGameInfo(profile, gameId) {
