@@ -291,30 +291,59 @@ function fetchGameInfo(profile, gameId) {
 function fetchJapanGameInfo(gameId) {
     var storeUrl = "https://store-jp.nintendo.com/item/software/D" + gameId;
     var storePage = sidefy.http.get(storeUrl);
-    if (!storePage) {
+
+    if (storePage) {
+        var gameName = "";
+        var gameImage = "";
+        var titleMatch = storePage.match(/property="og:title"\s+content="([^"]*)"/);
+        if (titleMatch && titleMatch[1]) {
+            gameName = titleMatch[1];
+        }
+
+        var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
+        if (imageMatch && imageMatch[1]) {
+            gameImage = imageMatch[1];
+        }
+
+        if (gameName) {
+            return {
+                name: gameName,
+                image: gameImage,
+                device: extractJapanDeviceInfo(storePage),
+                url: storeUrl
+            };
+        }
+    }
+
+    return fetchJapanGameInfoFromSearchApi(gameId, storeUrl);
+}
+
+function fetchJapanGameInfoFromSearchApi(gameId, storeUrl) {
+    var searchUrl = "https://search.nintendo.jp/nintendo_soft/search.json?opt_ss=1&limit=1&fq=id:" + gameId;
+    var response = sidefy.http.get(searchUrl);
+    if (!response) {
         return null;
     }
 
-    var gameName = "";
-    var gameImage = "";
-    var titleMatch = storePage.match(/property="og:title"\s+content="([^"]*)"/);
-    if (titleMatch && titleMatch[1]) {
-        gameName = titleMatch[1];
-    }
-
-    var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
-    if (imageMatch && imageMatch[1]) {
-        gameImage = imageMatch[1];
-    }
-
-    if (!gameName) {
+    var data = JSON.parse(response);
+    if (!data.result || !data.result.items || data.result.items.length === 0) {
         return null;
+    }
+
+    var item = data.result.items[0];
+    if (!item.title) {
+        return null;
+    }
+
+    var image = "";
+    if (item.iurl) {
+        image = "https://img-eshop.cdn.nintendo.net/i/" + item.iurl + ".jpg";
     }
 
     return {
-        name: gameName,
-        image: gameImage,
-        device: extractJapanDeviceInfo(storePage),
+        name: item.title,
+        image: image,
+        device: "",
         url: storeUrl
     };
 }
