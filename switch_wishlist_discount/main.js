@@ -12,64 +12,56 @@ var REGION_PROFILES = {
     US: {
         country: "US",
         lang: "en",
-        storeType: "americas",
-        locale: "en",
+        storeType: "noa",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "美国", en: "United States", ja: "アメリカ", pt: "Estados Unidos" }
     },
     CA: {
         country: "CA",
         lang: "en",
-        storeType: "americas",
-        locale: "en",
+        storeType: "noa",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "加拿大", en: "Canada", ja: "カナダ", pt: "Canadá" }
     },
     MX: {
         country: "MX",
         lang: "es",
-        storeType: "americas",
-        locale: "es",
+        storeType: "noa",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "墨西哥", en: "Mexico", ja: "メキシコ", pt: "México" }
     },
     BR: {
         country: "BR",
         lang: "pt",
-        storeType: "americas",
-        locale: "pt",
+        storeType: "noa",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "巴西", en: "Brazil", ja: "ブラジル", pt: "Brasil" }
     },
     GB: {
         country: "GB",
         lang: "en",
-        storeType: "americas",
-        locale: "en",
+        storeType: "eu",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "英国", en: "United Kingdom", ja: "イギリス", pt: "Reino Unido" }
     },
     DE: {
         country: "DE",
         lang: "de",
-        storeType: "americas",
-        locale: "de",
+        storeType: "eu",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "德国", en: "Germany", ja: "ドイツ", pt: "Alemanha" }
     },
     FR: {
         country: "FR",
         lang: "fr",
-        storeType: "americas",
-        locale: "fr",
+        storeType: "eu",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "法国", en: "France", ja: "フランス", pt: "França" }
     },
     AU: {
         country: "AU",
         lang: "en",
-        storeType: "americas",
-        locale: "en",
+        storeType: "eu",
         icon: "https://www.nintendo.com/favicon.ico",
         label: { zh: "澳大利亚", en: "Australia", ja: "オーストラリア", pt: "Austrália" }
     }
@@ -130,7 +122,7 @@ function fetchEvents(config) {
     var dateKey = today.getFullYear() + "" +
         String(today.getMonth() + 1).padStart(2, "0") +
         String(today.getDate()).padStart(2, "0");
-    var cacheKey = "switch_wishlist_multi_v4_" + regionCodes.join("-") + "_" + cleanedIds + "_" + dateKey;
+    var cacheKey = "switch_wishlist_multi_v5_" + regionCodes.join("-") + "_" + cleanedIds + "_" + dateKey;
 
     if (sidefy.storage && sidefy.storage.get) {
         var cachedData = sidefy.storage.get(cacheKey);
@@ -184,52 +176,39 @@ function fetchRegionDiscountEvents(profile, regionCode, cleanedIds) {
         return { events: events, complete: false };
     }
 
-    var priceData = JSON.parse(priceResponse);
+    var priceData;
+    try {
+        priceData = JSON.parse(priceResponse);
+    } catch (parseErr) {
+        sidefy.log("Price parse failed for region: " + regionCode);
+        return { events: events, complete: false };
+    }
+
     if (!priceData.prices || priceData.prices.length === 0) {
         return { events: events, complete: false };
     }
 
-    var discountedTitleIds = [];
-
-    for (var j = 0; j < priceData.prices.length; j++) {
-        var priceEntry = priceData.prices[j];
-        if (priceEntry.sales_status === "not_found") {
-            continue;
-        }
-        if (!priceEntry.discount_price || !priceEntry.regular_price) {
-            continue;
-        }
-        discountedTitleIds.push(String(priceEntry.title_id));
-    }
-
     var gameInfoMap = {};
-
-    for (var i = 0; i < discountedTitleIds.length; i++) {
-        var gameId = discountedTitleIds[i];
-        var gameInfo = fetchGameInfo(profile, gameId);
-        if (gameInfo) {
-            gameInfoMap[gameId] = gameInfo;
-        } else {
-            complete = false;
-            sidefy.log("Game info fetch failed for region " + regionCode + ", game: " + gameId);
-        }
-    }
-
     var eventDate = new Date();
     eventDate.setHours(0, 0, 0, 0);
     var timestamp = eventDate.getTime() / 1000;
     var regionLabel = sidefy.i18n(profile.label);
 
-    for (var k = 0; k < priceData.prices.length; k++) {
-        var priceInfo = priceData.prices[k];
-        var titleId = String(priceInfo.title_id);
-
-        if (priceInfo.sales_status === "not_found") {
+    for (var i = 0; i < priceData.prices.length; i++) {
+        var priceInfo = priceData.prices[i];
+        if (!isDiscountedPrice(priceInfo)) {
             continue;
         }
 
-        if (!priceInfo.discount_price || !priceInfo.regular_price) {
-            continue;
+        var titleId = String(priceInfo.title_id);
+        if (!gameInfoMap[titleId]) {
+            var gameInfo = fetchGameInfo(profile, titleId);
+            if (gameInfo) {
+                gameInfoMap[titleId] = gameInfo;
+            } else {
+                complete = false;
+                sidefy.log("Game info fetch failed for region " + regionCode + ", game: " + titleId);
+            }
         }
 
         var gameMeta = gameInfoMap[titleId];
@@ -277,12 +256,25 @@ function fetchRegionDiscountEvents(profile, regionCode, cleanedIds) {
     return { events: events, complete: complete };
 }
 
+function isDiscountedPrice(priceInfo) {
+    if (priceInfo.sales_status === "not_found") {
+        return false;
+    }
+    if (!priceInfo.discount_price || !priceInfo.regular_price) {
+        return false;
+    }
+    return true;
+}
+
 function fetchGameInfo(profile, gameId) {
     try {
         if (profile.storeType === "jp") {
             return fetchJapanGameInfo(gameId);
         }
-        return fetchAmericasGameInfo(profile, gameId);
+        if (profile.storeType === "eu") {
+            return fetchEcNintendoGameInfo(profile, gameId);
+        }
+        return fetchNoaGameInfo(profile, gameId);
     } catch (err) {
         return null;
     }
@@ -290,48 +282,25 @@ function fetchGameInfo(profile, gameId) {
 
 function fetchJapanGameInfo(gameId) {
     var storeUrl = "https://store-jp.nintendo.com/item/software/D" + gameId;
-    var storePage = sidefy.http.get(storeUrl);
-
-    if (storePage) {
-        var gameName = "";
-        var gameImage = "";
-        var titleMatch = storePage.match(/property="og:title"\s+content="([^"]*)"/);
-        if (titleMatch && titleMatch[1]) {
-            gameName = titleMatch[1];
-        }
-
-        var imageMatch = storePage.match(/property="og:image"\s+content="([^"]*)"/);
-        if (imageMatch && imageMatch[1]) {
-            gameImage = imageMatch[1];
-        }
-
-        if (gameName) {
-            return {
-                name: gameName,
-                image: gameImage,
-                device: extractJapanDeviceInfo(storePage),
-                url: storeUrl
-            };
-        }
-    }
-
-    return fetchJapanGameInfoFromSearchApi(gameId, storeUrl);
-}
-
-function fetchJapanGameInfoFromSearchApi(gameId, storeUrl) {
     var searchUrl = "https://search.nintendo.jp/nintendo_soft/search.json?opt_ss=1&limit=1&fq=id:" + gameId;
     var response = sidefy.http.get(searchUrl);
     if (!response) {
         return null;
     }
 
-    var data = JSON.parse(response);
+    var data;
+    try {
+        data = JSON.parse(response);
+    } catch (parseErr) {
+        return null;
+    }
+
     if (!data.result || !data.result.items || data.result.items.length === 0) {
         return null;
     }
 
     var item = data.result.items[0];
-    if (!item.title) {
+    if (!item.title || isInvalidGameTitle(item.title)) {
         return null;
     }
 
@@ -348,47 +317,95 @@ function fetchJapanGameInfoFromSearchApi(gameId, storeUrl) {
     };
 }
 
-function fetchAmericasGameInfo(profile, gameId) {
+function fetchNoaGameInfo(profile, gameId) {
     var storeUrl = "https://www.nintendo.com/pos-redirect/" + gameId +
-        "?l=" + profile.locale + "&c=" + profile.country;
+        "?l=" + profile.lang + "&c=" + profile.country;
     var storePage = sidefy.http.get(storeUrl);
     if (!storePage) {
-        return null;
+        return fetchEcNintendoGameInfo(profile, gameId);
     }
 
     var gameName = "";
-    var gameImage = "";
-    var storeHref = storeUrl;
     var schemaMatch = storePage.match(/"@type":\["VideoGame","Product"\],"name":"([^"]+)"/);
     if (schemaMatch && schemaMatch[1]) {
         gameName = schemaMatch[1];
     } else {
-        var titleMatch = storePage.match(/property="og:title"[^>]*content="([^"]*)"/);
-        if (titleMatch && titleMatch[1]) {
-            gameName = cleanStoreGameTitle(titleMatch[1], profile);
-        }
+        gameName = parseOgTitle(storePage, profile);
     }
 
-    var imageMatch = storePage.match(/property="og:image"[^>]*content="([^"]*)"/);
-    if (imageMatch && imageMatch[1]) {
-        gameImage = imageMatch[1];
+    if (!gameName || isInvalidGameTitle(gameName)) {
+        return fetchEcNintendoGameInfo(profile, gameId);
     }
 
+    var ogMeta = parseOgMeta(storePage);
+    var storeHref = storeUrl;
     var canonicalMatch = storePage.match(/rel="canonical" href="([^"]*)"/);
     if (canonicalMatch && canonicalMatch[1]) {
         storeHref = canonicalMatch[1];
     }
 
-    if (!gameName) {
+    return {
+        name: gameName,
+        image: ogMeta.image,
+        device: extractDeviceInfo(storePage),
+        url: storeHref
+    };
+}
+
+function fetchEcNintendoGameInfo(profile, gameId) {
+    var storeUrl = "https://ec.nintendo.com/" + profile.country + "/" + profile.lang + "/titles/" + gameId;
+    var storePage = sidefy.http.get(storeUrl);
+    if (!storePage) {
         return null;
     }
 
+    var gameName = parseOgTitle(storePage, profile);
+    if (gameName.indexOf(" / ") !== -1) {
+        gameName = gameName.split(" / ")[0].trim();
+    }
+
+    if (!gameName || isInvalidGameTitle(gameName)) {
+        return null;
+    }
+
+    var ogMeta = parseOgMeta(storePage);
+
     return {
         name: gameName,
-        image: gameImage,
-        device: extractAmericasDeviceInfo(storePage),
-        url: storeHref
+        image: ogMeta.image,
+        device: extractDeviceInfo(storePage),
+        url: storeUrl
     };
+}
+
+function parseOgTitle(pageHtml, profile) {
+    var titleMatch = pageHtml.match(/property="og:title"[^>]*content="([^"]*)"/);
+    if (!titleMatch || !titleMatch[1]) {
+        return "";
+    }
+    return cleanStoreGameTitle(titleMatch[1], profile);
+}
+
+function parseOgMeta(pageHtml) {
+    var image = "";
+    var imageMatch = pageHtml.match(/property="og:image"[^>]*content="\s*([^"]*)"/);
+    if (imageMatch && imageMatch[1]) {
+        image = imageMatch[1].replace(/\s+/g, "");
+    }
+    return { image: image };
+}
+
+function isInvalidGameTitle(title) {
+    if (!title || title.trim() === "") {
+        return true;
+    }
+    if (/Games\s*(?:[–\-]|&ndash;)\s*Nintendo Store/i.test(title)) {
+        return true;
+    }
+    if (/404|I AM ERROR|not available|page you requested|見つかりません|ご指定のページ/i.test(title)) {
+        return true;
+    }
+    return false;
 }
 
 function cleanStoreGameTitle(rawTitle, profile) {
@@ -437,7 +454,7 @@ function cleanStoreGameTitle(rawTitle, profile) {
         .trim();
 }
 
-function extractJapanDeviceInfo(pageHtml) {
+function extractDeviceInfo(pageHtml) {
     try {
         var switchMatch = pageHtml.match(/"productDetail\.playableHardNotice\.label":\[\{"type":\d+,"value":"Nintendo Switch"\}\]/);
         var switch2Match = pageHtml.match(/"productDetail\.playableHardNotice\.label\.onlySuper":\[\{"type":\d+,"value":"Nintendo Switch 2"\}\]/);
@@ -448,14 +465,7 @@ function extractJapanDeviceInfo(pageHtml) {
         } else if (switchMatch) {
             return "Switch";
         }
-    } catch (err) {
-        // ignore
-    }
-    return "";
-}
 
-function extractAmericasDeviceInfo(pageHtml) {
-    try {
         var hasSwitch2 = pageHtml.indexOf("Nintendo Switch 2") !== -1;
         var hasSwitch = pageHtml.indexOf("Nintendo Switch") !== -1;
         if (hasSwitch2 && hasSwitch) {
