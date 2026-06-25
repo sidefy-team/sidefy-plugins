@@ -2,6 +2,7 @@ function fetchEvents(config) {
     var lat = parseFloat(config.latitude);
     var lng = parseFloat(config.longitude);
     var cityName = config.city_name || "";
+    var offsetHours = parseFloat(config.timezone_offset);
     var sunriseColor = "#FF9500";
     var sunsetColor = "#5856D6";
 
@@ -59,8 +60,6 @@ function fetchEvents(config) {
         var UTset = Tset - lngHour;
         var UTrise = Trise - lngHour;
 
-        // Convert to local time using user-configured timezone offset
-        var offsetHours = parseFloat(config.timezone_offset);
         var sunriseHour = UTrise + offsetHours;
         var sunsetHour = UTset + offsetHours;
 
