@@ -34,5 +34,7 @@
   },
   "requirements": {
     "network": true
-  }
+  },
+  "discontinued": true,
+  "discontinued_reason": "This plugin only supports Solana tokens via Phantom API. Please use the new Crypto Price Monitor plugin instead, which supports all chains via CoinGecko API with better alert options (price threshold + percentage change) and a cooldown mechanism."
 }
