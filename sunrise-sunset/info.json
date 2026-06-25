@@ -9,15 +9,13 @@
       "type" : "string"
     },
     "latitude" : {
-      "default" : 34.26,
       "description" : "Location latitude",
-      "required" : false,
+      "required" : true,
       "type" : "number"
     },
     "longitude" : {
-      "default" : 108.94,
       "description" : "Location longitude",
-      "required" : false,
+      "required" : true,
       "type" : "number"
     },
     "timezone_offset" : {

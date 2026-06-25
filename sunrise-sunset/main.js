@@ -1,6 +1,6 @@
 function fetchEvents(config) {
-    var lat = isNaN(parseFloat(config.latitude)) ? 34.26 : parseFloat(config.latitude);
-    var lng = isNaN(parseFloat(config.longitude)) ? 108.94 : parseFloat(config.longitude);
+    var lat = parseFloat(config.latitude);
+    var lng = parseFloat(config.longitude);
     var cityName = config.city_name;
     var sunriseColor = "#FF9500";
     var sunsetColor = "#5856D6";
