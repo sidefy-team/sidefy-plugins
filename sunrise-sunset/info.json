@@ -1,0 +1,44 @@
+{
+  "author" : "Sidefy Team",
+  "category" : "Productivity & Utilities",
+  "config_options" : {
+    "city_name" : {
+      "default" : "Xi'an",
+      "description" : "City display name",
+      "required" : false,
+      "type" : "string"
+    },
+    "latitude" : {
+      "default" : 34.26,
+      "description" : "Location latitude",
+      "required" : false,
+      "type" : "number"
+    },
+    "longitude" : {
+      "default" : 108.94,
+      "description" : "Location longitude",
+      "required" : false,
+      "type" : "number"
+    },
+    "timezone_offset" : {
+      "default" : "8",
+      "description" : "UTC offset in hours (e.g. 8 for UTC+8, -5 for UTC-5)",
+      "required" : true,
+      "type" : "string"
+    }
+  },
+  "copyable" : true,
+  "description" : "Display today's sunrise and sunset times. Configurable latitude/longitude, defaults to Xi'an. Uses NOAA solar position algorithm for local calculation, no network required.",
+  "min_support_app_version" : "2025.9.0",
+  "name" : "Sunrise Sunset",
+  "requirements" : {
+    "network" : false,
+    "storage" : false
+  },
+  "tags" : [
+    "time",
+    "sunrise",
+    "sunset"
+  ],
+  "version" : "1.0.0"
+}
