@@ -3,7 +3,6 @@
   "category" : "Productivity & Utilities",
   "config_options" : {
     "city_name" : {
-      "default" : "Xi'an",
       "description" : "City display name",
       "required" : false,
       "type" : "string"
