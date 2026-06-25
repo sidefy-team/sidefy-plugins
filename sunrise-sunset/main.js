@@ -81,8 +81,8 @@ function fetchEvents(config) {
         var events = [
             {
                 title: sidefy.i18n({
-                    "zh": "日出 " + sunriseTime + " | 日照 " + daylightH + "时" + daylightM + "分",
-                    "en": "Sunrise " + sunriseTime + " | Daylight " + daylightH + "h " + daylightM + "m"
+                    "zh": cityName + " 日出 " + sunriseTime + " | 日照 " + daylightH + "时" + daylightM + "分",
+                    "en": cityName + " Sunrise " + sunriseTime + " | Daylight " + daylightH + "h " + daylightM + "m"
                 }),
                 startDate: sidefy.date.format(sunriseTs),
                 endDate: sidefy.date.format(sunriseTs + 1800),
@@ -92,8 +92,8 @@ function fetchEvents(config) {
             },
             {
                 title: sidefy.i18n({
-                    "zh": "日落 " + sunsetTime,
-                    "en": "Sunset " + sunsetTime
+                    "zh": cityName + " 日落 " + sunsetTime,
+                    "en": cityName + " Sunset " + sunsetTime
                 }),
                 startDate: sidefy.date.format(sunsetTs),
                 endDate: sidefy.date.format(sunsetTs + 1800),
