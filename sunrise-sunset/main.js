@@ -2,12 +2,12 @@ function fetchEvents(config) {
     var lat = parseFloat(config.latitude);
     var lng = parseFloat(config.longitude);
     var cityName = config.city_name || "";
-    var offsetHours = parseFloat(config.timezone_offset);
     var sunriseColor = "#FF9500";
     var sunsetColor = "#5856D6";
 
     try {
         var now = new Date();
+        var offsetHours = -now.getTimezoneOffset() / 60;
         var year = now.getFullYear();
         var month = now.getMonth() + 1;
         var day = now.getDate();
