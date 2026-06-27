@@ -1,5 +1,7 @@
 # Say Hi — Daily Wikipedia Greeting
 
+<img width="994" height="338" alt="Say Hi daily Wikipedia greeting preview" src="preview.png" />
+
 A Sidefy plugin that fetches a random **English Wikipedia** article each day and uses AI to generate both the **event title** and **greeting note** in your app language (`sidefy.app.language()`).
 
 ## How It Works
