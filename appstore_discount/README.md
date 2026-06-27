@@ -1,82 +1,85 @@
-# AppStore Discount Monitor Plugin
+# AppStore Discount Tracker
 
-## Description
-
-Monitor App Store app prices and get timeline notifications when prices drop below your configured reference price. Perfect for tracking apps you want to purchase at a lower price.
+Monitor App Store app prices and get timeline notifications when prices drop below your configured reference price.
 
 ## Features
 
 - Monitor multiple apps across different regions
-- Custom reference prices for precise discount tracking
-- Color-coded discounts (blue for small, yellow for medium, orange for large, red for huge)
-- Creates timeline events when prices drop
-- Multi-region support (US, China, Japan, UK, etc.)
-- Smart caching reduces API calls (refreshes daily)
-- Full internationalization support
+- Per-app region and reference price configuration
+- Color-coded discount levels
+- Smart caching (refreshes daily)
 
 ## Configuration
 
-### Required Parameter
+| Parameter | Type | Default | Description | Example |
+|-----------|------|---------|-------------|---------|
+| `apps` | string | — | App Store app IDs, comma-separated | `6751482006,9876543210` |
+| `default_region` | string | `us` | Default region when `{appId}_region` is not set | `default_region = us` |
+| `{appId}_region` | string | (Optional) | Manually add this key. Store region for the app. | `6751482006_region = us` |
+| `{appId}_original_price` | number | (Required) | Manually add this key. Reference/regular price. | `6751482006_original_price = 19.99` |
 
-**app_data**: App monitoring data
+## Example Configuration
 
-- Format: `AppID_Region_ReferencePrice`
-- Example: `12345_us_68.00,2736473_cn_38.00,9876543_jp_500`
-- Multiple apps separated by commas
-- Each entry must include:
-  - **AppID**: The App Store app ID
-  - **Region**: Two-letter country code (us, cn, jp, uk, etc.)
-  - **ReferencePrice**: Known regular price/reference price (numbers only, no currency symbols)
+```
+apps = 6751482006,9876543210
+
+6751482006_region = us
+6751482006_original_price = 19.99
+
+9876543210_region = cn
+9876543210_original_price = 68.00
+
+default_region = us
+```
 
 ## How to Find App ID
 
-1. Open the App Store and find the app you want to monitor
-2. Copy the app's URL (e.g., `https://apps.apple.com/us/app/example-app/id1234567890`)
-3. The numbers after `id` are the app ID (e.g., `1234567890`)
+1. Open the App Store and find the app
+2. Copy the share link (e.g. `https://apps.apple.com/us/app/goodnotes-6/id6751482006`)
+3. The numbers after `id` are the app ID (e.g. `6751482006`)
 
 ## How to Determine Reference Price
 
-Since the iTunes API doesn't provide discount information, you need to manually configure the reference price:
-
-1. Check the app's regular price during non-promotional periods
-2. Or use your "target price" that you consider worth buying
-3. When the current price drops below this value, the plugin will notify you
-
-## Configuration Example
-
-```json
-{
-  "app_data": "1234567890_us_9.99,9876543210_cn_68.00,5555555555_jp_1200"
-}
-```
-
-This will monitor:
-- App `1234567890` in US region, reference price $9.99
-- App `9876543210` in China region, reference price ¥68.00
-- App `5555555555` in Japan region, reference price ¥1200
-
-## How It Works
-
-1. The plugin checks configured app prices every 30 minutes
-2. Compares current price with your configured reference price
-3. If current price < reference price: Creates a timeline event with discount percentage
-4. Events include app screenshots (randomly selected), price details, and direct App Store links
-5. Cache expires daily to ensure fresh data
+The iTunes API only returns the current price — it cannot detect whether an app is on sale. Set `{appId}_original_price` to the regular price (or your target buy price).
 
 ## Discount Color Coding
 
-- Blue (0-24%): Small discount
-- Yellow (25-49%): Medium discount
-- Orange (50-74%): Large discount
+- Blue (0–24%): Small discount
+- Yellow (25–49%): Medium discount
+- Orange (50–74%): Large discount
 - Red (75%+): Huge discount
 
-## Important Notes
+## Changelog
 
-Due to App Store API limitations, we cannot automatically retrieve an app's "official original price" or "historical highest price." The iTunes API only provides the current price and doesn't tell us if an app is on sale.
+### v1.0.0
 
-Therefore, you need to:
-1. Record the app's regular price when it's not on discount
-2. Or set a "mental price point" based on your willingness to buy
-3. Periodically check and update reference prices in your configuration (if apps get permanent price cuts)
+- **Breaking change** — config format replaced; `app_data` is no longer used
 
-While this approach requires some manual setup, it provides the most reliable and accurate discount tracking.
+**What changed**
+
+| Before (v0.0.x) | After (v1.0.0) |
+|-----------------|----------------|
+| Single `app_data` field | `apps` list + per-app `{appId}_*` keys |
+| Format: `12345_us_68.00,9876543_cn_38.00` | See [Example Configuration](#example-configuration) |
+
+**Migration**
+
+Old config:
+
+```
+app_data = 6751482006_us_19.99,9876543210_cn_68.00
+```
+
+New config:
+
+```
+apps = 6751482006,9876543210
+
+6751482006_region = us
+6751482006_original_price = 19.99
+
+9876543210_region = cn
+9876543210_original_price = 68.00
+```
+
+If all apps share the same region, set `default_region` and omit `{appId}_region`.

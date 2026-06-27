@@ -3,22 +3,7 @@
  * 监控 App Store 应用的价格变化,并在时间线中显示打折应用。
  */
 function fetchEvents(config) {
-    // 检查必填参数
-    var appData = config.app_data;
-
-    if (!appData || appData.trim() === "") {
-        throw new Error(sidefy.i18n({
-            "zh": "应用数据不能为空,请在插件配置中填入需要监控的应用信息。格式: 12345_us_68.00,2736473_cn_38.00",
-            "en": "App data cannot be empty. Please enter the app information you want to monitor. Format: 12345_us_68.00,2736473_cn_38.00",
-            "ja": "アプリデータを空にすることはできません。監視するアプリ情報を入力してください。形式: 12345_us_68.00,2736473_cn_38.00",
-            "ko": "앱 데이터는 비워둘 수 없습니다. 모니터링할 앱 정보를 입력하세요. 형식: 12345_us_68.00,2736473_cn_38.00",
-            "de": "App-Daten dürfen nicht leer sein. Bitte geben Sie die App-Informationen ein. Format: 12345_us_68.00,2736473_cn_38.00",
-            "es": "Los datos de la aplicación no pueden estar vacíos. Por favor, ingrese la información de la aplicación. Formato: 12345_us_68.00,2736473_cn_38.00",
-            "fr": "Les données de l'application ne peuvent pas être vides. Veuillez entrer les informations de l'application. Format: 12345_us_68.00,2736473_cn_38.00",
-            "pt": "Os dados do aplicativo não podem estar vazios. Por favor, insira as informações do aplicativo. Formato: 12345_us_68.00,2736473_cn_38.00",
-            "ru": "Данные приложения не могут быть пустыми. Пожалуйста, введите информацию о приложении. Формат: 12345_us_68.00,2736473_cn_38.00"
-        }));
-    }
+    var appList = resolveAppList(config);
 
     // --- 缓存逻辑 ---
     // 在缓存键中加入日期,确保跨天后缓存自动失效
@@ -26,7 +11,10 @@ function fetchEvents(config) {
     var dateKey = today.getFullYear() + "" +
         String(today.getMonth() + 1).padStart(2, '0') +
         String(today.getDate()).padStart(2, '0');
-    var cacheKey = "appstore_discount_v6_" + appData.replace(/[,\s]/g, '_').substring(0, 50) + "_" + dateKey;
+    var configKey = appList.map(function (app) {
+        return app.appId + "_" + app.region + "_" + app.originalPrice;
+    }).join(",");
+    var cacheKey = "appstore_discount_v9_" + configKey.replace(/[,\s]/g, '_').substring(0, 50) + "_" + dateKey;
 
     var cachedData = sidefy.storage.get(cacheKey);
     if (cachedData) {
@@ -36,24 +24,6 @@ function fetchEvents(config) {
     // --- AppStore 折扣检查逻辑 ---
     var events = [];
     try {
-        // 解析应用数据列表
-        // 格式: 12345_us_68.00,2736473_cn_38.00
-        var appList = parseAppData(appData);
-
-        if (appList.length === 0) {
-            throw new Error(sidefy.i18n({
-                "zh": "没有有效的应用数据。请检查输入格式。示例: 12345_us_68.00",
-                "en": "No valid app data found. Please check the input format. Example: 12345_us_68.00",
-                "ja": "有効なアプリデータが見つかりません。入力形式を確認してください。例: 12345_us_68.00",
-                "ko": "유효한 앱 데이터를 찾을 수 없습니다. 입력 형식을 확인하세요. 예: 12345_us_68.00",
-                "de": "Keine gültigen App-Daten gefunden. Bitte überprüfen Sie das Eingabeformat. Beispiel: 12345_us_68.00",
-                "es": "No se encontraron datos de aplicación válidos. Por favor, verifique el formato. Ejemplo: 12345_us_68.00",
-                "fr": "Aucune donnée d'application valide trouvée. Veuillez vérifier le format. Exemple: 12345_us_68.00",
-                "pt": "Nenhum dado de aplicativo válido encontrado. Por favor, verifique o formato. Exemplo: 12345_us_68.00",
-                "ru": "Действительные данные приложения не найдены. Пожалуйста, проверьте формат. Пример: 12345_us_68.00"
-            }));
-        }
-
         // 检查每个应用的价格
         var discountedApps = [];
 
@@ -241,43 +211,96 @@ function formatPrice(priceValue, sampleFormatted, currency) {
 }
 
 /**
- * 解析应用数据列表
- * 格式: 12345_us_68.00,2736473_cn_38.00
- * appId_region_originalPrice
+ * 从配置中解析应用监控列表（与 Crypto Price Monitor 相同的 apps + {id}_* 模式）
  */
-function parseAppData(appData) {
+function resolveAppList(config) {
+    var defaultRegion = (config.default_region || "us").trim().toLowerCase();
+    var appEntries = [];
+
+    if (config.apps && typeof config.apps === "string") {
+        appEntries = config.apps.split(",").map(function (entry) {
+            return entry.trim();
+        }).filter(function (entry) {
+            return entry !== "";
+        });
+    }
+
+    if (appEntries.length === 0) {
+        throw new Error(sidefy.i18n({
+            "zh": "apps 不能为空。填写逗号分隔的 App Store 应用 ID，并为每个应用手动添加 {appId}_original_price 配置项。",
+            "en": "apps cannot be empty. Set comma-separated App Store app IDs, and manually add {appId}_original_price for each app.",
+            "ja": "apps を入力してください。App Store ID をカンマ区切りで指定し、各アプリに {appId}_original_price を追加してください。",
+            "ko": "apps를 입력하세요. App Store ID를 쉼표로 구분하고 각 앱에 {appId}_original_price를 추가하세요.",
+            "de": "apps darf nicht leer sein. App-Store-IDs kommagetrennt angeben und {appId}_original_price pro App hinzufügen.",
+            "es": "apps no puede estar vacío. Indique IDs separados por comas y agregue {appId}_original_price para cada app.",
+            "fr": "apps ne peut pas être vide. Indiquez les ID séparés par des virgules et ajoutez {appId}_original_price pour chaque app.",
+            "pt": "apps não pode estar vazio. Informe IDs separados por vírgula e adicione {appId}_original_price para cada app.",
+            "ru": "apps не может быть пустым. Укажите ID через запятую и добавьте {appId}_original_price для каждого приложения."
+        }));
+    }
+
     var result = [];
-    var items = appData.split(',');
+    var missingPrice = [];
 
-    for (var i = 0; i < items.length; i++) {
-        var item = items[i].trim();
-        if (!item) continue;
-
-        var parts = item.split('_');
-
-        // 必须有3个部分: appId, region, originalPrice
-        if (parts.length !== 3) {
+    for (var i = 0; i < appEntries.length; i++) {
+        var appId = extractAppId(appEntries[i]);
+        if (!appId) {
+            sidefy.log("Invalid app entry: " + appEntries[i]);
             continue;
         }
 
-        var appId = parts[0].trim();
-        var region = parts[1].trim();
-        var originalPriceStr = parts[2].trim();
-
-        // 解析原价数值
-        var originalPrice = parseFloat(originalPriceStr);
-
-        if (appId && region && !isNaN(originalPrice) && originalPrice > 0) {
-            result.push({
-                appId: appId,
-                region: region.toLowerCase(),
-                originalPrice: originalPrice,
-                originalPriceFormatted: originalPriceStr  // 保留原始格式
-            });
+        var regionRaw = config[appId + "_region"];
+        var region = defaultRegion;
+        if (regionRaw !== undefined && regionRaw !== null && String(regionRaw).trim() !== "") {
+            region = String(regionRaw).trim().toLowerCase();
         }
+
+        var originalPrice = Number(config[appId + "_original_price"]);
+        if (isNaN(originalPrice) || originalPrice <= 0) {
+            missingPrice.push(appId);
+            continue;
+        }
+
+        result.push({
+            appId: appId,
+            region: region,
+            originalPrice: originalPrice
+        });
+    }
+
+    if (result.length === 0) {
+        var hint = missingPrice.length > 0
+            ? missingPrice.map(function (id) { return id + "_original_price"; }).join(", ")
+            : "";
+        throw new Error(sidefy.i18n({
+            "zh": "没有有效的应用配置。请为每个应用手动添加参考价配置项，例如：" + hint,
+            "en": "No valid app configuration. Manually add reference price keys for each app, e.g. " + hint,
+            "ja": "有効なアプリ設定がありません。各アプリに参考価格キーを追加してください。例: " + hint,
+            "ko": "유효한 앱 설정이 없습니다. 각 앱에 참고 가격 키를 추가하세요, 예: " + hint,
+            "de": "Keine gültige App-Konfiguration. Referenzpreis-Schlüssel pro App hinzufügen, z.B. " + hint,
+            "es": "No hay configuración válida. Agregue claves de precio de referencia, p.ej. " + hint,
+            "fr": "Aucune configuration valide. Ajoutez les clés de prix de référence, p.ex. " + hint,
+            "pt": "Nenhuma configuração válida. Adicione chaves de preço de referência, ex.: " + hint,
+            "ru": "Нет действительной конфигурации. Добавьте ключи эталонной цены, напр. " + hint
+        }));
+    }
+
+    if (missingPrice.length > 0) {
+        sidefy.log("Skipped apps missing original_price: " + missingPrice.join(", "));
     }
 
     return result;
+}
+
+function extractAppId(entry) {
+    var urlMatch = entry.match(/\/id(\d+)/i);
+    if (urlMatch) {
+        return urlMatch[1];
+    }
+    if (/^\d+$/.test(entry)) {
+        return entry;
+    }
+    return null;
 }
 
 /**
