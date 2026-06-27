@@ -61,7 +61,6 @@ function fetchEvents(config) {
             sidefy.storage.set(cacheTimeKey, String(nowTs));
         }
 
-        // Load symbol cache from storage
         var symbolCacheKey = "crypto_watcher_symbol_map";
         var symbolMap = {};
         try {
@@ -86,6 +85,15 @@ function fetchEvents(config) {
                 ? new Date(coinData.last_updated_at * 1000)
                 : now;
 
+            var eventDate = new Date(now);
+            eventDate.setHours(0, 0, 0, 0);
+
+            var updatedTime =
+                String(lastUpdated.getHours()).padStart(2, "0") + ":" +
+                String(lastUpdated.getMinutes()).padStart(2, "0") + ":" +
+                String(lastUpdated.getSeconds()).padStart(2, "0");
+            var notes = sidefy.i18n(I18N_UPDATED_LABEL) + updatedTime;
+
             var color = "#4285f4";
             var changeText = "";
             if (change24h > 0) {
@@ -102,7 +110,6 @@ function fetchEvents(config) {
             var title = symbol + " $" + price.toFixed(6) + " " + changeText;
             var href = "https://www.coingecko.com/en/coins/" + tokenKey;
 
-            // Fetch symbol for unknown tokens
             if (!symbolMap[tokenKey]) {
                 try {
                     var coinUrl = "https://api.coingecko.com/api/v3/coins/" + tokenKey;
@@ -121,7 +128,6 @@ function fetchEvents(config) {
                 }
             }
 
-            // Check alert conditions
             var alerts = [];
             var alertBelow = config[tokenKey + "_alert_below"];
             var alertAbove = config[tokenKey + "_alert_above"];
@@ -145,7 +151,6 @@ function fetchEvents(config) {
                 }
             }
 
-            // Cooldown check
             if (alerts.length > 0 && cooldownHours > 0) {
                 var storageKey = "crypto_watcher_cooldown_" + tokenKey;
                 var cooldownData = sidefy.storage.get(storageKey);
@@ -158,21 +163,21 @@ function fetchEvents(config) {
                     cooldowns = {};
                 }
 
-                var nowTs = now.getTime();
+                var alertNowTs = now.getTime();
                 var activeAlerts = [];
                 var updatedCooldowns = {};
 
                 for (var i = 0; i < alerts.length; i++) {
                     var a = alerts[i];
                     var lastTrigger = cooldowns[a.type] || 0;
-                    if (nowTs - lastTrigger > cooldownHours * 3600000) {
+                    if (alertNowTs - lastTrigger > cooldownHours * 3600000) {
                         activeAlerts.push(a);
-                        updatedCooldowns[a.type] = nowTs;
+                        updatedCooldowns[a.type] = alertNowTs;
                     }
                 }
 
                 Object.keys(cooldowns).forEach(function (k) {
-                    if (!updatedCooldowns[k] && (nowTs - cooldowns[k] <= cooldownHours * 3600000)) {
+                    if (!updatedCooldowns[k] && (alertNowTs - cooldowns[k] <= cooldownHours * 3600000)) {
                         updatedCooldowns[k] = cooldowns[k];
                     }
                 });
@@ -191,10 +196,7 @@ function fetchEvents(config) {
                     } else if (at.type === "above") {
                         alertTexts.push("> $" + at.threshold);
                     } else if (at.type === "change_pct") {
-                        alertTexts.push(sidefy.i18n({
-                            "en": "24h change > ",
-                            "zh": "24h波动 > "
-                        }) + at.threshold + "%");
+                        alertTexts.push(sidefy.i18n(I18N_ALERT_CHANGE_PCT) + at.threshold + "%");
                     }
                 }
                 title = "[ALERT] " + title + " (" + alertTexts.join(", ") + ")";
@@ -202,12 +204,12 @@ function fetchEvents(config) {
 
             events.push({
                 title: title,
-                startDate: sidefy.formatDate(lastUpdated.getTime() / 1000),
-                endDate: sidefy.formatDate(lastUpdated.getTime() / 1000),
+                startDate: sidefy.date.format(eventDate.getTime() / 1000),
+                endDate: sidefy.date.format(eventDate.getTime() / 1000),
                 color: color,
-                notes: "",
+                notes: notes,
                 icon: null,
-                isAllDay: false,
+                isAllDay: true,
                 isPointInTime: true,
                 href: href
             });
@@ -220,3 +222,19 @@ function fetchEvents(config) {
 
     return events;
 }
+
+// --- i18n ---
+
+var I18N_UPDATED_LABEL = {
+    zh: "更新时间：",
+    en: "Updated: ",
+    ja: "更新: ",
+    ko: "업데이트: "
+};
+
+var I18N_ALERT_CHANGE_PCT = {
+    zh: "24h波动 > ",
+    en: "24h change > ",
+    ja: "24時間変動 > ",
+    ko: "24시간 변동 > "
+};

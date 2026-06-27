@@ -185,7 +185,7 @@ function fetchEvents(config) {
     });
 
     // 缓存文章列表 5 分钟
-    sidefy.storage.set(articlesCacheKey, events, { ttl: 5 * 60 * 1000 });
+    sidefy.storage.set(articlesCacheKey, events, 5);
     sidefy.log("[FreshRSS] Cached " + events.length + " articles for 5 minutes");
 
     return events;

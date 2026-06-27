@@ -78,10 +78,11 @@ function fetchEvents(config) {
         // 计算到今天结束的剩余毫秒数
         var endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
         var remainingMs = endOfDay.getTime() - now.getTime();
-        var ttl = Math.max(remainingMs, 5 * 60 * 1000); // 至少缓存5分钟
+        var ttlMinutes = Math.ceil(remainingMs / (60 * 1000));
+        ttlMinutes = Math.max(ttlMinutes, 5);
+        ttlMinutes = Math.min(ttlMinutes, 1440);
 
-        // 覆盖缓存
-        sidefy.storage.set(cacheKey, mergedEvents, { ttl: ttl });
+        sidefy.storage.set(cacheKey, mergedEvents, ttlMinutes);
 
         return mergedEvents;
     } catch (err) {

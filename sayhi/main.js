@@ -29,12 +29,7 @@ function fetchEvents(config) {
 
   var pageData = fetchRandomPage();
   if (!pageData) {
-    throw new Error(
-      sidefy.i18n({
-        zh: "无法获取维基百科条目，请检查网络连接。",
-        en: "Failed to fetch Wikipedia page. Check your network connection.",
-      }),
-    );
+    throw new Error(sidefy.i18n(I18N_FETCH_WIKIPEDIA_FAILED));
   }
 
   var title = pageData.title;
@@ -168,20 +163,41 @@ function parseAIResponse(raw) {
 
 function throwAIError(reason) {
   var messages = {
-    empty: {
-      zh: "AI 未返回内容，请检查 Sidefy 高级设置中的 LLM API Key。",
-      en: "AI returned no content. Check your LLM API key in Sidefy Advanced Settings.",
-    },
-    failed: {
-      zh: "AI 生成失败，请检查 API Key、网络或配额。",
-      en: "AI generation failed. Check your API key, network, or quota.",
-    },
-    invalid: {
-      zh: "AI 返回格式无效，请重试。",
-      en: "AI returned an invalid format. Please try again.",
-    },
+    empty: I18N_AI_EMPTY,
+    failed: I18N_AI_FAILED,
+    invalid: I18N_AI_INVALID,
   };
 
-  var bucket = messages[reason] || messages.failed;
+  var bucket = messages[reason] || I18N_AI_FAILED;
   throw new Error(sidefy.i18n(bucket));
 }
+
+// --- i18n ---
+
+var I18N_FETCH_WIKIPEDIA_FAILED = {
+  zh: "无法获取维基百科条目，请检查网络连接。",
+  en: "Failed to fetch Wikipedia page. Check your network connection.",
+  ja: "ウィキペディアのページを取得できませんでした。ネットワーク接続を確認してください。",
+  ko: "위키백과 페이지를 가져오지 못했습니다. 네트워크 연결을 확인하세요.",
+};
+
+var I18N_AI_EMPTY = {
+  zh: "AI 未返回内容，请检查 Sidefy 高级设置中的 LLM API Key。",
+  en: "AI returned no content. Check your LLM API key in Sidefy Advanced Settings.",
+  ja: "AI が内容を返しませんでした。Sidefy の高度な設定で LLM API キーを確認してください。",
+  ko: "AI가 내용을 반환하지 않았습니다. Sidefy 고급 설정에서 LLM API 키를 확인하세요.",
+};
+
+var I18N_AI_FAILED = {
+  zh: "AI 生成失败，请检查 API Key、网络或配额。",
+  en: "AI generation failed. Check your API key, network, or quota.",
+  ja: "AI 生成に失敗しました。API キー、ネットワーク、またはクォータを確認してください。",
+  ko: "AI 생성에 실패했습니다. API 키, 네트워크 또는 할당량을 확인하세요.",
+};
+
+var I18N_AI_INVALID = {
+  zh: "AI 返回格式无效，请重试。",
+  en: "AI returned an invalid format. Please try again.",
+  ja: "AI が無効な形式を返しました。もう一度お試しください。",
+  ko: "AI가 잘못된 형식을 반환했습니다. 다시 시도해 주세요.",
+};

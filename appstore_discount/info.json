@@ -1,7 +1,7 @@
 {
     "name": "AppStore Discount Tracker",
     "description": "Monitors App Store app prices and reminds you in the timeline when prices drop below your configured original price.\n\nPer-app config: for each app ID listed in apps, manually add config keys (replace {appId} with the App Store ID):\n  {appId}_region — two-letter store region, e.g. 6751482006_region = us\n  {appId}_original_price — reference/regular price, e.g. 6751482006_original_price = 19.99",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.9.18",
     "tags": [

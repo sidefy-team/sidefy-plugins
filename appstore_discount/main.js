@@ -121,17 +121,7 @@ function fetchEvents(config) {
                 var timestamp = eventDate.getTime() / 1000;
 
                 var discountColor = getDiscountColor(app.discountPercent);
-                var notes = sidefy.i18n({
-                    "zh": "原价: " + app.originalPrice + "\n现价: " + app.currentPrice + "\n折扣: -" + app.discountPercent + "%\n区域: " + app.region.toUpperCase(),
-                    "en": "Original Price: " + app.originalPrice + "\nCurrent Price: " + app.currentPrice + "\nDiscount: -" + app.discountPercent + "%\nRegion: " + app.region.toUpperCase(),
-                    "ja": "元の価格: " + app.originalPrice + "\n現在の価格: " + app.currentPrice + "\n割引: -" + app.discountPercent + "%\n地域: " + app.region.toUpperCase(),
-                    "ko": "원가: " + app.originalPrice + "\n현재 가격: " + app.currentPrice + "\n할인: -" + app.discountPercent + "%\n지역: " + app.region.toUpperCase(),
-                    "de": "Originalpreis: " + app.originalPrice + "\nAktueller Preis: " + app.currentPrice + "\nRabatt: -" + app.discountPercent + "%\nRegion: " + app.region.toUpperCase(),
-                    "es": "Precio Original: " + app.originalPrice + "\nPrecio Actual: " + app.currentPrice + "\nDescuento: -" + app.discountPercent + "%\nRegión: " + app.region.toUpperCase(),
-                    "fr": "Prix d'origine: " + app.originalPrice + "\nPrix actuel: " + app.currentPrice + "\nRéduction: -" + app.discountPercent + "%\nRégion: " + app.region.toUpperCase(),
-                    "pt": "Preço Original: " + app.originalPrice + "\nPreço Atual: " + app.currentPrice + "\nDesconto: -" + app.discountPercent + "%\nRegião: " + app.region.toUpperCase(),
-                    "ru": "Исходная цена: " + app.originalPrice + "\nТекущая цена: " + app.currentPrice + "\nСкидка: -" + app.discountPercent + "%\nРегион: " + app.region.toUpperCase()
-                });
+                var notes = i18nDiscountNotes(app.originalPrice, app.currentPrice, app.discountPercent, app.region);
 
                 var appEvent = {
                     title: app.name + " (-" + app.discountPercent + "%)",
@@ -156,17 +146,7 @@ function fetchEvents(config) {
         }
 
     } catch (err) {
-        throw new Error(sidefy.i18n({
-            "zh": "AppStore 折扣插件执行失败: " + err.message,
-            "en": "AppStore Discount plugin execution failed: " + err.message,
-            "ja": "AppStore 割引プラグインの実行に失敗しました: " + err.message,
-            "ko": "AppStore 할인 플러그인 실행 실패: " + err.message,
-            "de": "AppStore-Rabatt-Plugin-Ausführung fehlgeschlagen: " + err.message,
-            "es": "Falló la ejecución del complemento de descuento de AppStore: " + err.message,
-            "fr": "Échec de l'exécution du plugin de réduction AppStore: " + err.message,
-            "pt": "Falha na execução do plugin de desconto da AppStore: " + err.message,
-            "ru": "Ошибка выполнения плагина скидок AppStore: " + err.message
-        }));
+        throw new Error(i18nExecutionFailed(err.message));
     }
 
     return events;
@@ -226,17 +206,7 @@ function resolveAppList(config) {
     }
 
     if (appEntries.length === 0) {
-        throw new Error(sidefy.i18n({
-            "zh": "apps 不能为空。填写逗号分隔的 App Store 应用 ID，并为每个应用手动添加 {appId}_original_price 配置项。",
-            "en": "apps cannot be empty. Set comma-separated App Store app IDs, and manually add {appId}_original_price for each app.",
-            "ja": "apps を入力してください。App Store ID をカンマ区切りで指定し、各アプリに {appId}_original_price を追加してください。",
-            "ko": "apps를 입력하세요. App Store ID를 쉼표로 구분하고 각 앱에 {appId}_original_price를 추가하세요.",
-            "de": "apps darf nicht leer sein. App-Store-IDs kommagetrennt angeben und {appId}_original_price pro App hinzufügen.",
-            "es": "apps no puede estar vacío. Indique IDs separados por comas y agregue {appId}_original_price para cada app.",
-            "fr": "apps ne peut pas être vide. Indiquez les ID séparés par des virgules et ajoutez {appId}_original_price pour chaque app.",
-            "pt": "apps não pode estar vazio. Informe IDs separados por vírgula e adicione {appId}_original_price para cada app.",
-            "ru": "apps не может быть пустым. Укажите ID через запятую и добавьте {appId}_original_price для каждого приложения."
-        }));
+        throw new Error(sidefy.i18n(I18N_APPS_EMPTY));
     }
 
     var result = [];
@@ -272,17 +242,7 @@ function resolveAppList(config) {
         var hint = missingPrice.length > 0
             ? missingPrice.map(function (id) { return id + "_original_price"; }).join(", ")
             : "";
-        throw new Error(sidefy.i18n({
-            "zh": "没有有效的应用配置。请为每个应用手动添加参考价配置项，例如：" + hint,
-            "en": "No valid app configuration. Manually add reference price keys for each app, e.g. " + hint,
-            "ja": "有効なアプリ設定がありません。各アプリに参考価格キーを追加してください。例: " + hint,
-            "ko": "유효한 앱 설정이 없습니다. 각 앱에 참고 가격 키를 추가하세요, 예: " + hint,
-            "de": "Keine gültige App-Konfiguration. Referenzpreis-Schlüssel pro App hinzufügen, z.B. " + hint,
-            "es": "No hay configuración válida. Agregue claves de precio de referencia, p.ej. " + hint,
-            "fr": "Aucune configuration valide. Ajoutez les clés de prix de référence, p.ex. " + hint,
-            "pt": "Nenhuma configuração válida. Adicione chaves de preço de referência, ex.: " + hint,
-            "ru": "Нет действительной конфигурации. Добавьте ключи эталонной цены, напр. " + hint
-        }));
+        throw new Error(i18nNoValidAppConfig(hint));
     }
 
     if (missingPrice.length > 0) {
@@ -316,4 +276,41 @@ function getDiscountColor(discountPercent) {
     } else {
         return "#3498DB"; // 蓝色 - 小折扣
     }
+}
+
+// --- i18n ---
+
+var I18N_APPS_EMPTY = {
+    zh: "apps 不能为空。填写逗号分隔的 App Store 应用 ID，并为每个应用手动添加 {appId}_original_price 配置项。",
+    en: "apps cannot be empty. Set comma-separated App Store app IDs, and manually add {appId}_original_price for each app.",
+    ja: "apps を入力してください。App Store ID をカンマ区切りで指定し、各アプリに {appId}_original_price を追加してください。",
+    ko: "apps를 입력하세요. App Store ID를 쉼표로 구분하고 각 앱에 {appId}_original_price를 추가하세요."
+};
+
+function i18nDiscountNotes(originalPrice, currentPrice, discountPercent, region) {
+    var regionUpper = region.toUpperCase();
+    return sidefy.i18n({
+        zh: "原价: " + originalPrice + "\n现价: " + currentPrice + "\n折扣: -" + discountPercent + "%\n区域: " + regionUpper,
+        en: "Original Price: " + originalPrice + "\nCurrent Price: " + currentPrice + "\nDiscount: -" + discountPercent + "%\nRegion: " + regionUpper,
+        ja: "元の価格: " + originalPrice + "\n現在の価格: " + currentPrice + "\n割引: -" + discountPercent + "%\n地域: " + regionUpper,
+        ko: "원가: " + originalPrice + "\n현재 가격: " + currentPrice + "\n할인: -" + discountPercent + "%\n지역: " + regionUpper
+    });
+}
+
+function i18nExecutionFailed(message) {
+    return sidefy.i18n({
+        zh: "AppStore 折扣插件执行失败: " + message,
+        en: "AppStore Discount plugin execution failed: " + message,
+        ja: "AppStore 割引プラグインの実行に失敗しました: " + message,
+        ko: "AppStore 할인 플러그인 실행 실패: " + message
+    });
+}
+
+function i18nNoValidAppConfig(hint) {
+    return sidefy.i18n({
+        zh: "没有有效的应用配置。请为每个应用手动添加参考价配置项，例如：" + hint,
+        en: "No valid app configuration. Manually add reference price keys for each app, e.g. " + hint,
+        ja: "有効なアプリ設定がありません。各アプリに参考価格キーを追加してください。例: " + hint,
+        ko: "유효한 앱 설정이 없습니다. 각 앱에 참고 가격 키를 추가하세요, 예: " + hint
+    });
 }

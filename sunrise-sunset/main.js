@@ -12,7 +12,6 @@ function fetchEvents(config) {
         var month = now.getMonth() + 1;
         var day = now.getDate();
 
-        // NOAA Solar Position Algorithm
         var N = dayOfYear(year, month, day);
         var lngHour = lng / 15.0;
         var t = N + ((6 - lngHour) / 24.0);
@@ -29,10 +28,9 @@ function fetchEvents(config) {
         var cosDec = cosDeg(asinDeg(sinDec));
         var cosH = (cosDeg(90.833) - (sinDec * sinDeg(lat))) / (cosDec * cosDeg(lat));
 
-        // Check for polar day/night
         if (cosH > 1) {
             return [{
-                title: sidefy.i18n({"zh": cityName + " 今日极夜", "en": cityName + ": Polar Night"}),
+                title: i18nPolarNight(cityName),
                 startDate: sidefy.date.format(startOfDayTimestamp(now)),
                 endDate: sidefy.date.format(startOfDayTimestamp(now)),
                 color: "#34495e",
@@ -42,7 +40,7 @@ function fetchEvents(config) {
         }
         if (cosH < -1) {
             return [{
-                title: sidefy.i18n({"zh": cityName + " 今日极昼", "en": cityName + ": Midnight Sun"}),
+                title: i18nMidnightSun(cityName),
                 startDate: sidefy.date.format(startOfDayTimestamp(now)),
                 endDate: sidefy.date.format(startOfDayTimestamp(now)),
                 color: "#f1c40f",
@@ -77,12 +75,9 @@ function fetchEvents(config) {
         var daylightH = Math.floor(daylightHours);
         var daylightM = Math.round((daylightHours - daylightH) * 60);
 
-        var events = [
+        return [
             {
-                title: sidefy.i18n({
-                    "zh": cityName + " 日出 " + sunriseTime + " | 日照 " + daylightH + "时" + daylightM + "分",
-                    "en": cityName + " Sunrise " + sunriseTime + " | Daylight " + daylightH + "h " + daylightM + "m"
-                }),
+                title: i18nSunrise(cityName, sunriseTime, daylightH, daylightM),
                 startDate: sidefy.date.format(sunriseTs),
                 endDate: sidefy.date.format(sunriseTs + 1800),
                 color: sunriseColor,
@@ -90,10 +85,7 @@ function fetchEvents(config) {
                 isPointInTime: true
             },
             {
-                title: sidefy.i18n({
-                    "zh": cityName + " 日落 " + sunsetTime,
-                    "en": cityName + " Sunset " + sunsetTime
-                }),
+                title: i18nSunset(cityName, sunsetTime),
                 startDate: sidefy.date.format(sunsetTs),
                 endDate: sidefy.date.format(sunsetTs + 1800),
                 color: sunsetColor,
@@ -101,15 +93,12 @@ function fetchEvents(config) {
                 isPointInTime: true
             }
         ];
-
-        return events;
     } catch (err) {
         sidefy.log("Sunrise/Sunset error: " + err.message);
         return [];
     }
 }
 
-// Helper functions
 function sinDeg(deg) { return Math.sin(deg * Math.PI / 180); }
 function cosDeg(deg) { return Math.cos(deg * Math.PI / 180); }
 function tanDeg(deg) { return Math.tan(deg * Math.PI / 180); }
@@ -160,4 +149,42 @@ function hourToTimestamp(date, decimalHours) {
     var h = ((hm.h % 24) + 24) % 24;
     var d = new Date(date.getFullYear(), date.getMonth(), date.getDate() + dayOffset, h, hm.m, 0);
     return d.getTime() / 1000;
+}
+
+// --- i18n ---
+
+function i18nPolarNight(cityName) {
+    return sidefy.i18n({
+        zh: cityName + " 今日极夜",
+        en: cityName + ": Polar Night",
+        ja: cityName + " 今日は極夜",
+        ko: cityName + " 오늘 극야"
+    });
+}
+
+function i18nMidnightSun(cityName) {
+    return sidefy.i18n({
+        zh: cityName + " 今日极昼",
+        en: cityName + ": Midnight Sun",
+        ja: cityName + " 今日は白夜",
+        ko: cityName + " 오늘 백야"
+    });
+}
+
+function i18nSunrise(cityName, sunriseTime, daylightH, daylightM) {
+    return sidefy.i18n({
+        zh: cityName + " 日出 " + sunriseTime + " | 日照 " + daylightH + "时" + daylightM + "分",
+        en: cityName + " Sunrise " + sunriseTime + " | Daylight " + daylightH + "h " + daylightM + "m",
+        ja: cityName + " 日の出 " + sunriseTime + " | 日照 " + daylightH + "時間" + daylightM + "分",
+        ko: cityName + " 일출 " + sunriseTime + " | 일조 " + daylightH + "시간 " + daylightM + "분"
+    });
+}
+
+function i18nSunset(cityName, sunsetTime) {
+    return sidefy.i18n({
+        zh: cityName + " 日落 " + sunsetTime,
+        en: cityName + " Sunset " + sunsetTime,
+        ja: cityName + " 日の入り " + sunsetTime,
+        ko: cityName + " 일몰 " + sunsetTime
+    });
 }

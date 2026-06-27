@@ -1,7 +1,7 @@
 {
   "name": "Say Hi",
   "description": "Fetches a random English Wikipedia article each day; AI generates the event title and greeting in your app language.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Sidefy Team",
   "min_support_app_version": "2025.9.21",
   "tags": ["greeting", "wikipedia", "daily", "ai", "knowledge"],

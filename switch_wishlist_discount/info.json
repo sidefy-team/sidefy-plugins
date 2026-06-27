@@ -1,7 +1,7 @@
 {
     "name": "Switch Discount Tracker",
     "description": "Monitor Nintendo Switch eShop discounts across multiple regions. Add game NSUIDs and region codes; get a separate timeline event for each region where a watched game is on sale, with original price, sale price, and discount percentage.",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.10.7",
     "tags": [

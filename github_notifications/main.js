@@ -103,10 +103,7 @@ function fetchEvents(config) {
         });
 
         // 缓存结果 - 10分钟缓存
-        var cacheOptions = {
-            ttl: 10 * 60 * 1000
-        };
-        sidefy.storage.set(cacheKey, events, cacheOptions);
+        sidefy.storage.set(cacheKey, events, 10);
 
         return events;
 

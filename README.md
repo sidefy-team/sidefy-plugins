@@ -81,6 +81,61 @@ function fetchEvents(config) {
 }
 ```
 
+## Internationalization (i18n)
+
+All user-facing strings in plugins must use `sidefy.i18n()`. See also [claude.md](claude.md) for full conventions.
+
+### Supported languages
+
+Use **only** these 4 language codes. Do not add `de`, `es`, `fr`, `pt`, `ru`, or others:
+
+| Code | Language |
+|------|----------|
+| `zh` | Chinese |
+| `en` | English |
+| `ja` | Japanese |
+| `ko` | Korean |
+
+Plugin i18n keys use **`zh`** for Chinese (matches `sidefy.app.language()`). Do not use `zh-Hans`, `zh-Hant`, `zh-CN`, or `zh-TW` as keys.
+
+### Code organization
+
+1. Declare all i18n strings at the **bottom** of `main.js` (mark the section with `// --- i18n ---`).
+2. Use semantic names such as `I18N_UPDATED_LABEL`, `I18N_ERROR_NETWORK`.
+3. **Static text**: define `I18N_*` object constants; call `sidefy.i18n(I18N_XXX)` in business logic. Do not inline language objects in `fetchEvents` or helpers above the i18n block.
+4. **Dynamic text** (with variables): define `i18nXxx(...)` helper functions at the bottom; return `sidefy.i18n({ zh: ..., en: ..., ja: ..., ko: ... })`.
+5. Keep business logic and utilities **above** the i18n block.
+
+### Example
+
+```javascript
+function fetchEvents(config) {
+    var notes = sidefy.i18n(I18N_UPDATED_LABEL) + timeStr;
+    // ...
+    return events;
+}
+
+// --- i18n ---
+
+var I18N_UPDATED_LABEL = {
+    zh: "更新时间：",
+    en: "Updated: ",
+    ja: "更新: ",
+    ko: "업데이트: "
+};
+
+function i18nCountdownFuture(eventName, days) {
+    return sidefy.i18n({
+        zh: "距离 " + eventName + " 还有 " + days + " 天",
+        en: days + " days until " + eventName,
+        ja: eventName + "まであと" + days + "日",
+        ko: eventName + "까지 " + days + "일 남음"
+    });
+}
+```
+
+`sidefy.i18n()` picks the string for the current app language, then falls back to `en`, then to the first available value. All four languages must be filled in for every string.
+
 ## Submission Steps
 
 1. Fork this repository
@@ -100,3 +155,5 @@ function fetchEvents(config) {
 - info.json information is complete and accurate
 - README.md instructions are clear
 - Code comments are appropriate
+- User-facing strings use `sidefy.i18n()` with all 4 languages (`zh`, `en`, `ja`, `ko`)
+- i18n constants and helpers are declared at the bottom of `main.js`

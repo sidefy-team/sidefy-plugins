@@ -88,8 +88,8 @@ function fetchEvents(config) {
 
                             events.push({
                                 title: title,
-                                startDate: sidefy.formatDate(updateTime.getTime() / 1000),
-                                endDate: sidefy.formatDate(endTime.getTime() / 1000),
+                                startDate: sidefy.date.format(updateTime.getTime() / 1000),
+                                endDate: sidefy.date.format(endTime.getTime() / 1000),
                                 color: color,
                                 notes: "Solana 代币价格 - " + tokenKey.toUpperCase() + "\n价格: $" + data.price + "\n24h变化: " + priceChange.toFixed(2) + "%" +
                                     (config[watcherKey] !== undefined ? (direction === 'up' ? "\n⚠️ 价格高于监控阈值: $" + config[watcherKey] : "\n⚠️ 价格低于监控阈值: $" + config[watcherKey]) : ""),

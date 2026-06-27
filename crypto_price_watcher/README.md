@@ -8,7 +8,7 @@ A Sidefy plugin that monitors cryptocurrency prices via CoinGecko API and shows 
 - **Price Threshold Alerts**: Get notified when price drops below or rises above your configured thresholds.
 - **Percentage Change Alerts**: Get notified when 24h price change exceeds your configured percentage.
 - **Cooldown Mechanism**: Prevent repeated alerts for the same condition within a configurable cooldown period.
-- **Multilingual Support**: Event titles and alert texts support English and Chinese.
+- **Multilingual Support**: Event titles, alert texts, and notes support zh, en, ja, and ko.
 - **Color Coding**: Green for price up, red for down, blue for flat, orange for triggered alerts.
 
 ## Configuration
@@ -64,6 +64,16 @@ CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 
 ## Changelog
 
+### v1.1.1
+
+- Expanded i18n to 4 languages (zh, en, ja, ko)
+
+### v1.1.0
+
+- Display price events as all-day items instead of pinning to API update time
+- Show price update time (HH:MM:SS) in event notes
+- Use `sidefy.date.format` for timeline dates
+
 ### v1.0.0
 
 - Initial release
@@ -71,5 +81,5 @@ CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 - Price threshold alerts (above / below)
 - 24h percentage change alerts
 - Configurable alert cooldown
-- Multilingual support (English and Chinese)
+- Multilingual support (zh, en, ja, ko)
 - Color-coded price change indicators

@@ -1,83 +1,12 @@
 /**
  * Switch 多区打折监控插件
  */
-var REGION_PROFILES = {
-    JP: {
-        country: "JP",
-        lang: "ja",
-        storeType: "jp",
-        icon: "https://store-jp.nintendo.com/mobify/bundle/1763/static/img/head/favicon.ico",
-        label: { zh: "日本", en: "Japan", ja: "日本", pt: "Japão" }
-    },
-    US: {
-        country: "US",
-        lang: "en",
-        storeType: "noa",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "美国", en: "United States", ja: "アメリカ", pt: "Estados Unidos" }
-    },
-    CA: {
-        country: "CA",
-        lang: "en",
-        storeType: "noa",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "加拿大", en: "Canada", ja: "カナダ", pt: "Canadá" }
-    },
-    MX: {
-        country: "MX",
-        lang: "es",
-        storeType: "noa",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "墨西哥", en: "Mexico", ja: "メキシコ", pt: "México" }
-    },
-    BR: {
-        country: "BR",
-        lang: "pt",
-        storeType: "noa",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "巴西", en: "Brazil", ja: "ブラジル", pt: "Brasil" }
-    },
-    GB: {
-        country: "GB",
-        lang: "en",
-        storeType: "eu",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "英国", en: "United Kingdom", ja: "イギリス", pt: "Reino Unido" }
-    },
-    DE: {
-        country: "DE",
-        lang: "de",
-        storeType: "eu",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "德国", en: "Germany", ja: "ドイツ", pt: "Alemanha" }
-    },
-    FR: {
-        country: "FR",
-        lang: "fr",
-        storeType: "eu",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "法国", en: "France", ja: "フランス", pt: "França" }
-    },
-    AU: {
-        country: "AU",
-        lang: "en",
-        storeType: "eu",
-        icon: "https://www.nintendo.com/favicon.ico",
-        label: { zh: "澳大利亚", en: "Australia", ja: "オーストラリア", pt: "Austrália" }
-    }
-};
-
 function fetchEvents(config) {
     var gameIds = config.game_ids;
     var regionsRaw = config.regions || "JP,US,CA,MX,BR,GB,DE,FR,AU";
 
     if (!gameIds || gameIds.trim() === "") {
-        throw new Error(sidefy.i18n({
-            zh: "游戏 ID 列表不能为空，请在插件配置中填入要监控的游戏 NSUID。",
-            en: "Game ID list cannot be empty. Please enter the game NSUIDs you want to monitor.",
-            ja: "ゲーム ID リストを空にすることはできません。監視するゲーム ID を入力してください。",
-            pt: "A lista de IDs de jogos não pode estar vazia. Insira os NSUIDs dos jogos."
-        }));
+        throw new Error(sidefy.i18n(I18N_ERROR_EMPTY_GAME_IDS));
     }
 
     if (!sidefy.http || !sidefy.http.get) {
@@ -96,12 +25,7 @@ function fetchEvents(config) {
         .slice(0, 20);
 
     if (cleanedIdsArray.length === 0) {
-        throw new Error(sidefy.i18n({
-            zh: "未找到有效的游戏 NSUID。",
-            en: "No valid game NSUIDs found.",
-            ja: "有効なゲーム ID が見つかりません。",
-            pt: "Nenhum NSUID de jogo válido encontrado."
-        }));
+        throw new Error(sidefy.i18n(I18N_ERROR_NO_VALID_NSUID));
     }
 
     var regionCodes = regionsRaw
@@ -153,12 +77,7 @@ function fetchEvents(config) {
             sidefy.log("Switch discount fetch incomplete, skipping cache.");
         }
     } catch (err) {
-        throw new Error(sidefy.i18n({
-            zh: "Switch 多区折扣插件执行失败: " + err.message,
-            en: "Switch multi-region discount plugin failed: " + err.message,
-            ja: "Switch マルチリージョン割引プラグインの実行に失敗しました: " + err.message,
-            pt: "Falha no plugin de desconto multi-região do Switch: " + err.message
-        }));
+        throw new Error(i18nExecutionFailed(err.message));
     }
 
     return events;
@@ -219,24 +138,15 @@ function fetchRegionDiscountEvents(profile, regionCode, cleanedIds) {
         var regularPrice = parseFloat(priceInfo.regular_price.raw_value);
         var discountPrice = parseFloat(priceInfo.discount_price.raw_value);
         var discountPercent = Math.round((1 - discountPrice / regularPrice) * 100);
-        var notes = sidefy.i18n({
-            zh: "区域: " + regionLabel + "\n原价: " + priceInfo.regular_price.amount +
-                "\n现价: " + priceInfo.discount_price.amount + "\n折扣: -" + discountPercent + "%",
-            en: "Region: " + regionLabel + "\nOriginal: " + priceInfo.regular_price.amount +
-                "\nCurrent: " + priceInfo.discount_price.amount + "\nDiscount: -" + discountPercent + "%",
-            ja: "地域: " + regionLabel + "\n通常価格: " + priceInfo.regular_price.amount +
-                "\n現在価格: " + priceInfo.discount_price.amount + "\n割引: -" + discountPercent + "%",
-            pt: "Região: " + regionLabel + "\nOriginal: " + priceInfo.regular_price.amount +
-                "\nAtual: " + priceInfo.discount_price.amount + "\nDesconto: -" + discountPercent + "%"
-        });
+        var notes = i18nDiscountNotes(
+            regionLabel,
+            priceInfo.regular_price.amount,
+            priceInfo.discount_price.amount,
+            discountPercent
+        );
 
         if (gameMeta.device) {
-            notes += "\n" + sidefy.i18n({
-                zh: "对应本体: " + gameMeta.device,
-                en: "Compatible Device: " + gameMeta.device,
-                ja: "対応本体: " + gameMeta.device,
-                pt: "Dispositivo: " + gameMeta.device
-            });
+            notes += "\n" + i18nCompatibleDevice(gameMeta.device);
         }
 
         events.push({
@@ -490,4 +400,180 @@ function getDiscountColor(discountPercent) {
         return "#F39C12";
     }
     return "#3498DB";
+}
+
+// --- i18n ---
+
+var I18N_ERROR_EMPTY_GAME_IDS = {
+    zh: "游戏 ID 列表不能为空，请在插件配置中填入要监控的游戏 NSUID。",
+    en: "Game ID list cannot be empty. Please enter the game NSUIDs you want to monitor.",
+    ja: "ゲーム ID リストを空にすることはできません。監視するゲーム ID を入力してください。",
+    ko: "게임 ID 목록은 비워둘 수 없습니다. 모니터링할 게임 NSUID를 입력하세요."
+};
+
+var I18N_ERROR_NO_VALID_NSUID = {
+    zh: "未找到有效的游戏 NSUID。",
+    en: "No valid game NSUIDs found.",
+    ja: "有効なゲーム ID が見つかりません。",
+    ko: "유효한 게임 NSUID를 찾을 수 없습니다."
+};
+
+var I18N_REGION_JP = {
+    zh: "日本",
+    en: "Japan",
+    ja: "日本",
+    ko: "일본"
+};
+
+var I18N_REGION_US = {
+    zh: "美国",
+    en: "United States",
+    ja: "アメリカ",
+    ko: "미국"
+};
+
+var I18N_REGION_CA = {
+    zh: "加拿大",
+    en: "Canada",
+    ja: "カナダ",
+    ko: "캐나다"
+};
+
+var I18N_REGION_MX = {
+    zh: "墨西哥",
+    en: "Mexico",
+    ja: "メキシコ",
+    ko: "멕시코"
+};
+
+var I18N_REGION_BR = {
+    zh: "巴西",
+    en: "Brazil",
+    ja: "ブラジル",
+    ko: "브라질"
+};
+
+var I18N_REGION_GB = {
+    zh: "英国",
+    en: "United Kingdom",
+    ja: "イギリス",
+    ko: "영국"
+};
+
+var I18N_REGION_DE = {
+    zh: "德国",
+    en: "Germany",
+    ja: "ドイツ",
+    ko: "독일"
+};
+
+var I18N_REGION_FR = {
+    zh: "法国",
+    en: "France",
+    ja: "フランス",
+    ko: "프랑스"
+};
+
+var I18N_REGION_AU = {
+    zh: "澳大利亚",
+    en: "Australia",
+    ja: "オーストラリア",
+    ko: "호주"
+};
+
+var REGION_PROFILES = {
+    JP: {
+        country: "JP",
+        lang: "ja",
+        storeType: "jp",
+        icon: "https://store-jp.nintendo.com/mobify/bundle/1763/static/img/head/favicon.ico",
+        label: I18N_REGION_JP
+    },
+    US: {
+        country: "US",
+        lang: "en",
+        storeType: "noa",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_US
+    },
+    CA: {
+        country: "CA",
+        lang: "en",
+        storeType: "noa",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_CA
+    },
+    MX: {
+        country: "MX",
+        lang: "es",
+        storeType: "noa",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_MX
+    },
+    BR: {
+        country: "BR",
+        lang: "pt",
+        storeType: "noa",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_BR
+    },
+    GB: {
+        country: "GB",
+        lang: "en",
+        storeType: "eu",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_GB
+    },
+    DE: {
+        country: "DE",
+        lang: "de",
+        storeType: "eu",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_DE
+    },
+    FR: {
+        country: "FR",
+        lang: "fr",
+        storeType: "eu",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_FR
+    },
+    AU: {
+        country: "AU",
+        lang: "en",
+        storeType: "eu",
+        icon: "https://www.nintendo.com/favicon.ico",
+        label: I18N_REGION_AU
+    }
+};
+
+function i18nDiscountNotes(regionLabel, regularAmount, discountAmount, discountPercent) {
+    return sidefy.i18n({
+        zh: "区域: " + regionLabel + "\n原价: " + regularAmount +
+            "\n现价: " + discountAmount + "\n折扣: -" + discountPercent + "%",
+        en: "Region: " + regionLabel + "\nOriginal: " + regularAmount +
+            "\nCurrent: " + discountAmount + "\nDiscount: -" + discountPercent + "%",
+        ja: "地域: " + regionLabel + "\n通常価格: " + regularAmount +
+            "\n現在価格: " + discountAmount + "\n割引: -" + discountPercent + "%",
+        ko: "지역: " + regionLabel + "\n정가: " + regularAmount +
+            "\n현재가: " + discountAmount + "\n할인: -" + discountPercent + "%"
+    });
+}
+
+function i18nCompatibleDevice(device) {
+    return sidefy.i18n({
+        zh: "对应本体: " + device,
+        en: "Compatible Device: " + device,
+        ja: "対応本体: " + device,
+        ko: "호환 기기: " + device
+    });
+}
+
+function i18nExecutionFailed(message) {
+    return sidefy.i18n({
+        zh: "Switch 多区折扣插件执行失败: " + message,
+        en: "Switch multi-region discount plugin failed: " + message,
+        ja: "Switch マルチリージョン割引プラグインの実行に失敗しました: " + message,
+        ko: "Switch 다지역 할인 플러그인 실행 실패: " + message
+    });
 }

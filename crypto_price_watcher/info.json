@@ -1,7 +1,7 @@
 {
     "name": "Crypto Price Monitor",
     "description": "Monitor cryptocurrency prices via CoinGecko API, with price threshold and percentage change alerts.\n\nAlert rules: for each token listed in tokens, add optional config keys (replace {token} with the CoinGecko ID):\n  {token}_alert_below — alert when price drops below this value, e.g. solana_alert_below = 150\n  {token}_alert_above — alert when price rises above this value, e.g. solana_alert_above = 250\n  {token}_alert_change_pct — alert when 24h change exceeds this absolute percentage, e.g. solana_alert_change_pct = 10",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.9.0",
     "tags": [
