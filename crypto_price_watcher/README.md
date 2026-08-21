@@ -64,6 +64,10 @@ CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 
 ## Changelog
 
+### v1.1.3
+
+- Restore CoinGecko `simple/price` fetch after `coins/markets` failed in Sidefy
+
 ### v1.1.2
 
 - Show 24h window on price change in the event title
