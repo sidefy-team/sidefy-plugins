@@ -60,7 +60,7 @@ SOL $150.234567 ↗ +3.45% (24h)
 
 ## Data Source
 
-CoinGecko API: `https://api.coingecko.com/api/v3/coins/markets`
+CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 
 ## Changelog
 
@@ -69,7 +69,7 @@ CoinGecko API: `https://api.coingecko.com/api/v3/coins/markets`
 - Show 24h window on price change in the event title
 - Unify percentage-change alert text as `|Δ| > x%`
 - Store price, symbol, and alert cooldowns in one JSON keyed by coin
-- Fetch price and symbol in a single CoinGecko markets request; reuse cached state if the request fails
+- Reuse cached coin state if the price request fails; resolve symbols into the same JSON
 
 ### v1.1.1
 

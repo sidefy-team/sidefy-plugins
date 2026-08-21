@@ -78,33 +78,29 @@ function fetchEvents(config) {
 
         if (needFetch) {
             try {
-                var url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=" +
+                var url = "https://api.coingecko.com/api/v3/simple/price?ids=" +
                     tokens.map(encodeURIComponent).join(",") +
-                    "&per_page=" + Math.min(Math.max(tokens.length, 1), 250) +
-                    "&page=1&sparkline=false";
+                    "&vs_currencies=usd&include_24hr_change=true&include_last_updated_at=true";
                 var response = sidefy.http.get(url, headers);
                 if (response) {
-                    var list = JSON.parse(response);
-                    if (Array.isArray(list)) {
-                        for (var j = 0; j < list.length; j++) {
-                            var item = list[j];
-                            if (!item || !item.id || item.current_price === undefined || item.current_price === null) {
+                    var data = typeof response === "string" ? JSON.parse(response) : response;
+                    if (data && typeof data === "object") {
+                        for (var j = 0; j < tokens.length; j++) {
+                            var id = tokens[j];
+                            var item = data[id];
+                            if (!item || item.usd === undefined || item.usd === null) {
                                 continue;
                             }
-                            var prev = state.coins[item.id] || {};
-                            var updatedAt = item.last_updated ? new Date(item.last_updated).getTime() : 0;
-                            if (isNaN(updatedAt)) {
-                                updatedAt = 0;
-                            }
-                            state.coins[item.id] = {
-                                symbol: item.symbol ? String(item.symbol).toUpperCase() : (prev.symbol || item.id.toUpperCase()),
-                                price: Number(item.current_price),
-                                change24h: Number(item.price_change_percentage_24h) || 0,
-                                updatedAt: updatedAt || nowTs,
+                            var prev = state.coins[id] || {};
+                            state.coins[id] = {
+                                symbol: prev.symbol || id.toUpperCase(),
+                                price: Number(item.usd),
+                                change24h: Number(item.usd_24h_change) || 0,
+                                updatedAt: item.last_updated_at ? Number(item.last_updated_at) * 1000 : nowTs,
                                 cooldowns: prev.cooldowns
                             };
-                            if (!state.coins[item.id].cooldowns) {
-                                delete state.coins[item.id].cooldowns;
+                            if (!state.coins[id].cooldowns) {
+                                delete state.coins[id].cooldowns;
                             }
                         }
                         state.fetchedAt = nowTs;
@@ -114,6 +110,26 @@ function fetchEvents(config) {
                 }
             } catch (fetchErr) {
                 sidefy.log("CoinGecko API request failed: " + fetchErr.message);
+            }
+        }
+
+        // Resolve placeholder symbols (id uppercased) once
+        for (var s = 0; s < tokens.length; s++) {
+            var coinForSymbol = state.coins[tokens[s]];
+            if (!coinForSymbol || coinForSymbol.symbol !== tokens[s].toUpperCase()) {
+                continue;
+            }
+            try {
+                var coinUrl = "https://api.coingecko.com/api/v3/coins/" + encodeURIComponent(tokens[s]);
+                var coinResponse = sidefy.http.get(coinUrl, headers);
+                if (coinResponse) {
+                    var coinInfo = typeof coinResponse === "string" ? JSON.parse(coinResponse) : coinResponse;
+                    if (coinInfo && coinInfo.symbol) {
+                        coinForSymbol.symbol = String(coinInfo.symbol).toUpperCase();
+                    }
+                }
+            } catch (symbolErr) {
+                sidefy.log("Failed to fetch symbol for " + tokens[s] + ": " + symbolErr.message);
             }
         }
 
