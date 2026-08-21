@@ -41,14 +41,14 @@ alert_cooldown_hours = 6
 ### Normal
 
 ```
-SOL $150.234567 ↗ +3.45%
+SOL $150.234567 ↗ +3.45% (24h)
 ```
 
 ### Alert Triggered
 
 ```
-[ALERT] SOL $149.500000 ↗ +3.45% (< $150)
-[ALERT] BTC $86000.000000 ↘ -1.20% (> $85000, 24h change > 10%)
+[ALERT] SOL $149.500000 ↗ +3.45% (24h) (< $150)
+[ALERT] BTC $86000.000000 ↘ -1.20% (24h) (> $85000, |Δ| > 10%)
 ```
 
 ## How to Find CoinGecko Token IDs
@@ -60,9 +60,16 @@ SOL $150.234567 ↗ +3.45%
 
 ## Data Source
 
-CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
+CoinGecko API: `https://api.coingecko.com/api/v3/coins/markets`
 
 ## Changelog
+
+### v1.1.2
+
+- Show 24h window on price change in the event title
+- Unify percentage-change alert text as `|Δ| > x%`
+- Store price, symbol, and alert cooldowns in one JSON keyed by coin
+- Fetch price and symbol in a single CoinGecko markets request; reuse cached state if the request fails
 
 ### v1.1.1
 
