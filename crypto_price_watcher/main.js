@@ -28,11 +28,6 @@ function fetchEvents(config) {
             intervalMinutes = 15;
         }
 
-        var cooldownHours = Number(config.alert_cooldown_hours);
-        if (isNaN(cooldownHours) || cooldownHours < 0) {
-            cooldownHours = 6;
-        }
-
         var headers = {
             "User-Agent": "Sidefy Crypto Price Monitor",
             "Accept": "application/json"
@@ -41,7 +36,7 @@ function fetchEvents(config) {
         var now = new Date();
         var nowTs = now.getTime();
 
-        // One JSON: { fetchedAt, tokens, coins: { id: { symbol, price, change24h, updatedAt, cooldowns? } } }
+        // One JSON: { fetchedAt, tokens, coins: { id: { symbol, price, change24h, updatedAt } } }
         var state = { fetchedAt: 0, tokens: [], coins: {} };
         var raw = sidefy.storage.get(STORAGE_KEY);
         if (raw) {
@@ -59,11 +54,13 @@ function fetchEvents(config) {
             }
         }
 
-        // Drop coins no longer in config
+        // Drop coins no longer in config; strip legacy cooldown fields
         Object.keys(state.coins).forEach(function (id) {
             if (tokens.indexOf(id) === -1) {
                 delete state.coins[id];
+                return;
             }
+            delete state.coins[id].cooldowns;
         });
 
         var needFetch = !(state.fetchedAt > 0 && (nowTs - state.fetchedAt < intervalMinutes * 60000));
@@ -96,12 +93,8 @@ function fetchEvents(config) {
                                 symbol: prev.symbol || id.toUpperCase(),
                                 price: Number(item.usd),
                                 change24h: Number(item.usd_24h_change) || 0,
-                                updatedAt: item.last_updated_at ? Number(item.last_updated_at) * 1000 : nowTs,
-                                cooldowns: prev.cooldowns
+                                updatedAt: item.last_updated_at ? Number(item.last_updated_at) * 1000 : nowTs
                             };
-                            if (!state.coins[id].cooldowns) {
-                                delete state.coins[id].cooldowns;
-                            }
                         }
                         state.fetchedAt = nowTs;
                     }
@@ -183,34 +176,6 @@ function fetchEvents(config) {
             }
             if (alertChangePct !== undefined && !isNaN(Number(alertChangePct)) && Math.abs(change24h) > Number(alertChangePct)) {
                 alerts.push({ type: "change_pct", threshold: Number(alertChangePct) });
-            }
-
-            if (alerts.length > 0 && cooldownHours > 0) {
-                var cooldowns = coin.cooldowns || {};
-                var activeAlerts = [];
-                var updatedCooldowns = {};
-
-                for (var a = 0; a < alerts.length; a++) {
-                    var alertItem = alerts[a];
-                    var lastTrigger = cooldowns[alertItem.type] || 0;
-                    if (nowTs - lastTrigger > cooldownHours * 3600000) {
-                        activeAlerts.push(alertItem);
-                        updatedCooldowns[alertItem.type] = nowTs;
-                    }
-                }
-
-                Object.keys(cooldowns).forEach(function (key) {
-                    if (!updatedCooldowns[key] && (nowTs - cooldowns[key] <= cooldownHours * 3600000)) {
-                        updatedCooldowns[key] = cooldowns[key];
-                    }
-                });
-
-                if (Object.keys(updatedCooldowns).length > 0) {
-                    coin.cooldowns = updatedCooldowns;
-                } else {
-                    delete coin.cooldowns;
-                }
-                alerts = activeAlerts;
             }
 
             if (alerts.length > 0) {

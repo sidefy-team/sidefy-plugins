@@ -5,9 +5,8 @@ A Sidefy plugin that monitors cryptocurrency prices via CoinGecko API and shows 
 ## Features
 
 - **Multi-Token Monitoring**: Track multiple cryptocurrencies in a single plugin instance.
-- **Price Threshold Alerts**: Get notified when price drops below or rises above your configured thresholds.
-- **Percentage Change Alerts**: Get notified when 24h price change exceeds your configured percentage.
-- **Cooldown Mechanism**: Prevent repeated alerts for the same condition within a configurable cooldown period.
+- **Price Threshold Alerts**: Highlight when price drops below or rises above your configured thresholds.
+- **Percentage Change Alerts**: Highlight when 24h price change exceeds your configured percentage.
 - **Multilingual Support**: Event titles, alert texts, and notes support zh, en, ja, and ko.
 - **Color Coding**: Green for price up, red for down, blue for flat, orange for triggered alerts.
 
@@ -17,7 +16,6 @@ A Sidefy plugin that monitors cryptocurrency prices via CoinGecko API and shows 
 |-----------|------|---------|-------------|---------|
 | `tokens` | string | `bitcoin,ethereum` | CoinGecko token IDs, comma-separated | `solana,bitcoin,ethereum` |
 | `interval_minutes` | number | `15` | Minimum interval in minutes between API calls. Price data is cached for this duration. | `interval_minutes = 15` |
-| `alert_cooldown_hours` | number | `6` | Cooldown in hours for the same alert condition on the same token. Set to `0` to disable. | `alert_cooldown_hours = 6` |
 | `{token}_alert_below` | number | (Optional) | Manually add this key. Alert when price drops below this value. | `solana_alert_below = 150` |
 | `{token}_alert_above` | number | (Optional) | Manually add this key. Alert when price rises above this value. | `solana_alert_above = 250` |
 | `{token}_alert_change_pct` | number | (Optional) | Manually add this key. Alert when 24h change exceeds this absolute percentage. | `solana_alert_change_pct = 10` |
@@ -32,8 +30,6 @@ solana_alert_above = 250
 solana_alert_change_pct = 10
 
 bitcoin_alert_below = 80000
-
-alert_cooldown_hours = 6
 ```
 
 ## Display Format
@@ -51,6 +47,8 @@ SOL $150.234567 ↗ +3.45% (24h)
 [ALERT] BTC $86000.000000 ↘ -1.20% (24h) (> $85000, |Δ| > 10%)
 ```
 
+Alerts stay visible for as long as the condition is true.
+
 ## How to Find CoinGecko Token IDs
 
 1. Go to [CoinGecko](https://www.coingecko.com) and search for a token.
@@ -64,6 +62,10 @@ CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 
 ## Changelog
 
+### v1.1.4
+
+- Remove alert cooldown; show `[ALERT]` whenever the condition is still true
+
 ### v1.1.3
 
 - Restore CoinGecko `simple/price` fetch after `coins/markets` failed in Sidefy
@@ -72,7 +74,7 @@ CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 
 - Show 24h window on price change in the event title
 - Unify percentage-change alert text as `|Δ| > x%`
-- Store price, symbol, and alert cooldowns in one JSON keyed by coin
+- Store price, symbol, and related state in one JSON keyed by coin
 - Reuse cached coin state if the price request fails; resolve symbols into the same JSON
 
 ### v1.1.1
@@ -91,6 +93,5 @@ CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 - Multi-token price monitoring via CoinGecko API
 - Price threshold alerts (above / below)
 - 24h percentage change alerts
-- Configurable alert cooldown
 - Multilingual support (zh, en, ja, ko)
 - Color-coded price change indicators
