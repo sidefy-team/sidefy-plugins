@@ -573,7 +573,7 @@ var I18N_STATUS_CLOSED = {
 
 function i18nStarred(login, repo) {
     return sidefy.i18n({
-        zh: login + " starred " + repo,
+        zh: login + " 标星了 " + repo,
         en: login + " starred " + repo,
         ja: login + " が " + repo + " をスターしました",
         ko: login + "님이 " + repo + "에 스타를 했습니다"
@@ -591,16 +591,16 @@ function i18nReleased(repo, tag) {
 
 function i18nCreatedPR(login, repo) {
     return sidefy.i18n({
-        zh: login + " 在 " + repo + " 创建了 PR",
+        zh: login + " 在 " + repo + " 创建了拉取请求",
         en: login + " created PR in " + repo,
-        ja: login + " が " + repo + " で PR を作成しました",
-        ko: login + "님이 " + repo + "에서 PR을 생성했습니다"
+        ja: login + " が " + repo + " でプルリクエストを作成しました",
+        ko: login + "님이 " + repo + "에서 풀 리퀘스트를 생성했습니다"
     });
 }
 
 function i18nForked(login, repo) {
     return sidefy.i18n({
-        zh: login + " forked " + repo,
+        zh: login + " 分叉了 " + repo,
         en: login + " forked " + repo,
         ja: login + " が " + repo + " をフォークしました",
         ko: login + "님이 " + repo + "를 포크했습니다"
@@ -609,7 +609,7 @@ function i18nForked(login, repo) {
 
 function i18nCreatedIssue(login, repo) {
     return sidefy.i18n({
-        zh: login + " 在 " + repo + " 创建了 Issue",
+        zh: login + " 在 " + repo + " 创建了议题",
         en: login + " created issue in " + repo,
         ja: login + " が " + repo + " で Issue を作成しました",
         ko: login + "님이 " + repo + "에서 이슈를 생성했습니다"

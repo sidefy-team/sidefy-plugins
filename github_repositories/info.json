@@ -1,7 +1,7 @@
 {
     "name": "GitHub Repository",
     "description": "Track today's stars, releases, pull requests, forks, issues, and discussions for GitHub repositories.\n\nAdd repositories via incremental config: key = owner/repo (or GitHub URL), value = event types.\n  Example key: sidefy-team/sidefy\n  Example value: stars,releases,pullRequests,forks,issues,discussions\n  Leave value empty (or use * / all / true) to enable all event types.\n  Use false / off / disabled to temporarily disable a repository.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.9.0",
     "tags": [

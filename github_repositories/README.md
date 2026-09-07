@@ -43,6 +43,10 @@ octocat/Hello-World = stars,forks  # only stars and forks
 
 ### Changelog
 
+#### v1.0.1
+
+- Fix event title i18n: zh/ja/ko no longer keep English verbs like "starred" / "forked"
+
 #### v1.0.0
 
 - Initial release (ported from Sidefy built-in GitHub Repository plugin)
