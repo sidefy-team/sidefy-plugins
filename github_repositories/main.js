@@ -1,7 +1,8 @@
 // GitHub Repository — track today's repo activity (stars / releases / PRs / forks / issues / discussions)
 var BUILTIN_KEYS = { token: true };
 var ALL_EVENT_TYPES = ["stars", "releases", "pullRequests", "forks", "issues", "discussions"];
-var CACHE_TTL_MINUTES = 5;
+var EMPTY_CACHE_TTL_MINUTES = 5;
+var POPULATED_CACHE_TTL_MINUTES = 15;
 var USER_AGENT = "Sidefy-GitHub-Repository-Plugin";
 
 function fetchEvents(config) {
@@ -17,7 +18,7 @@ function fetchEvents(config) {
     var headers = defaultHeaders(token);
     var cacheKey = "github_repositories_today_v2_" + repositoryConfigHash(repos);
     var cached = sidefy.storage.get(cacheKey);
-    if (cached && Array.isArray(cached) && cached.length > 0) {
+    if (Array.isArray(cached)) {
         return cached;
     }
 
@@ -48,9 +49,8 @@ function fetchEvents(config) {
         }
     }
 
-    if (events.length > 0) {
-        sidefy.storage.set(cacheKey, events, CACHE_TTL_MINUTES);
-    }
+    var cacheTtl = events.length > 0 ? POPULATED_CACHE_TTL_MINUTES : EMPTY_CACHE_TTL_MINUTES;
+    sidefy.storage.set(cacheKey, events, cacheTtl);
     return events;
 }
 
