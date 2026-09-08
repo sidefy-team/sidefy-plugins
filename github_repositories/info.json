@@ -1,7 +1,7 @@
 {
     "name": "GitHub Repository",
-    "description": "Track today's stars, releases, pull requests, forks, issues, and discussions for GitHub repositories.\n\nAdd repositories via incremental config: key = owner/repo (or GitHub URL), value = event types.\n  Example key: sidefy-team/sidefy\n  Example value: stars,releases,pullRequests,forks,issues,discussions\n  Leave value empty (or use * / all / true) to enable all event types.\n  Use false / off / disabled to temporarily disable a repository.",
-    "version": "1.0.1",
+    "description": "Track today's stars, releases, pull requests, forks, issues, and discussions for GitHub repositories.\n\nAdd repositories via incremental config: key = owner/repo (or GitHub URL), value = event types.\n  Example key: sidefy-team/sidefy\n  Example value: stars,releases,pullRequests,forks,issues,discussions\n  Leave value empty (or use * / all / true / 1) to enable all event types.\n  Use false / 0 / off / disabled to temporarily disable a repository.\n  Separate types with comma, semicolon, or whitespace. Unrecognized names are ignored; if none match, all types are enabled.\n\nSupported types and aliases:\n  stars (star)\n  releases (release)\n  pullRequests (pr, prs, pull_requests, pull-requests)\n  forks (fork)\n  issues (issue)\n  discussions (discussion)",
+    "version": "1.0.3",
     "author": "Sidefy Team",
     "min_support_app_version": "2025.9.0",
     "tags": [

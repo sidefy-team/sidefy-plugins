@@ -7,7 +7,7 @@ Track today's GitHub repository activity on your Sidefy timeline: stars, release
 - Multiple repositories via incremental config keys
 - Optional Personal Access Token (higher rate limits; needed for private repos)
 - Per-repository event type filters
-- 15-minute response cache
+- 5-minute response cache, isolated by repository and event-type configuration
 
 ### Configuration
 
@@ -27,11 +27,20 @@ Add custom config entries:
 
 Value examples:
 
-- empty / `*` / `all` / `true` — enable all event types
-- `stars,releases,pullRequests` — only selected types
-- `false` / `off` / `disabled` — temporarily disable that repository
+- empty / `*` / `all` / `true` / `1` — enable all event types
+- `stars,releases,pullRequests` — only selected types (`,` `;` or whitespace separated)
+- `false` / `0` / `off` / `disabled` — temporarily disable that repository
 
-Supported event type names: `stars`, `releases`, `pullRequests` (aliases: `pr`, `prs`), `forks`, `issues`, `discussions`.
+Unrecognized type names are ignored. If none of the listed names match, all event types are enabled.
+
+| Type | Aliases |
+|------|---------|
+| `stars` | `star` |
+| `releases` | `release` |
+| `pullRequests` | `pr`, `prs`, `pull_requests`, `pull-requests` |
+| `forks` | `fork` |
+| `issues` | `issue` |
+| `discussions` | `discussion` |
 
 ### Example
 
@@ -42,6 +51,15 @@ octocat/Hello-World = stars,forks  # only stars and forks
 ```
 
 ### Changelog
+
+#### v1.0.3
+
+- Reduce response cache duration from 15 minutes to 5 minutes
+- Isolate cached responses by repository and event-type configuration
+
+#### v1.0.2
+
+- Document all event type aliases and value rules (`1` / `0`, separators, unrecognized names)
 
 #### v1.0.1
 
