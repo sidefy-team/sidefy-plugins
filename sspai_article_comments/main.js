@@ -18,7 +18,7 @@ function fetchEvents(config) {
 }
 
 function fetchArticleTitle(articleId) {
-    var cacheKey = "article_title_" + articleId;
+    var cacheKey = "article_title_v2_" + articleId;
     var cachedTitle = nunc.storage.get(cacheKey);
     if (cachedTitle) return cachedTitle;
 
@@ -31,7 +31,7 @@ function fetchArticleTitle(articleId) {
             var payload = JSON.parse(response);
             if (payload.error === 0 && payload.data && payload.data.title) {
                 var title = cleanText(payload.data.title);
-                nunc.storage.set(cacheKey, title, 60);
+                nunc.storage.set(cacheKey, title, 15);
                 return title;
             }
         }
@@ -43,7 +43,7 @@ function fetchArticleTitle(articleId) {
 
 function fetchArticleComments(articleId, articleTitle, pageSize, events) {
     try {
-        var cacheKey = "article_comments_" + articleId;
+        var cacheKey = "article_comments_v2_" + articleId;
         var cachedEvents = nunc.storage.get(cacheKey);
         if (Array.isArray(cachedEvents)) {
             Array.prototype.push.apply(events, cachedEvents);
@@ -100,7 +100,7 @@ function fetchArticleComments(articleId, articleTitle, pageSize, events) {
             if ((total !== null && offset >= total) || payload.data.length < requestLimit) break;
         }
 
-        nunc.storage.set(cacheKey, articleEvents, 60);
+        nunc.storage.set(cacheKey, articleEvents, 15);
         Array.prototype.push.apply(events, articleEvents);
 
     } catch (error) {
@@ -126,7 +126,7 @@ function makeCommentEvent(item, text, articleId, articleTitle, isReply) {
         title: nickname + ": " + text.slice(0, 70) + (text.length > 70 ? "…" : ""),
         startDate: nunc.date.format(timestamp),
         endDate: nunc.date.format(timestamp),
-        color: isReply ? "#34A853" : "#D7000F",
+        color: isReply ? "#007AFF" : "#D7000F",
         notes: notes,
         icon: user.avatar ? (user.avatar.indexOf("http") === 0 ? user.avatar : "https://cdnfile.sspai.com/" + user.avatar) : null,
         isAllDay: false,
