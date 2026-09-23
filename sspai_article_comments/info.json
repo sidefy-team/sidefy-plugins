@@ -1,0 +1,26 @@
+{
+  "name": "少数派文章评论",
+  "description": "读取少数派文章的公开热门评论和作者回复，并在时间线中查看。",
+  "version": "1.2.1",
+  "author": "sha2kyou",
+  "min_support_app_version": "2025.10.7",
+  "tags": ["sspai", "少数派", "评论", "Matrix", "社交媒体"],
+  "category": "社交媒体",
+  "config_options": {
+    "articleId": {
+      "type": "string",
+      "default": "114211",
+      "required": true,
+      "description": "一个或多个少数派文章 ID，可用逗号、空格或换行分隔；从 https://sspai.com/post/ 后获取数字"
+    },
+    "pageSize": {
+      "type": "number",
+      "default": 20,
+      "description": "每页评论数，最大 20"
+    }
+  },
+  "requirements": {
+    "network": true,
+    "storage": true
+  }
+}
