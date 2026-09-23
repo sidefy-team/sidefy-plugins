@@ -43,7 +43,7 @@ function fetchArticleTitle(articleId) {
 
 function fetchArticleComments(articleId, articleTitle, pageSize, events) {
     try {
-        var cacheKey = "article_comments_v2_" + articleId;
+        var cacheKey = "article_comments_v4_" + articleId;
         var cachedEvents = nunc.storage.get(cacheKey);
         if (Array.isArray(cachedEvents)) {
             Array.prototype.push.apply(events, cachedEvents);
@@ -112,23 +112,43 @@ function cleanText(value) {
     return typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
 }
 
+function isArticleAuthor(item) {
+    return !!(item && item.is_author === true);
+}
+
+function avatarIcon(avatar) {
+    if (!avatar) return null;
+    if (avatar.indexOf("http") === 0) {
+        return avatar.replace("://cdnfile.sspai.com/", "://rssfile.sspai.com/");
+    }
+    return "https://rssfile.sspai.com/" + avatar;
+}
+
+function commentLabel(isReply, isAuthor) {
+    if (isAuthor) {
+        return nunc.i18n(isReply ? I18N_AUTHOR_REPLY_LABEL : I18N_AUTHOR_LABEL);
+    }
+    return nunc.i18n(isReply ? I18N_REPLY_LABEL : I18N_COMMENT_LABEL);
+}
+
 function makeCommentEvent(item, text, articleId, articleTitle, isReply) {
     var user = item.user || item.author || {};
     var nickname = cleanText(user.nickname) || nunc.i18n(I18N_UNKNOWN_USER);
+    var isAuthor = isArticleAuthor(item);
     var timestamp = Number(item.created_at) || Date.now() / 1000;
     var articleURL = "https://sspai.com/post/" + articleId;
     var notes = nunc.i18n(I18N_ORIGINAL_ARTICLE) + ": " + articleTitle +
         "\n" + articleURL + "\n\n" +
-        (isReply ? nunc.i18n(I18N_REPLY_LABEL) : nunc.i18n(I18N_COMMENT_LABEL)) +
+        commentLabel(isReply, isAuthor) +
         " · " + nickname + "\n\n" + text;
 
     return {
         title: nickname + ": " + text.slice(0, 70) + (text.length > 70 ? "…" : ""),
         startDate: nunc.date.format(timestamp),
         endDate: nunc.date.format(timestamp),
-        color: isReply ? "#007AFF" : "#D7000F",
+        color: isAuthor ? "#007AFF" : "#D7000F",
         notes: notes,
-        icon: user.avatar ? (user.avatar.indexOf("http") === 0 ? user.avatar : "https://cdnfile.sspai.com/" + user.avatar) : null,
+        icon: avatarIcon(user.avatar),
         isAllDay: false,
         isPointInTime: true,
         eventType: "comment",
@@ -178,6 +198,20 @@ var I18N_REPLY_LABEL = {
     en: "Reply",
     ja: "返信",
     ko: "답글"
+};
+
+var I18N_AUTHOR_LABEL = {
+    zh: "作者",
+    en: "Author",
+    ja: "著者",
+    ko: "작성자"
+};
+
+var I18N_AUTHOR_REPLY_LABEL = {
+    zh: "作者回复",
+    en: "Author reply",
+    ja: "著者の返信",
+    ko: "작성자 답글"
 };
 
 var I18N_ORIGINAL_ARTICLE = {

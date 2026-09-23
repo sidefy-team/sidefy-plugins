@@ -1,7 +1,7 @@
 {
   "name": "少数派文章评论",
   "description": "读取少数派文章的公开热门评论和作者回复，并在时间线中查看。",
-  "version": "1.2.3",
+  "version": "1.2.5",
   "author": "Nunc.",
   "min_support_app_version": "2026.9.4",
   "tags": ["sspai", "少数派", "评论", "Matrix", "社交媒体"],
