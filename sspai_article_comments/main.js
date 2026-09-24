@@ -43,7 +43,7 @@ function fetchArticleTitle(articleId) {
 
 function fetchArticleComments(articleId, articleTitle, pageSize, events) {
     try {
-        var cacheKey = "article_comments_v4_" + articleId;
+        var cacheKey = "article_comments_v10_" + articleId;
         var cachedEvents = nunc.storage.get(cacheKey);
         if (Array.isArray(cachedEvents)) {
             Array.prototype.push.apply(events, cachedEvents);
@@ -82,15 +82,23 @@ function fetchArticleComments(articleId, articleTitle, pageSize, events) {
             payload.data.forEach(function (item) {
                 var commentText = cleanText(item.comment);
                 if (commentText) {
-                    articleEvents.push(makeCommentEvent(item, commentText, articleId, articleTitle, false));
+                    articleEvents.push(makeCommentEvent(item, commentText, articleId, articleTitle, null));
                 }
 
                 if (Array.isArray(item.reply)) {
+                    var context = [item];
                     item.reply.forEach(function (reply) {
                         var replyText = cleanText(reply.comment);
                         if (replyText) {
-                            articleEvents.push(makeCommentEvent(reply, replyText, articleId, articleTitle, true));
+                            articleEvents.push(makeCommentEvent(
+                                reply,
+                                replyText,
+                                articleId,
+                                articleTitle,
+                                quoteFromOthers(context, reply)
+                            ));
                         }
+                        context.push(reply);
                     });
                 }
             });
@@ -109,7 +117,46 @@ function fetchArticleComments(articleId, articleTitle, pageSize, events) {
 }
 
 function cleanText(value) {
-    return typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
+    if (typeof value !== "string") return "";
+    return value
+        .replace(/<br\s*\/?>/gi, " ")
+        .replace(/<a\b[^>]*>([\s\S]*?)<\/a>/gi, "$1")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, "\"")
+        .replace(/&#39;|&apos;/g, "'")
+        .replace(/&nbsp;/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function commentUser(item) {
+    return (item && (item.user || item.author)) || {};
+}
+
+function userKey(item) {
+    var user = commentUser(item);
+    if (user.id) return "id:" + user.id;
+    var nickname = cleanText(user.nickname);
+    return nickname ? "name:" + nickname : "";
+}
+
+function displayName(item) {
+    return cleanText(commentUser(item).nickname) || nunc.i18n(I18N_UNKNOWN_USER);
+}
+
+function quoteFromOthers(context, reply) {
+    var currentKey = userKey(reply);
+    for (var i = context.length - 1; i >= 0; i--) {
+        var source = context[i];
+        if (!currentKey || userKey(source) === currentKey) continue;
+        var text = cleanText(source.comment);
+        if (!text) continue;
+        return { nickname: displayName(source), text: text };
+    }
+    return null;
 }
 
 function isArticleAuthor(item) {
@@ -124,23 +171,17 @@ function avatarIcon(avatar) {
     return "https://rssfile.sspai.com/" + avatar;
 }
 
-function commentLabel(isReply, isAuthor) {
-    if (isAuthor) {
-        return nunc.i18n(isReply ? I18N_AUTHOR_REPLY_LABEL : I18N_AUTHOR_LABEL);
-    }
-    return nunc.i18n(isReply ? I18N_REPLY_LABEL : I18N_COMMENT_LABEL);
-}
-
-function makeCommentEvent(item, text, articleId, articleTitle, isReply) {
-    var user = item.user || item.author || {};
-    var nickname = cleanText(user.nickname) || nunc.i18n(I18N_UNKNOWN_USER);
+function makeCommentEvent(item, text, articleId, articleTitle, quoted) {
+    var user = commentUser(item);
+    var nickname = displayName(item);
     var isAuthor = isArticleAuthor(item);
     var timestamp = Number(item.created_at) || Date.now() / 1000;
     var articleURL = "https://sspai.com/post/" + articleId;
-    var notes = nunc.i18n(I18N_ORIGINAL_ARTICLE) + ": " + articleTitle +
-        "\n" + articleURL + "\n\n" +
-        commentLabel(isReply, isAuthor) +
-        " · " + nickname + "\n\n" + text;
+    var notes = nunc.i18n(I18N_ORIGINAL_ARTICLE) + ": " + articleTitle + "\n" + articleURL;
+    if (quoted) {
+        notes += "\n" + i18nQuotedReply(quoted.nickname, quoted.text);
+    }
+    notes += "\n" + text;
 
     return {
         title: nickname + ": " + text.slice(0, 70) + (text.length > 70 ? "…" : ""),
@@ -186,40 +227,21 @@ var I18N_UNKNOWN_USER = {
     ko: "SSPAI 사용자"
 };
 
-var I18N_COMMENT_LABEL = {
-    zh: "评论",
-    en: "Comment",
-    ja: "コメント",
-    ko: "댓글"
-};
-
-var I18N_REPLY_LABEL = {
-    zh: "回复",
-    en: "Reply",
-    ja: "返信",
-    ko: "답글"
-};
-
-var I18N_AUTHOR_LABEL = {
-    zh: "作者",
-    en: "Author",
-    ja: "著者",
-    ko: "작성자"
-};
-
-var I18N_AUTHOR_REPLY_LABEL = {
-    zh: "作者回复",
-    en: "Author reply",
-    ja: "著者の返信",
-    ko: "작성자 답글"
-};
-
 var I18N_ORIGINAL_ARTICLE = {
     zh: "原文章",
     en: "Original article",
     ja: "元の記事",
     ko: "원문"
 };
+
+function i18nQuotedReply(nickname, text) {
+    return nunc.i18n({
+        zh: "原回复：「" + nickname + "：" + text + "」",
+        en: "Original reply: \"" + nickname + ": " + text + "\"",
+        ja: "元の返信：「" + nickname + "：" + text + "」",
+        ko: "원 답글: \"" + nickname + ": " + text + "\""
+    });
+}
 
 function i18nTitleError(articleId, message) {
     return nunc.i18n({
