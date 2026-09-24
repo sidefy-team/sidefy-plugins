@@ -43,7 +43,7 @@ function fetchArticleTitle(articleId) {
 
 function fetchArticleComments(articleId, articleTitle, pageSize, events) {
     try {
-        var cacheKey = "article_comments_v10_" + articleId;
+        var cacheKey = "article_comments_v11_" + articleId;
         var cachedEvents = nunc.storage.get(cacheKey);
         if (Array.isArray(cachedEvents)) {
             Array.prototype.push.apply(events, cachedEvents);
@@ -177,7 +177,7 @@ function makeCommentEvent(item, text, articleId, articleTitle, quoted) {
     var isAuthor = isArticleAuthor(item);
     var timestamp = Number(item.created_at) || Date.now() / 1000;
     var articleURL = "https://sspai.com/post/" + articleId;
-    var notes = nunc.i18n(I18N_ORIGINAL_ARTICLE) + ": " + articleTitle + "\n" + articleURL;
+    var notes = nunc.i18n(I18N_ORIGINAL_ARTICLE) + ": " + articleTitle + " " + articleURL;
     if (quoted) {
         notes += "\n" + i18nQuotedReply(quoted.nickname, quoted.text);
     }
