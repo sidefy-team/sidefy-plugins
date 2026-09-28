@@ -83,7 +83,7 @@ function fetchEvents(config) {
 
 ## 国际化（i18n）
 
-插件中所有面向用户的文案必须使用 `sidefy.i18n()`。完整约定见 [claude.md](claude.md)。
+插件中所有面向用户的文案必须使用 `sidefy.i18n()`。
 
 ### 支持语言
 

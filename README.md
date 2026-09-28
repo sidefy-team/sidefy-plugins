@@ -83,7 +83,7 @@ function fetchEvents(config) {
 
 ## Internationalization (i18n)
 
-All user-facing strings in plugins must use `sidefy.i18n()`. See also [claude.md](claude.md) for full conventions.
+All user-facing strings in plugins must use `sidefy.i18n()`.
 
 ### Supported languages
 
