@@ -43,7 +43,7 @@ function fetchArticleTitle(articleId) {
 
 function fetchArticleComments(articleId, articleTitle, pageSize, events) {
     try {
-        var cacheKey = "article_comments_v11_" + articleId;
+        var cacheKey = "article_comments_v14_" + articleId;
         var cachedEvents = nunc.storage.get(cacheKey);
         if (Array.isArray(cachedEvents)) {
             Array.prototype.push.apply(events, cachedEvents);
@@ -181,7 +181,7 @@ function makeCommentEvent(item, text, articleId, articleTitle, quoted) {
     if (quoted) {
         notes += "\n" + i18nQuotedReply(quoted.nickname, quoted.text);
     }
-    notes += "\n" + text;
+    notes += "\n" + i18nCurrentReply(nickname, text);
 
     return {
         title: nickname + ": " + text.slice(0, 70) + (text.length > 70 ? "…" : ""),
@@ -236,10 +236,19 @@ var I18N_ORIGINAL_ARTICLE = {
 
 function i18nQuotedReply(nickname, text) {
     return nunc.i18n({
-        zh: "原回复：「" + nickname + "：" + text + "」",
-        en: "Original reply: \"" + nickname + ": " + text + "\"",
-        ja: "元の返信：「" + nickname + "：" + text + "」",
-        ko: "원 답글: \"" + nickname + ": " + text + "\""
+        zh: "原回复（" + nickname + "）：" + text,
+        en: "Original reply (" + nickname + "): " + text,
+        ja: "元の返信（" + nickname + "）：" + text,
+        ko: "원 답글 (" + nickname + "): " + text
+    });
+}
+
+function i18nCurrentReply(nickname, text) {
+    return nunc.i18n({
+        zh: "回复（" + nickname + "）：" + text,
+        en: "Reply (" + nickname + "): " + text,
+        ja: "返信（" + nickname + "）：" + text,
+        ko: "답글 (" + nickname + "): " + text
     });
 }
 
