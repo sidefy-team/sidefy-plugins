@@ -27,7 +27,12 @@ No configuration required. Plugin works out of the box.
 
 ### Changelog
 
-#### v0.1.0
+#### v0.0.6
+
+- Localized error messages with `sidefy.i18n()` (`zh` / `en` / `ja` / `ko`)
+- Added i18n constants and helpers in a `// --- i18n ---` block at the bottom of `main.js`
+
+#### v0.0.1
 
 - Initial release
 - Daily random Pokemon display functionality

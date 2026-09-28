@@ -4,7 +4,7 @@
 
 function fetchEvents(config) {
     if (!config.url || !config.username || !config.password) {
-        throw new Error("Please configure FreshRSS URL, Username, and API Password.");
+        throw new Error(sidefy.i18n(I18N_ERROR_CONFIG));
     }
 
     // Clean URL
@@ -41,7 +41,7 @@ function fetchEvents(config) {
         var response = sidefy.http.get(loginUrl, headers);
 
         if (!response) {
-            throw new Error("Login failed (empty response)");
+            throw new Error(sidefy.i18n(I18N_ERROR_LOGIN_EMPTY));
         }
 
         // Response format is line-based text usually:
@@ -58,14 +58,14 @@ function fetchEvents(config) {
         } else {
             // Try to see if it returned an error
             if (response.indexOf("Error=") !== -1) {
-                throw new Error("FreshRSS Login Error: " + response);
+                throw new Error(i18nLoginError(response));
             }
 
             // Debugging: Show what we actually got
             var debugRes = typeof response === 'string' ? response : JSON.stringify(response);
             if (debugRes.length > 200) debugRes = debugRes.substring(0, 200) + "...";
 
-            throw new Error("Failed to parse Auth token. Response start: " + debugRes);
+            throw new Error(i18nAuthParseError(debugRes));
         }
     }
 
@@ -189,4 +189,38 @@ function fetchEvents(config) {
     sidefy.log("[FreshRSS] Cached " + events.length + " articles for 5 minutes");
 
     return events;
+}
+
+// --- i18n ---
+
+var I18N_ERROR_CONFIG = {
+    zh: "请配置 FreshRSS 地址、用户名和 API 密码。",
+    en: "Please configure FreshRSS URL, Username, and API Password.",
+    ja: "FreshRSS の URL、ユーザー名、API パスワードを設定してください。",
+    ko: "FreshRSS URL, 사용자 이름, API 비밀번호를 설정해 주세요."
+};
+
+var I18N_ERROR_LOGIN_EMPTY = {
+    zh: "登录失败（响应为空）。",
+    en: "Login failed (empty response)",
+    ja: "ログインに失敗しました（応答が空です）。",
+    ko: "로그인에 실패했습니다(응답이 비어 있음)."
+};
+
+function i18nLoginError(response) {
+    return sidefy.i18n({
+        zh: "FreshRSS 登录错误: " + response,
+        en: "FreshRSS Login Error: " + response,
+        ja: "FreshRSS ログインエラー: " + response,
+        ko: "FreshRSS 로그인 오류: " + response
+    });
+}
+
+function i18nAuthParseError(detail) {
+    return sidefy.i18n({
+        zh: "无法解析 Auth 令牌。响应开头: " + detail,
+        en: "Failed to parse Auth token. Response start: " + detail,
+        ja: "Auth トークンを解析できません。応答の先頭: " + detail,
+        ko: "Auth 토큰을 분석할 수 없습니다. 응답 시작: " + detail
+    });
 }

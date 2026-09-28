@@ -39,6 +39,11 @@ Each RSS feed source is automatically assigned a unique color based on its URL u
 
 ### Changelog
 
+#### v1.2.1
+
+- Localized the plugin's error messages with `sidefy.i18n()` (`zh` / `en` / `ja` / `ko`)
+- Added i18n constants and helpers in a `// --- i18n ---` block at the bottom of `main.js`
+
 #### v1.2.0
 
 - **Adopted Sidefy's color system**: Now uses `sidefy.color.hash()` for color assignment instead of custom color selection

@@ -5,7 +5,7 @@
 function fetchEvents(config) {
     var token = config.token;
     if (!token || token.trim() === "") {
-        throw new Error("请配置您的 V2EX 私有 RSS Token。");
+        throw new Error(sidefy.i18n(I18N_ERROR_TOKEN));
     }
 
     var rssUrl = "https://www.v2ex.com/n/" + token.trim() + ".xml";
@@ -22,7 +22,7 @@ function fetchEvents(config) {
     try {
         var response = sidefy.http.get(rssUrl);
         if (!response) {
-            throw new Error("获取 V2EX RSS 订阅失败。");
+            throw new Error(sidefy.i18n(I18N_ERROR_FETCH));
         }
 
         // Parse Atom entries
@@ -42,14 +42,15 @@ function fetchEvents(config) {
                 // Construct a meaningful title if the original is empty
                 var displayTitle = title;
                 if (!displayTitle) {
-                    if (type.id === "thanks") {
-                        displayTitle = (authorName || "有人") + " 感谢了你的回复";
-                    } else if (type.id === "reward") {
-                        displayTitle = (authorName || "有人") + " 打赏了你";
+                    var fallbackAuthor = authorName || sidefy.i18n(I18N_SOMEONE);
+                    // detectType() only returns thanks/reward/favorite for an empty title, and
+                    // its own catch-all is "thanks" — so the last arm is the total fallback.
+                    if (type.id === "reward") {
+                        displayTitle = i18nRewardTitle(fallbackAuthor);
                     } else if (type.id === "favorite") {
-                        displayTitle = (authorName || "有人") + " 收藏了你的主题";
+                        displayTitle = i18nFavoriteTitle(fallbackAuthor);
                     } else {
-                        displayTitle = (authorName || "有人") + " 发送了新消息";
+                        displayTitle = i18nThanksTitle(fallbackAuthor);
                     }
                 }
 
@@ -86,7 +87,7 @@ function fetchEvents(config) {
 
         return mergedEvents;
     } catch (err) {
-        sidefy.log("V2EX 插件错误: " + err.message);
+        sidefy.log("V2EX plugin error: " + err.message);
         // 如果请求失败但有缓存,返回缓存数据
         if (cachedEvents.length > 0) {
             return cachedEvents;
@@ -164,39 +165,39 @@ function detectType(title, content, link) {
         // If title is empty, check content first.
         var cleanTxt = cleanContent(content);
         if (cleanTxt && cleanTxt.length > 0) {
-            return { id: "thanks", label: "点赞" };
+            return { id: "thanks" };
         }
 
         // Empty title/content + token-style link is treated as reward.
         // Example: https://www.v2ex.com2GcVra...
         var lowerLink = (link || "").toLowerCase();
         if (isTokenStyleV2exLink(lowerLink)) {
-            return { id: "reward", label: "打赏" };
+            return { id: "reward" };
         }
 
         // Empty title/content + topic link is usually "favorite".
         if (lowerLink.indexOf("/t/") !== -1 || lowerLink.indexOf("/topic/") !== -1) {
-            return { id: "favorite", label: "收藏" };
+            return { id: "favorite" };
         }
 
         // Opaque/non-topic links with empty title/content are usually thanks/reward notifications.
-        return { id: "thanks", label: "点赞" };
+        return { id: "thanks" };
     }
 
     var text = title.toLowerCase();
     if (text.indexOf("回复了你") !== -1 || text.indexOf("回复了") !== -1) {
-        return { id: "reply", label: "回复" };
+        return { id: "reply" };
     }
     if (text.indexOf("感谢了你") !== -1 || text.indexOf("感谢了") !== -1) {
-        return { id: "thanks", label: "点赞" };
+        return { id: "thanks" };
     }
     if (text.indexOf("提到你") !== -1 || text.indexOf("提到了你") !== -1) {
-        return { id: "mention", label: "提及" };
+        return { id: "mention" };
     }
     if (text.indexOf("收藏了") !== -1) {
-        return { id: "favorite", label: "收藏" };
+        return { id: "favorite" };
     }
-    return { id: "other", label: "通知" };
+    return { id: "other" };
 }
 
 /**
@@ -276,4 +277,54 @@ function hashString(str) {
         hash |= 0;
     }
     return Math.abs(hash).toString(16);
+}
+
+// --- i18n ---
+
+var I18N_SOMEONE = {
+    zh: "有人",
+    en: "Someone",
+    ja: "誰か",
+    ko: "익명의 사용자"
+};
+
+var I18N_ERROR_TOKEN = {
+    zh: "请配置您的 V2EX 私有 RSS Token。",
+    en: "Please configure your V2EX private RSS token.",
+    ja: "V2EX のプライベート RSS トークンを設定してください。",
+    ko: "V2EX 개인 RSS 토큰을 설정해 주세요."
+};
+
+var I18N_ERROR_FETCH = {
+    zh: "获取 V2EX RSS 订阅失败。",
+    en: "Failed to fetch the V2EX RSS feed.",
+    ja: "V2EX RSS フィードの取得に失敗しました。",
+    ko: "V2EX RSS 피드를 가져오지 못했습니다."
+};
+
+function i18nThanksTitle(author) {
+    return sidefy.i18n({
+        zh: author + " 感谢了你的回复",
+        en: author + " thanked your reply",
+        ja: author + " があなたの返信に感謝しました",
+        ko: author + "님이 회원님의 답글에 감사를 표했습니다"
+    });
+}
+
+function i18nRewardTitle(author) {
+    return sidefy.i18n({
+        zh: author + " 打赏了你",
+        en: author + " rewarded you",
+        ja: author + " があなたに投げ銭しました",
+        ko: author + "님이 회원님에게 후원했습니다"
+    });
+}
+
+function i18nFavoriteTitle(author) {
+    return sidefy.i18n({
+        zh: author + " 收藏了你的主题",
+        en: author + " favorited your topic",
+        ja: author + " があなたのトピックをお気に入りに追加しました",
+        ko: author + "님이 회원님의 게시글을 즐겨찾기에 추가했습니다"
+    });
 }

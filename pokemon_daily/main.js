@@ -30,7 +30,7 @@ function fetchEvents(config) {
 
         var response = sidefy.http.get(pokemonUrl);
         if (!response) {
-            throw new Error("获取宝可梦信息失败，请检查网络连接。");
+            throw new Error(sidefy.i18n(I18N_ERROR_FETCH));
         }
 
         // --- 解析HTML提取信息 ---
@@ -59,7 +59,7 @@ function fetchEvents(config) {
         }
 
     } catch (err) {
-        throw new Error("宝可梦插件执行失败: " + err.message);
+        throw new Error(i18nPokemonFailed(err.message));
     }
 
     return events;
@@ -182,4 +182,22 @@ function getTypeColor(type) {
     };
 
     return typeColors[type] || "#666666";
+}
+
+// --- i18n ---
+
+var I18N_ERROR_FETCH = {
+    zh: "获取宝可梦信息失败，请检查网络连接。",
+    en: "Failed to fetch Pokémon data. Please check your network connection.",
+    ja: "ポケモン情報の取得に失敗しました。ネットワーク接続を確認してください。",
+    ko: "포켓몬 정보를 가져오지 못했습니다. 네트워크 연결을 확인해 주세요."
+};
+
+function i18nPokemonFailed(detail) {
+    return sidefy.i18n({
+        zh: "宝可梦插件执行失败: " + detail,
+        en: "Pokémon plugin failed: " + detail,
+        ja: "ポケモンプラグインの実行に失敗しました: " + detail,
+        ko: "포켓몬 플러그인 실행에 실패했습니다: " + detail
+    });
 }
