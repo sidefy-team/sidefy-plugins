@@ -1,45 +1,66 @@
-// Bilibili 用户视频插件 - 按日期缓存版本
+// Bilibili 用户视频插件 - 按视频 ID 累积缓存
 // 作者: 李慕白
 function fetchEvents(config) {
-    var POLL_INTERVAL = 10 * 60 * 1000;  // 15 分钟
-    var CACHE_TTL = 60 * 60;             // 1 小时（秒）
+    var POLL_INTERVAL = 10 * 60 * 1000;
     var MAX_MIDS = 10;
     var VIDEOS_PER_MID = 10;
 
-    // 1. 获取今天的缓存 key
-    var CACHE_KEY = getCacheKey();  // "bili_poll_2025-01-15"
-    var today = getTodayKey();      // "2025-01-15"
+    var now = Date.now();
+    var today = getTodayKey();
+    var CACHE_KEY = "bili_index_v1_" + today;
+    var midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    var expiresAt = midnight.getTime();
 
     // 2. 解析配置（带去重）
     var mids = parseMids(config.mids);
-    if (mids.length === 0) {
-        return [];
-    }
-
     // 3. 读取或初始化存储
-    var storage = sidefy.storage.get(CACHE_KEY);
+    var index = sidefy.storage.get(CACHE_KEY);
+    var storage = index ? loadVideos(index) : sidefy.storage.get("bili_poll_archive_v1");
+    if (storage && ((storage.meta.expiresAt && now >= storage.meta.expiresAt) ||
+                    (storage.meta.date && storage.meta.date !== today))) {
+        storage = null;
+    }
     if (!storage) {
-        storage = initStorage(mids, today);
+        storage = sidefy.storage.get("bili_poll_v4_" + getTodayKey()) || initStorage(mids);
     }
 
-    // 4. 更新 mids 列表并清理旧数据
+    // 4. 配置变化只重置轮询，不删除已保存的视频
+    if (storage.meta.mids.join(',') !== mids.join(',')) {
+        storage.meta.idx = 0;
+        storage.meta.last = 0;
+    }
     storage.meta.mids = mids;
-    cleanupOldData(storage, mids);
+    storage.meta.date = today;
+    storage.meta.expiresAt = expiresAt;
 
     // 5. 判断是否需要轮询
-    var now = Date.now();
-    var shouldPoll = (now - storage.meta.last) >= POLL_INTERVAL;
+    var shouldPoll = mids.length > 0 && (now - storage.meta.last) >= POLL_INTERVAL;
 
     if (shouldPoll) {
         // 轮询：查询一个 UP 主
-        pollNextMid(storage, VIDEOS_PER_MID, CACHE_TTL);
+        pollNextMid(storage, VIDEOS_PER_MID);
 
         // 更新轮询时间
         storage.meta.last = now;
 
-        // 保存到存储（缓存 24 小时）
-        sidefy.storage.set(CACHE_KEY, storage, 86400);
     }
+
+    // 客户端 TTL 最短为 5 分钟；expiresAt 保证午夜后不返回旧缓存
+    var ttlMinutes = Math.max(5, (expiresAt - now) / 60000);
+    var savedIndex = { meta: storage.meta, data: {} };
+    for (var mid in storage.data) {
+        var videos = storage.data[mid].vids || [];
+        var ids = [];
+        for (var i = 0; i < videos.length; i++) {
+            var video = videos[i];
+            if (!video.b) continue;
+            saveCache(videoKey(video.b), { video: video, expiresAt: expiresAt }, ttlMinutes);
+            ids.push(video.b);
+        }
+        savedIndex.data[mid] = { vids: ids };
+    }
+    saveCache(CACHE_KEY, savedIndex, ttlMinutes);
 
     // 6. 返回所有事件
     return buildEvents(storage, config);
@@ -47,11 +68,31 @@ function fetchEvents(config) {
 
     // ==================== 辅助函数 ====================
 
-    /**
-     * 获取今天的缓存 key
-     */
-    function getCacheKey() {
-        return "bili_poll_v4_" + getTodayKey();
+    function videoKey(bvid) {
+        return "bili_video_v1_" + today + "_" + bvid;
+    }
+
+    function loadVideos(index) {
+        var result = { meta: index.meta, data: {} };
+        for (var mid in index.data) {
+            var videos = [];
+            var ids = index.data[mid].vids || [];
+            for (var i = 0; i < ids.length; i++) {
+                var cached = sidefy.storage.get(videoKey(ids[i]));
+                if (cached && cached.expiresAt > now) {
+                    videos.push(cached.video);
+                }
+            }
+            result.data[mid] = { vids: videos };
+        }
+        return result;
+    }
+
+    function saveCache(key, value, ttlMinutes) {
+        var result = sidefy.storage.set(key, value, ttlMinutes);
+        if (result === false || (result && result.error)) {
+            throw new Error("视频缓存保存失败，已有存储未删除");
+        }
     }
 
     /**
@@ -91,39 +132,14 @@ function fetchEvents(config) {
     }
 
     /**
-     * 清理不在当前配置中的旧数据
-     */
-    function cleanupOldData(storage, currentMids) {
-        var midSet = {};
-        for (var i = 0; i < currentMids.length; i++) {
-            midSet[currentMids[i]] = true;
-        }
-
-        var hasChanged = false;
-        for (var mid in storage.data) {
-            if (!midSet[mid]) {
-                delete storage.data[mid];
-                hasChanged = true;
-            }
-        }
-
-        // 如果配置变化，重置轮询
-        if (hasChanged || storage.meta.mids.length !== currentMids.length) {
-            storage.meta.idx = 0;
-            storage.meta.last = 0;
-        }
-    }
-
-    /**
      * 初始化存储结构
      */
-    function initStorage(mids, date) {
+    function initStorage(mids) {
         return {
             meta: {
                 mids: mids,
                 idx: 0,
-                last: 0,
-                date: date
+                last: 0
             },
             data: {}
         };
@@ -132,7 +148,7 @@ function fetchEvents(config) {
     /**
      * 查询下一个 UP 主（轮询）
      */
-    function pollNextMid(storage, pageSize, cacheTTL) {
+    function pollNextMid(storage, pageSize) {
         var mids = storage.meta.mids;
         if (mids.length === 0) return;
 
@@ -142,9 +158,19 @@ function fetchEvents(config) {
         try {
             var videos = fetchBilibiliVideos(mid, pageSize);
 
-            storage.data[mid] = {
-                vids: videos
-            };
+            var existing = storage.data[mid] ? storage.data[mid].vids || [] : [];
+            var merged = [];
+            var positions = Object.create(null);
+            existing.concat(videos).forEach(function(video) {
+                if (!video.b) return;
+                if (positions[video.b] === undefined) {
+                    positions[video.b] = merged.length;
+                    merged.push(video);
+                } else {
+                    merged[positions[video.b]] = video;
+                }
+            });
+            storage.data[mid] = { vids: merged };
         } catch (err) {
             // 查询失败，保持原有数据不变
         }
