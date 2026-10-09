@@ -1,4 +1,4 @@
-// Bilibili 用户视频插件 - 按视频 ID 累积缓存
+// Bilibili 用户视频插件 - 按用户 ID 缓存
 // 作者: 李慕白
 function fetchEvents(config) {
     var POLL_INTERVAL = 10 * 60 * 1000;
@@ -7,7 +7,7 @@ function fetchEvents(config) {
 
     var now = Date.now();
     var today = getTodayKey();
-    var CACHE_KEY = "bili_index_v1_" + today;
+    var CACHE_KEY = "bili_index_v2_" + today;
     var midnight = new Date(now);
     midnight.setHours(24, 0, 0, 0);
     var expiresAt = midnight.getTime();
@@ -16,13 +16,13 @@ function fetchEvents(config) {
     var mids = parseMids(config.mids);
     // 3. 读取或初始化存储
     var index = sidefy.storage.get(CACHE_KEY);
-    var storage = index ? loadVideos(index) : sidefy.storage.get("bili_poll_archive_v1");
+    var storage = index ? loadUsers(index) : null;
     if (storage && ((storage.meta.expiresAt && now >= storage.meta.expiresAt) ||
                     (storage.meta.date && storage.meta.date !== today))) {
         storage = null;
     }
     if (!storage) {
-        storage = sidefy.storage.get("bili_poll_v4_" + getTodayKey()) || initStorage(mids);
+        storage = initStorage(mids);
     }
 
     // 4. 配置变化只重置轮询，不删除已保存的视频
@@ -50,15 +50,8 @@ function fetchEvents(config) {
     var ttlMinutes = Math.max(5, (expiresAt - now) / 60000);
     var savedIndex = { meta: storage.meta, data: {} };
     for (var mid in storage.data) {
-        var videos = storage.data[mid].vids || [];
-        var ids = [];
-        for (var i = 0; i < videos.length; i++) {
-            var video = videos[i];
-            if (!video.b) continue;
-            saveCache(videoKey(video.b), { video: video, expiresAt: expiresAt }, ttlMinutes);
-            ids.push(video.b);
-        }
-        savedIndex.data[mid] = { vids: ids };
+        saveCache(userKey(mid), { vids: storage.data[mid].vids || [], expiresAt: expiresAt }, ttlMinutes);
+        savedIndex.data[mid] = {};
     }
     saveCache(CACHE_KEY, savedIndex, ttlMinutes);
 
@@ -68,22 +61,17 @@ function fetchEvents(config) {
 
     // ==================== 辅助函数 ====================
 
-    function videoKey(bvid) {
-        return "bili_video_v1_" + today + "_" + bvid;
+    function userKey(mid) {
+        return "bili_user_v1_" + today + "_" + mid;
     }
 
-    function loadVideos(index) {
+    function loadUsers(index) {
         var result = { meta: index.meta, data: {} };
         for (var mid in index.data) {
-            var videos = [];
-            var ids = index.data[mid].vids || [];
-            for (var i = 0; i < ids.length; i++) {
-                var cached = sidefy.storage.get(videoKey(ids[i]));
-                if (cached && cached.expiresAt > now) {
-                    videos.push(cached.video);
-                }
+            var cached = sidefy.storage.get(userKey(mid));
+            if (cached && cached.expiresAt > now) {
+                result.data[mid] = { vids: cached.vids || [] };
             }
-            result.data[mid] = { vids: videos };
         }
         return result;
     }
