@@ -7,7 +7,9 @@ Track today's GitHub repository activity on your Sidefy timeline: stars, release
 - Multiple repositories via incremental config keys
 - Optional Personal Access Token (higher rate limits; needed for private repos)
 - Per-repository event type filters
-- Response cache isolated by repository and event-type configuration: 5 minutes for empty results, 15 minutes for results with events
+- Separate caches per repository and event-type configuration, expiring at local midnight
+- Merge events by stable ID; retain cached events on empty, partial, or failed responses
+- Refresh every 5 minutes for empty results or 15 minutes for results with events
 
 ### Configuration
 
@@ -51,6 +53,12 @@ octocat/Hello-World = stars,forks  # only stars and forks
 ```
 
 ### Changelog
+
+#### v1.1.0
+
+- Store each repository independently until local midnight
+- Append new events and update existing events by stable ID, including PR status changes
+- Preserve today's cached events on empty, partial, or failed responses
 
 #### v1.0.4
 

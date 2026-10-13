@@ -16,41 +16,71 @@ function fetchEvents(config) {
     }
 
     var headers = defaultHeaders(token);
-    var cacheKey = "github_repositories_today_v2_" + repositoryConfigHash(repos);
-    var cached = sidefy.storage.get(cacheKey);
-    if (Array.isArray(cached)) {
-        return cached;
-    }
+    var now = new Date();
+    var day = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+    var midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    var expiresAt = midnight.getTime();
 
     for (var i = 0; i < repos.length; i++) {
         var repo = repos[i];
         var types = repo.types;
+        var cacheKey = "github_repo_daily_v3_" + encodeURIComponent(repo.name.toLowerCase()) + "_" + day + "_" + repositoryConfigHash([repo]);
+        var cached = sidefy.storage.get(cacheKey);
+        if (!cached || cached.expiresAt <= now.getTime()) {
+            cached = { events: [], last: 0 };
+        }
+        var interval = cached.events.length > 0 ? POPULATED_CACHE_TTL_MINUTES : EMPTY_CACHE_TTL_MINUTES;
+        if (cached.last && now.getTime() - cached.last < interval * 60000) {
+            appendAll(events, cached.events);
+            continue;
+        }
+        var repoEvents = [];
         try {
             if (types.stars) {
-                appendAll(events, fetchStars(repo.name, headers, token));
+                appendAll(repoEvents, fetchStars(repo.name, headers, token));
             }
             if (types.releases) {
-                appendAll(events, fetchReleases(repo.name, headers));
+                appendAll(repoEvents, fetchReleases(repo.name, headers));
             }
             if (types.pullRequests) {
-                appendAll(events, fetchPullRequests(repo.name, headers));
+                appendAll(repoEvents, fetchPullRequests(repo.name, headers));
             }
             if (types.forks) {
-                appendAll(events, fetchForks(repo.name, headers));
+                appendAll(repoEvents, fetchForks(repo.name, headers));
             }
             if (types.issues) {
-                appendAll(events, fetchIssues(repo.name, headers));
+                appendAll(repoEvents, fetchIssues(repo.name, headers));
             }
             if (types.discussions) {
-                appendAll(events, fetchDiscussions(repo.name, headers, token));
+                appendAll(repoEvents, fetchDiscussions(repo.name, headers, token));
             }
         } catch (err) {
             sidefy.log("Failed for " + repo.name + ": " + (err && err.message ? err.message : err));
         }
+        var merged = mergeRepositoryEvents(cached.events, repoEvents);
+        var result = sidefy.storage.set(cacheKey, { events: merged, last: now.getTime(), expiresAt: expiresAt },
+            Math.max(5, (expiresAt - now.getTime()) / 60000));
+        if (result === false || (result && result.error)) {
+            sidefy.log("Cache save failed for " + repo.name);
+        }
+        appendAll(events, merged);
     }
+    return events;
+}
 
-    var cacheTtl = events.length > 0 ? POPULATED_CACHE_TTL_MINUTES : EMPTY_CACHE_TTL_MINUTES;
-    sidefy.storage.set(cacheKey, events, cacheTtl);
+function mergeRepositoryEvents(existing, incoming) {
+    var events = [];
+    var positions = Object.create(null);
+    existing.concat(incoming).forEach(function (event) {
+        var key = event.id;
+        if (positions[key] === undefined) {
+            positions[key] = events.length;
+            events.push(event);
+        } else {
+            events[positions[key]] = event;
+        }
+    });
     return events;
 }
 
@@ -256,6 +286,7 @@ function avatarUrl(login) {
 function pointEvent(opts) {
     var ts = opts.date.getTime() / 1000;
     return {
+        id: opts.id || ((opts.eventType || "").replace(/^pr_.*/, "pr") + ":" + (opts.href || "")),
         title: opts.title,
         startDate: sidefy.date.format(ts),
         endDate: sidefy.date.format(ts),
@@ -314,6 +345,7 @@ function fetchStars(repo, headers, token) {
         var login = edge.node && edge.node.login ? edge.node.login : "unknown";
         var icon = (edge.node && edge.node.avatarUrl) || avatarUrl(login);
         events.push(pointEvent({
+            id: "star:" + repo.toLowerCase() + ":" + login.toLowerCase() + ":" + date.toISOString(),
             title: i18nStarred(login, repo),
             date: date,
             color: "#F1C232",
@@ -349,6 +381,7 @@ function fetchStarsRestFallback(repo, headers) {
         }
         var login = item.user && item.user.login ? item.user.login : "unknown";
         events.push(pointEvent({
+            id: "star:" + repo.toLowerCase() + ":" + login.toLowerCase() + ":" + date.toISOString(),
             title: i18nStarred(login, repo),
             date: date,
             color: "#F1C232",
