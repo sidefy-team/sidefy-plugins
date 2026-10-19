@@ -157,3 +157,9 @@ function i18nCountdownFuture(eventName, days) {
 - Code comments are appropriate
 - User-facing strings use `sidefy.i18n()` with all 4 languages (`zh`, `en`, `ja`, `ko`)
 - i18n constants and helpers are declared at the bottom of `main.js`
+
+## License
+
+Copyright (C) 2025 Nunc.
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full terms.

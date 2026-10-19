@@ -157,3 +157,9 @@ function i18nCountdownFuture(eventName, days) {
 - 代码注释适当
 - 面向用户的文案使用 `sidefy.i18n()`，且包含全部 4 种语言（`zh`、`en`、`ja`、`ko`）
 - i18n 常量与辅助函数声明在 `main.js` 文件底部
+
+## 许可证
+
+Copyright (C) 2025 Nunc.
+
+本项目采用 Apache License 2.0，完整条款见 [LICENSE](LICENSE)。
