@@ -1,0 +1,30 @@
+{
+  "name": "X Posts",
+  "description": "Follow public posts from one X account at their original publication times. Duplicate the plugin to follow another account.",
+  "version": "0.1.6",
+  "author": "Nunc.",
+  "min_support_app_version": "2026.10.17",
+  "tags": [
+    "x",
+    "social media",
+    "posts",
+    "twitter"
+  ],
+  "category": "Social Media",
+  "config_options": {
+    "username": {
+      "type": "string",
+      "default": "",
+      "required": true,
+      "description": "One X username, with or without @ (for example, thsottiaux). Do not enter a profile URL."
+    }
+  },
+  "requirements": {
+    "network": false,
+    "storage": true,
+    "ai": false,
+    "ai_decision": false,
+    "crawler": true
+  },
+  "copyable": true
+}
