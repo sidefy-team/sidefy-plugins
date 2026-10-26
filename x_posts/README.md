@@ -5,7 +5,7 @@ Follow public posts from one X account in Nunc. Duplicate the plugin to follow a
 ## Setup
 
 1. Configure the Jina crawler service in Nunc.
-2. Enable Crawler and Storage permissions.
+2. Enable Network, Crawler, and Storage permissions.
 3. Set `username` to one X handle, with or without `@`, for example `thsottiaux`. Profile URLs are not accepted.
 
 This plugin has no keyword filter and does not use AI or AI Decision.
@@ -21,6 +21,12 @@ This plugin has no keyword filter and does not use AI or AI Decision.
 - Login restrictions and page changes can prevent retrieval. Failures are logged, existing posts remain available until midnight, and the attempt time is recorded to avoid repeated requests on every refresh. With no cached posts, the plugin returns no events.
 
 ## Changelog
+
+### v0.1.7
+
+- Declare Network permission alongside Crawler and Storage.
+- Preserve list items inside post bodies when separating timeline entries.
+- Refresh the cache namespace to discard previously truncated posts.
 
 ### v0.1.6
 

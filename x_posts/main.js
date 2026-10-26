@@ -5,7 +5,7 @@ function fetchEvents(config) {
     var midnight = new Date(now);
     midnight.setHours(24, 0, 0, 0);
     var expiresAt = midnight.getTime();
-    var key = "x_posts_daily_v3_" + username.toLowerCase();
+    var key = "x_posts_daily_v4_" + username.toLowerCase();
     var cached = nunc.storage.get(key);
     if (!cached || cached.expiresAt <= now || cached.expiresAt !== expiresAt || !Array.isArray(cached.posts)) {
         cached = { posts: [], last: 0, expiresAt: expiresAt };
@@ -17,7 +17,7 @@ function fetchEvents(config) {
         try {
             var page = nunc.crawler("https://x.com/" + username);
             if (!page || page.success !== true || typeof page.content !== "string") throw new Error(nunc.i18n(I18N_CRAWLER));
-            var blocks = page.content.split(/\n\s*\*\s+/);
+            var blocks = page.content.split(/\n[ \t]*\*[ \t]+(?=\[(?:!\[[^\]\n]*\]\(https:\/\/pbs\.twimg\.com\/profile_images\/|[^\]\n]*\]\(https:\/\/(?:x\.com|twitter\.com)\/[A-Za-z0-9_]+(?:\/status\/\d+)?\)))/);
             var seen = {};
             blocks.forEach(function(block) {
                 var first = /\[[^\]\n]*\]\(https:\/\/(?:x\.com|twitter\.com)\/([A-Za-z0-9_]+)\/status\/(\d+)\)/.exec(block);
