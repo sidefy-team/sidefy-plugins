@@ -47,8 +47,10 @@ your-plugin-name/
     "network": true,
     //存储权限：最大限制存储16k数据，最大存储5条数据
     "storage": true,
-    //AI 权限：使用用户在高级设置配置的大模型能力，最大限制每5分钟请求5次，单次请求超时30秒
-    "ai": false
+    //AI 权限：使用用户配置的通用 AI 服务（nunc.ai.chat），受服务端限制和插件执行超时约束
+    "ai": false,
+    // AI 决策权限：允许调用 nunc.ai.decide
+    "ai_decision": false
   }
 }
 ```
@@ -80,6 +82,22 @@ function fetchEvents(config) {
   return events;
 }
 ```
+
+## AI 决策 API
+
+`nunc.ai.decide(input, decision)`（兼容 `sidefy.ai.decide`）使用应用的 **AI 决策**服务，需要独立的 `ai_decision` 权限（`ai` 仅授权 `ai.chat`）。AI 决策与通用 AI 分别配置。
+
+```javascript
+var text = "Xcode 更新：苹果开发工具发布新版本。";
+
+var probability = sidefy.ai.decide(text, { match: "与苹果开发有关" });
+var category = sidefy.ai.decide(text, { choice: { news: "新闻", other: "其他" } });
+var importance = sidefy.ai.decide(text, { score: ["一般", "重要", "紧急"] });
+```
+
+input 支持非空文本、JSON 对象或数组；数组作为共同上下文，不代表逐项批量判断。decision 必须且只能包含一个判断字段。match 返回 0～1 概率；choice 返回选项键；score 返回等级加权值（上例为 0～2，可为小数）。choice 至少包含两个具名选项及非空描述；score 至少包含两个非空等级描述，按从低到高排列。
+
+同步调用，成功响应自动缓存。参数错误抛出 TypeError；权限、配置或服务失败返回 null，并记录原因。应用阈值前先判断 `probability !== null`，0 是有效结果。未命中缓存的请求可能产生费用，并受服务端限制和插件执行超时约束。
 
 ## 国际化（i18n）
 

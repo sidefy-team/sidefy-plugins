@@ -47,8 +47,10 @@ your-plugin-name/
     "network": true,
     // Storage permission: maximum 16k data storage, up to 5 entries
     "storage": true,
-    // AI permission: uses user-configured LLM capabilities in advanced settings, limited to 5 requests per 5 minutes, 30-second timeout per request
-    "ai": false
+    // AI permission: uses user-configured General AI service (nunc.ai.chat); requests are subject to service limits and the plugin execution timeout
+    "ai": false,
+    // AI Decision permission: allows nunc.ai.decide
+    "ai_decision": false
   }
 }
 ```
@@ -80,6 +82,22 @@ function fetchEvents(config) {
   return events;
 }
 ```
+
+## AI decision API
+
+`nunc.ai.decide(input, decision)` (also `sidefy.ai.decide`) uses the app's **AI Decision** service and requires the independent `ai_decision` permission (`ai` only grants `ai.chat`). Configure AI Decision separately from General AI.
+
+```javascript
+var text = "Xcode update: a new version of Apple's development tools.";
+
+var probability = sidefy.ai.decide(text, { match: "About Apple development" });
+var category = sidefy.ai.decide(text, { choice: { news: "News", other: "Other" } });
+var importance = sidefy.ai.decide(text, { score: ["Routine", "Important", "Urgent"] });
+```
+
+Input accepts non-empty text or JSON objects/arrays. Arrays are context, not automatic batches. Specify exactly one decision field. `match` returns a probability in [0,1]; `choice` returns an option key; `score` returns a weighted level index (0–2 in this example). Choice requires at least two named options with non-empty descriptions; score requires at least two non-empty levels, lowest first.
+
+Calls are synchronous and successful responses are cached automatically. Invalid arguments throw `TypeError`; permission/configuration/service failures return `null` and log the reason. Check `probability !== null` before applying a threshold; zero is valid. Uncached calls may incur cost and remain subject to provider limits and the plugin execution timeout.
 
 ## Internationalization (i18n)
 
