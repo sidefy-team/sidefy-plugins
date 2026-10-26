@@ -1,51 +1,75 @@
-# X Posts
+## X Posts Plugin
 
-Follow public posts from one X account in Nunc. Duplicate the plugin to follow additional accounts independently.
+Follow public posts from one X account on your Nunc timeline, with the original publication time and a link to each post.
 
-## Setup
+### Features
 
-1. Configure the Jina crawler service in Nunc.
-2. Enable Network, Crawler, and Storage permissions.
-3. Set `username` to one X handle, with or without `@`, for example `thsottiaux`. Profile URLs are not accepted.
+- Single-account subscription; duplicate the plugin to follow additional accounts independently
+- Post titles of up to 64 characters, with the complete retrieved text in notes
+- Post images when available and direct links to X
+- Publication times displayed in your local time zone
+- Account-specific caches that expire at local midnight
+- Merge posts by ID and preserve cached posts on empty, partial, or failed responses
+- Refresh every 15 minutes with cached posts or every 5 minutes without posts
 
-This plugin has no keyword filter and does not use AI or AI Decision.
+### Configuration
 
-## Behavior and limitations
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `username` | string | Yes | One X username, with or without `@` (e.g., `thsottiaux`). Do not enter a profile URL. |
 
-- Retrieves the public profile when Nunc refreshes plugins, at most once every 15 minutes with cached posts or every 5 minutes without posts.
-- Keeps an account-specific cache until local midnight, independently of the refresh interval. Merges posts by ID and retains up to 30 recent posts when a response is partial, empty, or fails.
-- Uses the post ID to determine its publication timestamp, returns UTC timestamps, and lets Nunc display local time.
-- Includes original text, a link to the post, and an available image. Titles are shortened to 64 Unicode code points; notes retain the retrieved text.
-- Reads up to 30 posts exposed by the public profile. This is not a complete timeline or permanent archive. Long posts may be truncated by X.
-- Skips other authors and replies identified by the page's English “Replying to” label. Reply detection is not guaranteed across page formats.
-- Login restrictions and page changes can prevent retrieval. Failures are logged, existing posts remain available until midnight, and the attempt time is recorded to avoid repeated requests on every refresh. With no cached posts, the plugin returns no events.
+### How to Get and Configure the Username
 
-## Changelog
+1. Open the account's X profile, for example `https://x.com/thsottiaux`.
+2. Copy the username from the URL and enter it in `username`.
+3. Configure the Jina crawler service in Nunc.
+4. Enable Network, Crawler, and Storage permissions for the plugin.
 
-### v0.1.7
+To follow another account, duplicate the plugin and change its username. AI and AI Decision permissions are not required.
+
+### Display Format
+
+```text
+@username · First 64 characters of the post…
+
+Complete retrieved post text
+```
+
+The account prefix and ellipsis do not count toward the 64-character limit. Titles are counted by Unicode code point. Short posts appear in full in both the title and notes. Click the event to open the original post on X.
+
+### Notes
+
+- Retains up to 30 recent posts exposed by the public profile; this is not a complete timeline or permanent archive.
+- Long posts may be truncated by X before retrieval.
+- Skips other authors and replies identified by the page's English “Replying to” label. Reply detection can vary with page format.
+- Login restrictions or page changes may prevent retrieval. Failures are logged, and existing cached posts remain available until midnight. If no posts are cached, no events are returned.
+
+### Changelog
+
+#### v0.1.7
 
 - Declare Network permission alongside Crawler and Storage.
 - Preserve list items inside post bodies when separating timeline entries.
 - Refresh the cache namespace to discard previously truncated posts.
 
-### v0.1.6
+#### v0.1.6
 
 - Shorten post titles to 64 Unicode code points while keeping the complete retrieved text in notes.
 
-### v0.1.5
+#### v0.1.5
 
 - Add the twitter tag for plugin discovery.
 
-### v0.1.4
+#### v0.1.4
 
 - Set the plugin author to Nunc. to match the repository metadata convention.
 
-### v0.1.3
+#### v0.1.3
 
 - Separate refresh intervals from daily cache expiry, following the GitHub Repository plugin.
 - Merge posts by ID and preserve cached posts on failed, empty, or partial responses.
 
-### v0.1.2
+#### v0.1.2
 
 - Publish the single-account X plugin with duplication support and no keyword filtering.
 - Support profile posts with either an empty status link or an avatar at the beginning.
