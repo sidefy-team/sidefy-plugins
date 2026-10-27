@@ -17,6 +17,7 @@ Follow public posts from one X account on your Nunc timeline, with the original 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `username` | string | Yes | One X username, with or without `@` (e.g., `thsottiaux`). Do not enter a profile URL. |
+| `aiTitle` | boolean | No | Default `false`. Set to `true` to generate concise titles from post content in the app's language using General AI. |
 
 ### How to Get and Configure the Username
 
@@ -25,7 +26,7 @@ Follow public posts from one X account on your Nunc timeline, with the original 
 3. Configure the Jina crawler service in Nunc.
 4. Enable Network, Crawler, and Storage permissions for the plugin.
 
-To follow another account, duplicate the plugin and change its username. AI and AI Decision permissions are not required.
+To follow another account, duplicate the plugin and change its username. To use `aiTitle`, configure General AI in Nunc and enable the plugin's AI permission. The plugin declares AI permission for this optional feature; when `aiTitle` is `false`, it makes no AI requests. AI Decision permission is not required.
 
 ### Display Format
 
@@ -37,6 +38,8 @@ Complete retrieved post text
 
 The account prefix and ellipsis do not count toward the 64-character limit. Titles are counted by Unicode code point. Short posts appear in full in both the title and notes. Click the event to open the original post on X.
 
+With `aiTitle` enabled, the generated title replaces the text after `@username ·`, retaining the 64-character limit and complete notes. Missing titles are generated in one batch per refresh. Successful titles are cached by account, app language, and exact post text until local midnight. Failed or invalid responses fall back to the original text and can be retried on a later refresh. AI calls use your configured service and are subject to its costs and the plugin execution timeout.
+
 ### Notes
 
 - Retains up to 30 recent posts exposed by the public profile; this is not a complete timeline or permanent archive.
@@ -45,6 +48,13 @@ The account prefix and ellipsis do not count toward the 64-character limit. Titl
 - Login restrictions or page changes may prevent retrieval. Failures are logged, and existing cached posts remain available until midnight. If no posts are cached, no events are returned.
 
 ### Changelog
+
+#### v0.2.0
+
+- Add the optional `aiTitle` setting, disabled by default, using General AI to generate titles from post content.
+- Cache successful titles and fall back to original text when generation fails.
+- Accept the string boolean values supplied by the native plugin configuration editor.
+- Slow-request fallback requires the accompanying Nunc engine update that reserves execution time after AI calls; older clients can still time out the entire plugin refresh.
 
 #### v0.1.7
 
