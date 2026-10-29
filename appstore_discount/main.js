@@ -191,7 +191,7 @@ function formatPrice(priceValue, sampleFormatted, currency) {
 }
 
 /**
- * 从配置中解析应用监控列表（与 Crypto Price Monitor 相同的 apps + {id}_* 模式）
+ * 从配置中解析应用监控列表（apps + {id}_* 模式）
  */
 function resolveAppList(config) {
     var defaultRegion = (config.default_region || "us").trim().toLowerCase();
