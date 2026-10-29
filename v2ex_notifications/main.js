@@ -285,21 +285,36 @@ var I18N_SOMEONE = {
     zh: "有人",
     en: "Someone",
     ja: "誰か",
-    ko: "익명의 사용자"
+    ko: "익명의 사용자",
+    de: "Jemand",
+    es: "Alguien",
+    fr: "Quelqu’un",
+    pt: "Alguém",
+    ru: "Кто-то"
 };
 
 var I18N_ERROR_TOKEN = {
     zh: "请配置您的 V2EX 私有 RSS Token。",
     en: "Please configure your V2EX private RSS token.",
     ja: "V2EX のプライベート RSS トークンを設定してください。",
-    ko: "V2EX 개인 RSS 토큰을 설정해 주세요."
+    ko: "V2EX 개인 RSS 토큰을 설정해 주세요.",
+    de: "Konfigurieren Sie Ihr privates V2EX-RSS-Token.",
+    es: "Configura tu token RSS privado de V2EX.",
+    fr: "Configurez votre jeton RSS privé V2EX.",
+    pt: "Configure seu token RSS privado do V2EX.",
+    ru: "Настройте личный RSS-токен V2EX."
 };
 
 var I18N_ERROR_FETCH = {
     zh: "获取 V2EX RSS 订阅失败。",
     en: "Failed to fetch the V2EX RSS feed.",
     ja: "V2EX RSS フィードの取得に失敗しました。",
-    ko: "V2EX RSS 피드를 가져오지 못했습니다."
+    ko: "V2EX RSS 피드를 가져오지 못했습니다.",
+    de: "Der V2EX-RSS-Feed konnte nicht abgerufen werden.",
+    es: "No se pudo obtener el feed RSS de V2EX.",
+    fr: "Impossible de récupérer le flux RSS V2EX.",
+    pt: "Não foi possível obter o feed RSS do V2EX.",
+    ru: "Не удалось получить RSS-ленту V2EX."
 };
 
 function i18nThanksTitle(author) {
@@ -307,7 +322,12 @@ function i18nThanksTitle(author) {
         zh: author + " 感谢了你的回复",
         en: author + " thanked your reply",
         ja: author + " があなたの返信に感謝しました",
-        ko: author + "님이 회원님의 답글에 감사를 표했습니다"
+        ko: author + "님이 회원님의 답글에 감사를 표했습니다",
+        de: author + " hat sich für Ihre Antwort bedankt",
+        es: author + " agradeció tu respuesta",
+        fr: author + " a remercié votre réponse",
+        pt: author + " agradeceu sua resposta",
+        ru: author + " поблагодарил вас за ответ"
     });
 }
 
@@ -316,7 +336,12 @@ function i18nRewardTitle(author) {
         zh: author + " 打赏了你",
         en: author + " rewarded you",
         ja: author + " があなたに投げ銭しました",
-        ko: author + "님이 회원님에게 후원했습니다"
+        ko: author + "님이 회원님에게 후원했습니다",
+        de: author + " hat Sie belohnt",
+        es: author + " te recompensó",
+        fr: author + " vous a récompensé",
+        pt: author + " recompensou você",
+        ru: author + " наградил вас"
     });
 }
 
@@ -325,6 +350,11 @@ function i18nFavoriteTitle(author) {
         zh: author + " 收藏了你的主题",
         en: author + " favorited your topic",
         ja: author + " があなたのトピックをお気に入りに追加しました",
-        ko: author + "님이 회원님의 게시글을 즐겨찾기에 추가했습니다"
+        ko: author + "님이 회원님의 게시글을 즐겨찾기에 추가했습니다",
+        de: author + " hat Ihr Thema favorisiert",
+        es: author + " añadió tu tema a favoritos",
+        fr: author + " a ajouté votre sujet aux favoris",
+        pt: author + " adicionou seu tópico aos favoritos",
+        ru: author + " добавил вашу тему в избранное"
     });
 }

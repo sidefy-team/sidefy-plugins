@@ -54,6 +54,10 @@ octocat/Hello-World = stars,forks  # only stars and forks
 
 ### Changelog
 
+### v1.1.1
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 #### v1.1.0
 
 - Store each repository independently until local midnight

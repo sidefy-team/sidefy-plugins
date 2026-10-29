@@ -1,4 +1,6 @@
-# Sidefy 插件贡献指南
+# Nunc Plugins 插件贡献指南
+
+本仓库维护 Nunc/Sidefy 插件运行时使用的社区插件。
 
 [English](README.md) | [中文](README_ZH.md)
 
@@ -16,6 +18,8 @@ your-plugin-name/
 ```
 
 ## info.json
+
+`info.json` 是客户端使用的元数据契约。`version`、配置项、权限声明和 README 文档必须保持同步。版本号遵循语义化版本：修复使用 patch，兼容性功能使用 minor，破坏性配置变更使用 major。
 
 ```json
 {
@@ -57,7 +61,7 @@ your-plugin-name/
 
 ## main.js
 
-必须包含 fetchEvents 函数（可参考 [bilibili_user_videos](https://github.com/sha2kyou/sidefy-plugins/tree/main/bilibili_user_videos)）：
+必须包含 fetchEvents 函数（可参考 [bilibili_user_videos](./bilibili_user_videos)）：
 
 ```javascript
 function fetchEvents(config) {
@@ -101,11 +105,11 @@ input 支持非空文本、JSON 对象或数组；数组作为共同上下文，
 
 ## 国际化（i18n）
 
-插件中所有面向用户的文案必须使用 `sidefy.i18n()`。
+插件中所有面向用户的文案都必须使用 `sidefy.i18n()`，包括事件标题、备注、参数校验错误和用户可见状态文本；从第三方获取的文章标题等原始内容可以保持原文。维护时会按此规则检查所有启用插件。
 
 ### 支持语言
 
-**仅**支持以下 4 种语言代码，不得添加 `de`、`es`、`fr`、`pt`、`ru` 等：
+必须使用 Nunc `app.language()` 返回的准确语言代码。中文及 `zh-CN`、`zh-Hans`、`zh-TW`、`zh-Hant` 等系统变体会统一为 `zh`。每条插件文案都必须提供以下 9 种语言：
 
 | 代码 | 语言 |
 |------|------|
@@ -113,15 +117,20 @@ input 支持非空文本、JSON 对象或数组；数组作为共同上下文，
 | `en` | 英语 |
 | `ja` | 日语 |
 | `ko` | 韩语 |
+| `de` | 德语 |
+| `es` | 西班牙语 |
+| `fr` | 法语 |
+| `pt` | 葡萄牙语 |
+| `ru` | 俄语 |
 
-中文 i18n 键名使用 **`zh`**（与 `sidefy.app.language()` 一致）。勿使用 `zh-Hans`、`zh-Hant`、`zh-CN`、`zh-TW` 等作为键名。
+中文 i18n 键名使用 **`zh`**（与 `sidefy.app.language()` 一致）。勿使用 `zh-Hans`、`zh-Hant`、`zh-CN`、`zh-TW` 等作为键名。应用语言代码由 Nunc 的 `AppConstants.Language` 定义，目前准确为 `zh`、`en`、`ja`、`ko`、`de`、`es`、`fr`、`pt`、`ru`。
 
 ### 代码组织
 
 1. 所有 i18n 文案集中在 `main.js` **文件最底部**（用 `// --- i18n ---` 标记）。
 2. 使用语义化变量名，如 `I18N_UPDATED_LABEL`、`I18N_ERROR_NETWORK`。
 3. **静态文案**：声明 `I18N_*` 对象常量，业务逻辑中调用 `sidefy.i18n(I18N_XXX)`；不要在 `fetchEvents` 或 i18n 区块上方的函数里内联语言对象。
-4. **含动态插值**：在底部声明 `i18nXxx(...)` 辅助函数，函数内 `return sidefy.i18n({ zh: ..., en: ..., ja: ..., ko: ... })`。
+4. **含动态插值**：在底部声明 `i18nXxx(...)` 辅助函数，函数内 `return sidefy.i18n({ zh: ..., en: ..., ja: ..., ko: ..., de: ..., es: ..., fr: ..., pt: ..., ru: ... })`。
 5. 业务逻辑与工具函数写在 i18n 区块**上方**。
 
 ### 示例
@@ -152,7 +161,18 @@ function i18nCountdownFuture(eventName, days) {
 }
 ```
 
-`sidefy.i18n()` 按 Sidefy App 当前语言匹配；未命中时回退到 `en`，再回退到第一个可用值。每条文案均需填写完整的四种语言。
+`sidefy.i18n()` 按 Sidefy App 当前语言匹配；未命中时回退到 `en`，再回退到第一个可用值。每条文案均需填写完整的九种语言。
+
+## 插件权限与安全
+
+`info.json` 必须声明插件实际使用的全部能力：
+
+- `network`：允许发起 HTTP 请求；应说明使用的域名和 API。
+- `storage`：允许持久化存储；应在文档中说明缓存的数据和保留时间。
+- `ai`：允许调用用户配置的通用 AI 服务；应披露会发送哪些用户或远程内容。
+- `ai_decision`：允许调用 `sidefy.ai.decide`，必须与 `ai` 分开声明。
+
+请只申请必要的权限，并校验、编码用户提供的 URL、ID、Token 和查询参数。不得记录密码、访问令牌、Cookie 或原始 Authorization 请求头。社区插件属于不受信任代码：安装或启用前，请审核源代码、申请的权限、网络目标、存储行为和 AI 数据流。仓库维护者不保证第三方服务的安全性或可用性。
 
 ## 提交步骤
 
@@ -165,6 +185,21 @@ function i18nCountdownFuture(eventName, days) {
 >[!WARNING] 
 >更多 API 说明请查看 Sidefy 应用内的自定义插件编辑器文档页面
 
+## 维护与审查清单
+
+合并插件改动前，维护者应逐个检查所有插件目录：
+
+- 存在 `main.js`、`info.json` 和 `README.md`。
+- 存在 `fetchEvents(config)`，且事件字段格式正确。
+- `info.json` 中的网络、存储和 AI 权限与实际调用一致。
+- 所有用户可见运行时文案都使用完整的 `zh`、`en`、`ja`、`ko`、`de`、`es`、`fr`、`pt`、`ru` 九语 i18n。
+- i18n 声明位于 `main.js` 文件底部。
+- `README.md` 的配置说明与 `info.json` 及代码一致。
+- 行为改动同步升级 `info.json` 版本，并增加对应 Changelog。
+- 用户输入、外部 URL、凭据和缓存键经过校验并安全处理。
+
+仓库中可能存在已停止维护的插件。此类插件应明确标记，不应作为新插件的实现范例。
+
 ## 检查清单
 
 - 插件在 Sidefy 中测试通过
@@ -173,8 +208,12 @@ function i18nCountdownFuture(eventName, days) {
 - info.json 信息完整准确
 - README.md 使用说明清晰
 - 代码注释适当
-- 面向用户的文案使用 `sidefy.i18n()`，且包含全部 4 种语言（`zh`、`en`、`ja`、`ko`）
+- 面向用户的文案使用 `sidefy.i18n()`，且包含全部 9 种语言（`zh`、`en`、`ja`、`ko`、`de`、`es`、`fr`、`pt`、`ru`）
 - i18n 常量与辅助函数声明在 `main.js` 文件底部
+
+## 维护审查记录
+
+仓库级的目录结构、权限、i18n 和后续问题基线见 [PLUGIN_AUDIT.md](PLUGIN_AUDIT.md)。
 
 ## 许可证
 

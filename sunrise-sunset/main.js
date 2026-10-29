@@ -158,7 +158,12 @@ function i18nPolarNight(cityName) {
         zh: cityName + " 今日极夜",
         en: cityName + ": Polar Night",
         ja: cityName + " 今日は極夜",
-        ko: cityName + " 오늘 극야"
+        ko: cityName + " 오늘 극야",
+        de: cityName + ": Polarnacht",
+        es: cityName + ": Noche polar",
+        fr: cityName + " : Nuit polaire",
+        pt: cityName + ": Noite polar",
+        ru: cityName + ": Полярная ночь"
     });
 }
 
@@ -167,7 +172,12 @@ function i18nMidnightSun(cityName) {
         zh: cityName + " 今日极昼",
         en: cityName + ": Midnight Sun",
         ja: cityName + " 今日は白夜",
-        ko: cityName + " 오늘 백야"
+        ko: cityName + " 오늘 백야",
+        de: cityName + ": Mitternachtssonne",
+        es: cityName + ": Sol de medianoche",
+        fr: cityName + " : Soleil de minuit",
+        pt: cityName + ": Sol da meia-noite",
+        ru: cityName + ": Полуночное солнце"
     });
 }
 
@@ -176,7 +186,12 @@ function i18nSunrise(cityName, sunriseTime, daylightH, daylightM) {
         zh: cityName + " 日出 " + sunriseTime + " | 日照 " + daylightH + "时" + daylightM + "分",
         en: cityName + " Sunrise " + sunriseTime + " | Daylight " + daylightH + "h " + daylightM + "m",
         ja: cityName + " 日の出 " + sunriseTime + " | 日照 " + daylightH + "時間" + daylightM + "分",
-        ko: cityName + " 일출 " + sunriseTime + " | 일조 " + daylightH + "시간 " + daylightM + "분"
+        ko: cityName + " 일출 " + sunriseTime + " | 일조 " + daylightH + "시간 " + daylightM + "분",
+        de: cityName + " Sonnenaufgang " + sunriseTime + " | Tageslicht " + daylightH + " h " + daylightM + " min",
+        es: cityName + " Amanecer " + sunriseTime + " | Luz diurna " + daylightH + " h " + daylightM + " min",
+        fr: cityName + " Lever " + sunriseTime + " | Lumière " + daylightH + " h " + daylightM + " min",
+        pt: cityName + " Nascer do sol " + sunriseTime + " | Luz do dia " + daylightH + " h " + daylightM + " min",
+        ru: cityName + " Восход " + sunriseTime + " | Световой день " + daylightH + " ч " + daylightM + " мин"
     });
 }
 
@@ -185,6 +200,11 @@ function i18nSunset(cityName, sunsetTime) {
         zh: cityName + " 日落 " + sunsetTime,
         en: cityName + " Sunset " + sunsetTime,
         ja: cityName + " 日の入り " + sunsetTime,
-        ko: cityName + " 일몰 " + sunsetTime
+        ko: cityName + " 일몰 " + sunsetTime,
+        de: cityName + " Sonnenuntergang " + sunsetTime,
+        es: cityName + " Atardecer " + sunsetTime,
+        fr: cityName + " Coucher " + sunsetTime,
+        pt: cityName + " Pôr do sol " + sunsetTime,
+        ru: cityName + " Закат " + sunsetTime
     });
 }

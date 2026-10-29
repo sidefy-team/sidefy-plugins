@@ -24,7 +24,8 @@ Fetch unread and recent articles from your self-hosted FreshRSS instance, displa
 
 | Parameter | Type   | Default | Description                 |
 | --------- | ------ | ------- | --------------------------- |
-| limit     | number | 50      | Number of articles to fetch |
+| limit     | number | 50      | Number of articles to fetch (1–100) |
+| onlyUnread | boolean | false | Only fetch unread articles |
 
 ### How to Setup API Access
 
@@ -39,9 +40,24 @@ Each RSS feed source is automatically assigned a unique color based on its URL u
 
 ### Changelog
 
+### v1.2.4
+
+- Validate the FreshRSS URL and require HTTPS.
+- Isolate cached tokens and articles by server, path, username, limit, and unread mode.
+- Stop logging part of the authentication token.
+
+### v1.2.3
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
+#### v1.2.2
+
+- Added the `onlyUnread` option to the plugin configuration and limited `limit` to 1–100 articles.
+- Fixed feeds without an `origin` object causing event generation to fail.
+
 #### v1.2.1
 
-- Localized the plugin's error messages with `sidefy.i18n()` (`zh` / `en` / `ja` / `ko`)
+- Localized the plugin's error messages with `sidefy.i18n()` using all nine Nunc language codes
 - Added i18n constants and helpers in a `// --- i18n ---` block at the bottom of `main.js`
 
 #### v1.2.0

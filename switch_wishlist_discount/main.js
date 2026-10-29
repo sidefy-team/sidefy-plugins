@@ -408,77 +408,132 @@ var I18N_ERROR_EMPTY_GAME_IDS = {
     zh: "游戏 ID 列表不能为空，请在插件配置中填入要监控的游戏 NSUID。",
     en: "Game ID list cannot be empty. Please enter the game NSUIDs you want to monitor.",
     ja: "ゲーム ID リストを空にすることはできません。監視するゲーム ID を入力してください。",
-    ko: "게임 ID 목록은 비워둘 수 없습니다. 모니터링할 게임 NSUID를 입력하세요."
+    ko: "게임 ID 목록은 비워둘 수 없습니다. 모니터링할 게임 NSUID를 입력하세요.",
+    de: "Die Spiele-ID-Liste darf nicht leer sein. Geben Sie die zu überwachenden NSUIDs ein.",
+    es: "La lista de IDs no puede estar vacía. Introduce los NSUID que quieres vigilar.",
+    fr: "La liste d’IDs ne peut pas être vide. Saisissez les NSUID à surveiller.",
+    pt: "A lista de IDs não pode ficar vazia. Informe os NSUIDs a monitorar.",
+    ru: "Список ID игр не может быть пустым. Укажите отслеживаемые NSUID."
 };
 
 var I18N_ERROR_NO_VALID_NSUID = {
     zh: "未找到有效的游戏 NSUID。",
     en: "No valid game NSUIDs found.",
     ja: "有効なゲーム ID が見つかりません。",
-    ko: "유효한 게임 NSUID를 찾을 수 없습니다."
+    ko: "유효한 게임 NSUID를 찾을 수 없습니다.",
+    de: "Keine gültigen Spiele-NSUIDs gefunden.",
+    es: "No se encontraron NSUID de juegos válidos.",
+    fr: "Aucun NSUID de jeu valide trouvé.",
+    pt: "Nenhum NSUID de jogo válido encontrado.",
+    ru: "Действительные NSUID игр не найдены."
 };
 
 var I18N_REGION_JP = {
     zh: "日本",
     en: "Japan",
     ja: "日本",
-    ko: "일본"
+    ko: "일본",
+    de: "Japan",
+    es: "Japón",
+    fr: "Japon",
+    pt: "Japão",
+    ru: "Япония"
 };
 
 var I18N_REGION_US = {
     zh: "美国",
     en: "United States",
     ja: "アメリカ",
-    ko: "미국"
+    ko: "미국",
+    de: "Vereinigte Staaten",
+    es: "Estados Unidos",
+    fr: "États-Unis",
+    pt: "Estados Unidos",
+    ru: "США"
 };
 
 var I18N_REGION_CA = {
     zh: "加拿大",
     en: "Canada",
     ja: "カナダ",
-    ko: "캐나다"
+    ko: "캐나다",
+    de: "Kanada",
+    es: "Canadá",
+    fr: "Canada",
+    pt: "Canadá",
+    ru: "Канада"
 };
 
 var I18N_REGION_MX = {
     zh: "墨西哥",
     en: "Mexico",
     ja: "メキシコ",
-    ko: "멕시코"
+    ko: "멕시코",
+    de: "Mexiko",
+    es: "México",
+    fr: "Mexique",
+    pt: "México",
+    ru: "Мексика"
 };
 
 var I18N_REGION_BR = {
     zh: "巴西",
     en: "Brazil",
     ja: "ブラジル",
-    ko: "브라질"
+    ko: "브라질",
+    de: "Brasilien",
+    es: "Brasil",
+    fr: "Brésil",
+    pt: "Brasil",
+    ru: "Бразилия"
 };
 
 var I18N_REGION_GB = {
     zh: "英国",
     en: "United Kingdom",
     ja: "イギリス",
-    ko: "영국"
+    ko: "영국",
+    de: "Vereinigtes Königreich",
+    es: "Reino Unido",
+    fr: "Royaume-Uni",
+    pt: "Reino Unido",
+    ru: "Великобритания"
 };
 
 var I18N_REGION_DE = {
     zh: "德国",
     en: "Germany",
     ja: "ドイツ",
-    ko: "독일"
+    ko: "독일",
+    de: "Deutschland",
+    es: "Alemania",
+    fr: "Allemagne",
+    pt: "Alemanha",
+    ru: "Германия"
 };
 
 var I18N_REGION_FR = {
     zh: "法国",
     en: "France",
     ja: "フランス",
-    ko: "프랑스"
+    ko: "프랑스",
+    de: "Frankreich",
+    es: "Francia",
+    fr: "France",
+    pt: "França",
+    ru: "Франция"
 };
 
 var I18N_REGION_AU = {
     zh: "澳大利亚",
     en: "Australia",
     ja: "オーストラリア",
-    ko: "호주"
+    ko: "호주",
+    de: "Australien",
+    es: "Australia",
+    fr: "Australie",
+    pt: "Austrália",
+    ru: "Австралия"
 };
 
 var REGION_PROFILES = {
@@ -556,7 +611,12 @@ function i18nDiscountNotes(regionLabel, regularAmount, discountAmount, discountP
         ja: "地域: " + regionLabel + "\n通常価格: " + regularAmount +
             "\n現在価格: " + discountAmount + "\n割引: -" + discountPercent + "%",
         ko: "지역: " + regionLabel + "\n정가: " + regularAmount +
-            "\n현재가: " + discountAmount + "\n할인: -" + discountPercent + "%"
+            "\n현재가: " + discountAmount + "\n할인: -" + discountPercent + "%",
+        de: "Region: " + regionLabel + "\nOriginal: " + regularAmount + "\nAktuell: " + discountAmount + "\nRabatt: -" + discountPercent + "%",
+        es: "Región: " + regionLabel + "\nOriginal: " + regularAmount + "\nActual: " + discountAmount + "\nDescuento: -" + discountPercent + "%",
+        fr: "Région : " + regionLabel + "\nOriginal : " + regularAmount + "\nActuel : " + discountAmount + "\nRéduction : -" + discountPercent + "%",
+        pt: "Região: " + regionLabel + "\nOriginal: " + regularAmount + "\nAtual: " + discountAmount + "\nDesconto: -" + discountPercent + "%",
+        ru: "Регион: " + regionLabel + "\nИсходная: " + regularAmount + "\nТекущая: " + discountAmount + "\nСкидка: -" + discountPercent + "%"
     });
 }
 
@@ -565,7 +625,12 @@ function i18nCompatibleDevice(device) {
         zh: "对应本体: " + device,
         en: "Compatible Device: " + device,
         ja: "対応本体: " + device,
-        ko: "호환 기기: " + device
+        ko: "호환 기기: " + device,
+        de: "Kompatibles Gerät: " + device,
+        es: "Dispositivo compatible: " + device,
+        fr: "Appareil compatible : " + device,
+        pt: "Dispositivo compatível: " + device,
+        ru: "Совместимое устройство: " + device
     });
 }
 
@@ -574,6 +639,11 @@ function i18nExecutionFailed(message) {
         zh: "Switch 多区折扣插件执行失败: " + message,
         en: "Switch multi-region discount plugin failed: " + message,
         ja: "Switch マルチリージョン割引プラグインの実行に失敗しました: " + message,
-        ko: "Switch 다지역 할인 플러그인 실행 실패: " + message
+        ko: "Switch 다지역 할인 플러그인 실행 실패: " + message,
+        de: "Ausführung des Switch-Mehrregionen-Rabatt-Plugins fehlgeschlagen: " + message,
+        es: "Error del plugin de descuentos multi-región de Switch: " + message,
+        fr: "Échec du plugin de réductions Switch multirégional : " + message,
+        pt: "Falha no plugin de descontos multi-região do Switch: " + message,
+        ru: "Ошибка плагина скидок Switch для нескольких регионов: " + message
     });
 }

@@ -28,6 +28,19 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
 
 ## Changelog
 
+### v0.1.6
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
+### v0.1.5
+
+- Validate invalid target dates instead of returning an empty countdown message.
+- Normalize `warning_days` to a non-negative number.
+
+### v0.1.4
+
+- Updated runtime metadata and multilingual event-name handling.
+
 ### v0.1.3
 
 - Added customizable `warning_days` parameter to control when orange warning appears
@@ -38,5 +51,5 @@ A Sidefy plugin that displays the number of days remaining until a specified dat
 
 - Initial release
 - Support for target date and event name
-- Multi-language support (English and Chinese)
+- Multi-language support (Chinese, English, Japanese, and Korean)
 - Color-coded status (Blue for upcoming, Red for today, Gray for past)

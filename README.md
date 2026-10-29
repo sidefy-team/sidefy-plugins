@@ -1,4 +1,6 @@
-# Sidefy Plugin Contribution Guide
+# Nunc Plugins Contribution Guide
+
+This repository contains community plugins for the Nunc/Sidefy plugin runtime.
 
 [English](README.md) | [中文](README_ZH.md)
 
@@ -16,6 +18,8 @@ your-plugin-name/
 ```
 
 ## info.json
+
+`info.json` is the client-facing metadata contract. Keep `version`, configuration options, requirements, and README documentation synchronized. Use semantic versioning: patch for fixes, minor for compatible features, and major for breaking configuration changes.
 
 ```json
 {
@@ -57,7 +61,7 @@ your-plugin-name/
 
 ## main.js
 
-Must include the `fetchEvents` function (see [bilibili_user_videos](https://github.com/sha2kyou/sidefy-plugins/tree/main/bilibili_user_videos) for reference):
+Must include the `fetchEvents` function (see [bilibili_user_videos](./bilibili_user_videos) for reference):
 
 ```javascript
 function fetchEvents(config) {
@@ -101,11 +105,11 @@ Calls are synchronous and successful responses are cached automatically. Invalid
 
 ## Internationalization (i18n)
 
-All user-facing strings in plugins must use `sidefy.i18n()`.
+All user-facing strings in plugins must use `sidefy.i18n()`. This includes event titles, notes, validation errors, and user-visible status text; third-party content such as a fetched article title may remain unchanged. Every active plugin is checked against this rule during maintenance.
 
 ### Supported languages
 
-Use **only** these 4 language codes. Do not add `de`, `es`, `fr`, `pt`, `ru`, or others:
+Use the exact language codes returned by Nunc's `app.language()` API. Chinese is normalized to `zh`, including system variants such as `zh-CN`, `zh-Hans`, `zh-TW`, and `zh-Hant`. Plugins must provide all 9 language keys below:
 
 | Code | Language |
 |------|----------|
@@ -113,15 +117,20 @@ Use **only** these 4 language codes. Do not add `de`, `es`, `fr`, `pt`, `ru`, or
 | `en` | English |
 | `ja` | Japanese |
 | `ko` | Korean |
+| `de` | German |
+| `es` | Spanish |
+| `fr` | French |
+| `pt` | Portuguese |
+| `ru` | Russian |
 
-Plugin i18n keys use **`zh`** for Chinese (matches `sidefy.app.language()`). Do not use `zh-Hans`, `zh-Hant`, `zh-CN`, or `zh-TW` as keys.
+Plugin i18n keys use **`zh`** for Chinese (matches `sidefy.app.language()`). Do not use `zh-Hans`, `zh-Hant`, `zh-CN`, or `zh-TW` as keys. The app language codes are defined by Nunc's `AppConstants.Language` and currently are exactly `zh`, `en`, `ja`, `ko`, `de`, `es`, `fr`, `pt`, and `ru`.
 
 ### Code organization
 
 1. Declare all i18n strings at the **bottom** of `main.js` (mark the section with `// --- i18n ---`).
 2. Use semantic names such as `I18N_UPDATED_LABEL`, `I18N_ERROR_NETWORK`.
 3. **Static text**: define `I18N_*` object constants; call `sidefy.i18n(I18N_XXX)` in business logic. Do not inline language objects in `fetchEvents` or helpers above the i18n block.
-4. **Dynamic text** (with variables): define `i18nXxx(...)` helper functions at the bottom; return `sidefy.i18n({ zh: ..., en: ..., ja: ..., ko: ... })`.
+4. **Dynamic text** (with variables): define `i18nXxx(...)` helper functions at the bottom; return `sidefy.i18n({ zh: ..., en: ..., ja: ..., ko: ..., de: ..., es: ..., fr: ..., pt: ..., ru: ... })`.
 5. Keep business logic and utilities **above** the i18n block.
 
 ### Example
@@ -152,7 +161,18 @@ function i18nCountdownFuture(eventName, days) {
 }
 ```
 
-`sidefy.i18n()` picks the string for the current app language, then falls back to `en`, then to the first available value. All four languages must be filled in for every string.
+`sidefy.i18n()` picks the string for the current app language, then falls back to `en`, then to the first available value. All nine languages must be filled in for every string.
+
+## Plugin permissions and security
+
+`info.json` must declare every capability a plugin uses:
+
+- `network`: permits HTTP requests; document the domains and APIs used.
+- `storage`: permits persistent plugin storage; document cached data and retention where relevant.
+- `ai`: permits the configured general AI service; disclose what user or remote content is sent.
+- `ai_decision`: permits `sidefy.ai.decide`; declare it separately from `ai`.
+
+Request the minimum permissions necessary. Validate and encode user-controlled URL, ID, token, and query parameters. Do not log passwords, access tokens, cookies, or raw authorization headers. Community plugins are untrusted code: review the source, requested permissions, network destinations, storage behavior, and AI data flow before installing or enabling one. The repository maintainers do not guarantee the security or availability of third-party services.
 
 ## Submission Steps
 
@@ -165,6 +185,21 @@ function i18nCountdownFuture(eventName, days) {
 >[!WARNING]
 >For more API documentation, please check the custom plugin editor documentation page within the Sidefy app
 
+## Maintenance and review checklist
+
+Before merging a plugin change, maintainers should scan every plugin directory and verify:
+
+- `main.js`, `info.json`, and `README.md` are present.
+- `fetchEvents(config)` exists and event fields are valid.
+- `info.json` permissions match actual network, storage, and AI calls.
+- All user-facing runtime strings use nine complete i18n keys: `zh`, `en`, `ja`, `ko`, `de`, `es`, `fr`, `pt`, and `ru`.
+- i18n declarations are at the bottom of `main.js`.
+- Configuration documented in `README.md` matches both `info.json` and code.
+- Behavior changes bump `info.json` version and add a matching Changelog entry.
+- User-controlled inputs, external URLs, credentials, and cache keys are validated and handled safely.
+
+The repository may contain discontinued plugins. They should be clearly marked and should not be treated as examples for new contributions.
+
 ## Checklist
 
 - Plugin tested successfully in Sidefy
@@ -173,8 +208,12 @@ function i18nCountdownFuture(eventName, days) {
 - info.json information is complete and accurate
 - README.md instructions are clear
 - Code comments are appropriate
-- User-facing strings use `sidefy.i18n()` with all 4 languages (`zh`, `en`, `ja`, `ko`)
+- User-facing strings use `sidefy.i18n()` with all 9 languages (`zh`, `en`, `ja`, `ko`, `de`, `es`, `fr`, `pt`, `ru`)
 - i18n constants and helpers are declared at the bottom of `main.js`
+
+## Maintenance audit
+
+See [PLUGIN_AUDIT.md](PLUGIN_AUDIT.md) for the latest repository-wide structure, permission, i18n, and follow-up review baseline.
 
 ## License
 

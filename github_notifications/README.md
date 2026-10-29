@@ -61,6 +61,14 @@ You can configure the following types in the `notificationTypes` parameter (comm
 
 ### Changelog
 
+#### v0.2.4
+
+- Localized event metadata, validation errors, and API errors with all nine Nunc language codes.
+
+#### v0.2.3
+
+- Marked the plugin as discontinued because GitHub notification updates are not timely.
+
 #### v0.1.0
 
 - Initial release

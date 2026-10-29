@@ -12,20 +12,14 @@ function fetchEvents(config) {
     midnight.setHours(24, 0, 0, 0);
     var expiresAt = midnight.getTime();
 
-    // 2. 解析配置（带去重）
     var mids = parseMids(config.mids);
-    // 3. 读取或初始化存储
+    var pageSize = Math.max(1, Math.min(20, Number(config.pageSize) || 10));
     var index = sidefy.storage.get(CACHE_KEY);
     var storage = index ? loadUsers(index) : null;
     if (storage && ((storage.meta.expiresAt && now >= storage.meta.expiresAt) ||
-                    (storage.meta.date && storage.meta.date !== today))) {
-        storage = null;
-    }
-    if (!storage) {
-        storage = initStorage(mids);
-    }
+                    (storage.meta.date && storage.meta.date !== today))) storage = null;
+    if (!storage) storage = initStorage(mids);
 
-    // 4. 配置变化只重置轮询，不删除已保存的视频
     if (storage.meta.mids.join(',') !== mids.join(',')) {
         storage.meta.idx = 0;
         storage.meta.last = 0;
@@ -34,19 +28,12 @@ function fetchEvents(config) {
     storage.meta.date = today;
     storage.meta.expiresAt = expiresAt;
 
-    // 5. 判断是否需要轮询
     var shouldPoll = mids.length > 0 && (now - storage.meta.last) >= POLL_INTERVAL;
-
     if (shouldPoll) {
-        // 轮询：查询一个 UP 主
-        pollNextMid(storage, VIDEOS_PER_MID);
-
-        // 更新轮询时间
+        pollNextMid(storage, Math.min(VIDEOS_PER_MID, pageSize));
         storage.meta.last = now;
-
     }
 
-    // 客户端 TTL 最短为 5 分钟；expiresAt 保证午夜后不返回旧缓存
     var ttlMinutes = Math.max(5, (expiresAt - now) / 60000);
     var savedIndex = { meta: storage.meta, data: {} };
     for (var mid in storage.data) {
@@ -54,249 +41,99 @@ function fetchEvents(config) {
         savedIndex.data[mid] = {};
     }
     saveCache(CACHE_KEY, savedIndex, ttlMinutes);
-
-    // 6. 返回所有事件
     return buildEvents(storage, config);
 
-
-    // ==================== 辅助函数 ====================
-
-    function userKey(mid) {
-        return "bili_user_v1_" + today + "_" + mid;
-    }
-
+    function userKey(mid) { return "bili_user_v1_" + today + "_" + mid; }
     function loadUsers(index) {
         var result = { meta: index.meta, data: {} };
         for (var mid in index.data) {
             var cached = sidefy.storage.get(userKey(mid));
-            if (cached && cached.expiresAt > now) {
-                result.data[mid] = { vids: cached.vids || [] };
-            }
+            if (cached && cached.expiresAt > now) result.data[mid] = { vids: cached.vids || [] };
         }
         return result;
     }
-
     function saveCache(key, value, ttlMinutes) {
         var result = sidefy.storage.set(key, value, ttlMinutes);
-        if (result === false || (result && result.error)) {
-            throw new Error("视频缓存保存失败，已有存储未删除");
-        }
+        if (result === false || (result && result.error)) throw new Error(sidefy.i18n(I18N_CACHE_ERROR));
     }
-
-    /**
-     * 获取今天的日期字符串
-     */
     function getTodayKey() {
-        var now = new Date();
-        var year = now.getFullYear();
-        var month = String(now.getMonth() + 1).padStart(2, '0');
-        var day = String(now.getDate()).padStart(2, '0');
-        return year + "-" + month + "-" + day;
+        var date = new Date();
+        return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, '0') + "-" + String(date.getDate()).padStart(2, '0');
     }
-
-    /**
-     * 解析并去重 mid 字符串
-     */
     function parseMids(midStr) {
         if (!midStr) return [];
-
-        var mids = midStr.split(',')
-            .map(function(m) { return m.trim(); })
-            .filter(function(m) { return m.length > 0; });
-
-        // 去重
-        var uniqueMids = {};
-        var result = [];
-
-        for (var i = 0; i < mids.length; i++) {
-            var mid = mids[i];
-            if (!uniqueMids[mid]) {
-                uniqueMids[mid] = true;
-                result.push(mid);
-            }
-        }
-
+        var seen = {}, result = [];
+        String(midStr).split(',').map(function(m) { return m.trim(); }).filter(Boolean).forEach(function(mid) {
+            if (/^\d+$/.test(mid) && !seen[mid]) { seen[mid] = true; result.push(mid); }
+        });
         return result.slice(0, MAX_MIDS);
     }
-
-    /**
-     * 初始化存储结构
-     */
-    function initStorage(mids) {
-        return {
-            meta: {
-                mids: mids,
-                idx: 0,
-                last: 0
-            },
-            data: {}
-        };
-    }
-
-    /**
-     * 查询下一个 UP 主（轮询）
-     */
+    function initStorage(mids) { return { meta: { mids: mids, idx: 0, last: 0 }, data: {} }; }
     function pollNextMid(storage, pageSize) {
         var mids = storage.meta.mids;
-        if (mids.length === 0) return;
-
+        if (!mids.length) return;
         var idx = storage.meta.idx % mids.length;
         var mid = mids[idx];
-
         try {
             var videos = fetchBilibiliVideos(mid, pageSize);
-
             var existing = storage.data[mid] ? storage.data[mid].vids || [] : [];
-            var merged = [];
-            var positions = Object.create(null);
+            var merged = [], positions = Object.create(null);
             existing.concat(videos).forEach(function(video) {
                 if (!video.b) return;
-                if (positions[video.b] === undefined) {
-                    positions[video.b] = merged.length;
-                    merged.push(video);
-                } else {
-                    merged[positions[video.b]] = video;
-                }
+                if (positions[video.b] === undefined) { positions[video.b] = merged.length; merged.push(video); }
+                else merged[positions[video.b]] = video;
             });
             storage.data[mid] = { vids: merged };
         } catch (err) {
-            // 查询失败，保持原有数据不变
+            sidefy.log(err && err.message ? err.message : String(err));
         }
-
         storage.meta.idx = (idx + 1) % mids.length;
     }
-
-    /**
-     * 调用 B 站 API 获取视频（只保留今天发布的）
-     */
     function fetchBilibiliVideos(mid, pageSize) {
-        var url = "https://api.bilibili.com/x/space/arc/search?mid=" + mid +
-                  "&pn=1&ps=" + pageSize + "&order=pubdate";
-
-        var headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36",
-            "Accept": "application/json",
-            "Referer": "https://www.bilibili.com/"
-        };
-
-        var maxRetries = 3;
+        var url = "https://api.bilibili.com/x/space/arc/search?mid=" + encodeURIComponent(mid) + "&pn=1&ps=" + pageSize + "&order=pubdate";
+        var headers = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) AppleWebKit/537.36", "Accept": "application/json", "Referer": "https://www.bilibili.com/" };
         var response = null;
-
-        for (var attempt = 0; attempt < maxRetries; attempt++) {
+        for (var attempt = 0; attempt < 3; attempt++) {
             try {
                 response = sidefy.http.get(url, headers);
                 if (response && response.length > 0) {
-                    var data = JSON.parse(response);
-                    if (data.code === 0) {
-                        break;
-                    } else if (data.code === -799) {
-                        if (attempt < maxRetries - 1) {
-                            sleep(5000);
-                        }
-                    } else {
-                        throw new Error("API 返回错误: " + data.code);
-                    }
+                    var parsed = JSON.parse(response);
+                    if (parsed.code === 0) break;
+                    if (parsed.code === -799 && attempt < 2) { sleep(5000); continue; }
+                    throw new Error(i18nApiError(parsed.code));
                 }
             } catch (err) {
-                if (attempt === maxRetries - 1) {
-                    throw err;
-                }
+                if (attempt === 2) throw err;
                 sleep(3000);
             }
         }
-
-        if (!response) {
-            throw new Error("HTTP 请求失败");
-        }
-
+        if (!response) throw new Error(sidefy.i18n(I18N_REQUEST_ERROR));
         var data = JSON.parse(response);
-        if (data.code !== 0 || !data.data || !data.data.list || !data.data.list.vlist) {
-            throw new Error("API 返回格式错误");
-        }
-
-        // 获取今天的时间范围
-        var today = getTodayKey();
-        var todayStart = new Date(today + "T00:00:00").getTime() / 1000;
-        var todayEnd = new Date(today + "T23:59:59").getTime() / 1000;
-
-        var videos = [];
-        var vlist = data.data.list.vlist;
-
-        for (var i = 0; i < vlist.length; i++) {
-            var v = vlist[i];
-
-            // 只保留今天发布的视频
-            if (v.created >= todayStart && v.created <= todayEnd) {
-                videos.push({
-                    t: v.title,
-                    d: v.created,
-                    b: v.bvid,
-                    p: v.pic,
-                    a: v.author,
-                    pc: v.play || 0,
-                    dc: v.video_review || 0,
-                    l: v.length
-                });
-            }
-        }
-
-        return videos;
+        if (data.code !== 0 || !data.data || !data.data.list || !data.data.list.vlist) throw new Error(sidefy.i18n(I18N_RESPONSE_ERROR));
+        var todayStart = new Date(getTodayKey() + "T00:00:00").getTime() / 1000;
+        var todayEnd = new Date(getTodayKey() + "T23:59:59").getTime() / 1000;
+        return data.data.list.vlist.filter(function(v) { return v.created >= todayStart && v.created <= todayEnd; }).map(function(v) {
+            return { t: v.title, d: v.created, b: v.bvid, p: v.pic, a: v.author, pc: v.play || 0, dc: v.video_review || 0, l: v.length };
+        });
     }
-
-    /**
-     * 构建事件列表
-     */
     function buildEvents(storage, config) {
         var events = [];
-
         for (var mid in storage.data) {
-            var upData = storage.data[mid];
-
-            var videos = upData.vids || [];
-            for (var i = 0; i < videos.length; i++) {
-                var v = videos[i];
-
-                var playCount = formatCount(v.pc);
-                var danmakuCount = formatCount(v.dc);
-
-                events.push({
-                    title: v.t,
-                    startDate: sidefy.date.format(v.d),
-                    endDate: sidefy.date.format(v.d),
-                    color: "#FB7299",
-                    icon: config.icon,
-                    notes: "UP主: " + v.a +
-                           "\n播放: " + playCount +
-                           "\n弹幕: " + danmakuCount +
-                           "\n时长: " + v.l,
-                    isAllDay: false,
-                    isPointInTime: true,
-                    href: "https://www.bilibili.com/video/" + v.b,
-                    imageURL: v.p
-                });
-            }
+            (storage.data[mid].vids || []).forEach(function(v) {
+                events.push({ title: v.t, startDate: sidefy.date.format(v.d), endDate: sidefy.date.format(v.d), color: "#FB7299", icon: config.icon, notes: i18nVideoNotes(v.a, formatCount(v.pc), formatCount(v.dc), v.l), isAllDay: false, isPointInTime: true, href: "https://www.bilibili.com/video/" + encodeURIComponent(v.b), imageURL: v.p });
+            });
         }
-
         return events;
     }
-
-    /**
-     * 格式化数字
-     */
-    function formatCount(count) {
-        if (!count || count === 0) return "0";
-        if (count >= 100000000) return (count / 100000000).toFixed(1) + "亿";
-        if (count >= 10000) return (count / 10000).toFixed(1) + "万";
-        return count.toString();
-    }
-
-    /**
-     * 同步延迟
-     */
-    function sleep(ms) {
-        var endTime = Date.now() + ms;
-        while (Date.now() < endTime) {
-            // 忙等待
-        }
-    }
+    function formatCount(count) { if (!count) return "0"; if (count >= 100000000) return (count / 100000000).toFixed(1) + sidefy.i18n(I18N_HUNDRED_MILLION); if (count >= 10000) return (count / 10000).toFixed(1) + sidefy.i18n(I18N_TEN_THOUSAND); return String(count); }
+    function sleep(ms) { var endTime = Date.now() + ms; while (Date.now() < endTime) {} }
 }
+
+// --- i18n ---
+var I18N_CACHE_ERROR = { zh: "视频缓存保存失败。", en: "Failed to save video cache.", ja: "動画キャッシュの保存に失敗しました。", ko: "동영상 캐시를 저장하지 못했습니다.", de: "Videocache konnte nicht gespeichert werden.", es: "No se pudo guardar la caché de vídeos.", fr: "Impossible d’enregistrer le cache vidéo.", pt: "Não foi possível salvar o cache de vídeos.", ru: "Не удалось сохранить кэш видео." };
+var I18N_REQUEST_ERROR = { zh: "Bilibili 请求失败。", en: "Bilibili request failed.", ja: "Bilibili のリクエストに失敗しました。", ko: "Bilibili 요청에 실패했습니다.", de: "Bilibili-Anfrage fehlgeschlagen.", es: "La solicitud a Bilibili falló.", fr: "La requête Bilibili a échoué.", pt: "A solicitação ao Bilibili falhou.", ru: "Запрос к Bilibili не выполнен." };
+var I18N_RESPONSE_ERROR = { zh: "Bilibili 返回的数据格式无效。", en: "Bilibili returned an invalid response.", ja: "Bilibili が無効な応答を返しました。", ko: "Bilibili가 잘못된 응답을 반환했습니다.", de: "Bilibili hat eine ungültige Antwort zurückgegeben.", es: "Bilibili devolvió una respuesta no válida.", fr: "Bilibili a renvoyé une réponse invalide.", pt: "O Bilibili retornou uma resposta inválida.", ru: "Bilibili вернул недопустимый ответ." };
+var I18N_HUNDRED_MILLION = { zh: "亿", en: " hundred million", ja: "億", ko: "억", de: " Hundert Millionen", es: " cien millones", fr: " cent millions", pt: " cem milhões", ru: " сотен миллионов" };
+var I18N_TEN_THOUSAND = { zh: "万", en: " ten thousand", ja: "万", ko: "만", de: " Zehntausend", es: " diez mil", fr: " dix mille", pt: " dez mil", ru: " десять тысяч" };
+function i18nApiError(code) { return sidefy.i18n({ zh: "Bilibili API 错误：" + code, en: "Bilibili API error: " + code, ja: "Bilibili API エラー: " + code, ko: "Bilibili API 오류: " + code, de: "Bilibili-API-Fehler: " + code, es: "Error de la API de Bilibili: " + code, fr: "Erreur de l’API Bilibili : " + code, pt: "Erro da API do Bilibili: " + code, ru: "Ошибка API Bilibili: " + code }); }
+function i18nVideoNotes(author, play, danmaku, length) { return sidefy.i18n({ zh: "UP主：" + author + "\n播放：" + play + "\n弹幕：" + danmaku + "\n时长：" + length, en: "Creator: " + author + "\nViews: " + play + "\nDanmaku: " + danmaku + "\nDuration: " + length, ja: "投稿者: " + author + "\n再生数: " + play + "\n弾幕: " + danmaku + "\n長さ: " + length, ko: "업로더: " + author + "\n조회수: " + play + "\n탄막: " + danmaku + "\n길이: " + length, de: "Ersteller: " + author + "\nAufrufe: " + play + "\nDanmaku: " + danmaku + "\nDauer: " + length, es: "Creador: " + author + "\nVistas: " + play + "\nDanmaku: " + danmaku + "\nDuración: " + length, fr: "Créateur : " + author + "\nVues : " + play + "\nDanmaku : " + danmaku + "\nDurée : " + length, pt: "Criador: " + author + "\nVisualizações: " + play + "\nDanmaku: " + danmaku + "\nDuração: " + length, ru: "Автор: " + author + "\nПросмотры: " + play + "\nДанмаку: " + danmaku + "\nДлительность: " + length }); }

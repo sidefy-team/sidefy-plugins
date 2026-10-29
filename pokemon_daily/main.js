@@ -190,7 +190,12 @@ var I18N_ERROR_FETCH = {
     zh: "获取宝可梦信息失败，请检查网络连接。",
     en: "Failed to fetch Pokémon data. Please check your network connection.",
     ja: "ポケモン情報の取得に失敗しました。ネットワーク接続を確認してください。",
-    ko: "포켓몬 정보를 가져오지 못했습니다. 네트워크 연결을 확인해 주세요."
+    ko: "포켓몬 정보를 가져오지 못했습니다. 네트워크 연결을 확인해 주세요.",
+    de: "Pokémon-Daten konnten nicht abgerufen werden. Prüfen Sie Ihre Netzwerkverbindung.",
+    es: "No se pudieron obtener los datos de Pokémon. Comprueba tu conexión de red.",
+    fr: "Impossible de récupérer les données Pokémon. Vérifiez votre connexion réseau.",
+    pt: "Não foi possível obter os dados de Pokémon. Verifique a conexão de rede.",
+    ru: "Не удалось получить данные Pokémon. Проверьте сетевое подключение."
 };
 
 function i18nPokemonFailed(detail) {
@@ -198,6 +203,11 @@ function i18nPokemonFailed(detail) {
         zh: "宝可梦插件执行失败: " + detail,
         en: "Pokémon plugin failed: " + detail,
         ja: "ポケモンプラグインの実行に失敗しました: " + detail,
-        ko: "포켓몬 플러그인 실행에 실패했습니다: " + detail
+        ko: "포켓몬 플러그인 실행에 실패했습니다: " + detail,
+    de: "Pokémon-Plugin fehlgeschlagen: " + detail,
+        es: "Error del plugin de Pokémon: " + detail,
+        fr: "Échec du plugin Pokémon : " + detail,
+        pt: "Falha no plugin de Pokémon: " + detail,
+        ru: "Ошибка плагина Pokémon: " + detail
     });
 }

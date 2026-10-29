@@ -1,35 +1,35 @@
 {
-  "author" : "Nunc.",
-  "category" : "Productivity & Utilities",
-  "config_options" : {
-    "city_name" : {
-      "description" : "City display name",
-      "required" : false,
-      "type" : "string"
+    "author": "Nunc.",
+    "category": "Productivity & Utilities",
+    "config_options": {
+        "city_name": {
+            "description": "City display name",
+            "required": false,
+            "type": "string"
+        },
+        "latitude": {
+            "description": "Location latitude",
+            "required": true,
+            "type": "number"
+        },
+        "longitude": {
+            "description": "Location longitude",
+            "required": true,
+            "type": "number"
+        }
     },
-    "latitude" : {
-      "description" : "Location latitude",
-      "required" : true,
-      "type" : "number"
+    "copyable": true,
+    "description": "Display today's sunrise and sunset times. Configurable latitude/longitude. Uses NOAA solar position algorithm and Mac system timezone, no network required.",
+    "min_support_app_version": "2025.9.0",
+    "name": "Sunrise Sunset",
+    "requirements": {
+        "network": false,
+        "storage": false
     },
-    "longitude" : {
-      "description" : "Location longitude",
-      "required" : true,
-      "type" : "number"
-    }
-  },
-  "copyable" : true,
-  "description" : "Display today's sunrise and sunset times. Configurable latitude/longitude. Uses NOAA solar position algorithm and Mac system timezone, no network required.",
-  "min_support_app_version" : "2025.9.0",
-  "name" : "Sunrise Sunset",
-  "requirements" : {
-    "network" : false,
-    "storage" : false
-  },
-  "tags" : [
-    "time",
-    "sunrise",
-    "sunset"
-  ],
-  "version" : "1.0.5"
+    "tags": [
+        "time",
+        "sunrise",
+        "sunset"
+    ],
+    "version": "1.0.7"
 }

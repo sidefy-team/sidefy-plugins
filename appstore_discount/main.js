@@ -284,7 +284,12 @@ var I18N_APPS_EMPTY = {
     zh: "apps 不能为空。填写逗号分隔的 App Store 应用 ID，并为每个应用手动添加 {appId}_original_price 配置项。",
     en: "apps cannot be empty. Set comma-separated App Store app IDs, and manually add {appId}_original_price for each app.",
     ja: "apps を入力してください。App Store ID をカンマ区切りで指定し、各アプリに {appId}_original_price を追加してください。",
-    ko: "apps를 입력하세요. App Store ID를 쉼표로 구분하고 각 앱에 {appId}_original_price를 추가하세요."
+    ko: "apps를 입력하세요. App Store ID를 쉼표로 구분하고 각 앱에 {appId}_original_price를 추가하세요.",
+    de: "apps darf nicht leer sein. Geben Sie durch Kommas getrennte App-Store-IDs ein und fügen Sie für jede App {appId}_original_price hinzu.",
+    es: "apps no puede estar vacío. Introduce IDs de App Store separados por comas y añade {appId}_original_price para cada aplicación.",
+    fr: "apps ne peut pas être vide. Saisissez des identifiants App Store séparés par des virgules et ajoutez {appId}_original_price pour chaque app.",
+    pt: "apps não pode ficar vazio. Informe IDs da App Store separados por vírgulas e adicione {appId}_original_price para cada app.",
+    ru: "apps не может быть пустым. Укажите ID приложений App Store через запятую и добавьте {appId}_original_price для каждого приложения."
 };
 
 function i18nDiscountNotes(originalPrice, currentPrice, discountPercent, region) {
@@ -293,7 +298,12 @@ function i18nDiscountNotes(originalPrice, currentPrice, discountPercent, region)
         zh: "原价: " + originalPrice + "\n现价: " + currentPrice + "\n折扣: -" + discountPercent + "%\n区域: " + regionUpper,
         en: "Original Price: " + originalPrice + "\nCurrent Price: " + currentPrice + "\nDiscount: -" + discountPercent + "%\nRegion: " + regionUpper,
         ja: "元の価格: " + originalPrice + "\n現在の価格: " + currentPrice + "\n割引: -" + discountPercent + "%\n地域: " + regionUpper,
-        ko: "원가: " + originalPrice + "\n현재 가격: " + currentPrice + "\n할인: -" + discountPercent + "%\n지역: " + regionUpper
+        ko: "원가: " + originalPrice + "\n현재 가격: " + currentPrice + "\n할인: -" + discountPercent + "%\n지역: " + regionUpper,
+    de: "Originalpreis: " + originalPrice + "\nAktueller Preis: " + currentPrice + "\nRabatt: -" + discountPercent + "%\nRegion: " + regionUpper,
+        es: "Precio original: " + originalPrice + "\nPrecio actual: " + currentPrice + "\nDescuento: -" + discountPercent + "%\nRegión: " + regionUpper,
+        fr: "Prix d’origine : " + originalPrice + "\nPrix actuel : " + currentPrice + "\nRéduction : -" + discountPercent + "%\nRégion : " + regionUpper,
+        pt: "Preço original: " + originalPrice + "\nPreço atual: " + currentPrice + "\nDesconto: -" + discountPercent + "%\nRegião: " + regionUpper,
+        ru: "Исходная цена: " + originalPrice + "\nТекущая цена: " + currentPrice + "\nСкидка: -" + discountPercent + "%\nРегион: " + regionUpper
     });
 }
 
@@ -302,7 +312,12 @@ function i18nExecutionFailed(message) {
         zh: "AppStore 折扣插件执行失败: " + message,
         en: "AppStore Discount plugin execution failed: " + message,
         ja: "AppStore 割引プラグインの実行に失敗しました: " + message,
-        ko: "AppStore 할인 플러그인 실행 실패: " + message
+        ko: "AppStore 할인 플러그인 실행 실패: " + message,
+    de: "Ausführung des App-Store-Rabatt-Plugins fehlgeschlagen: " + message,
+        es: "Error al ejecutar el plugin de descuentos de App Store: " + message,
+        fr: "Échec de l’exécution du plugin de réductions App Store : " + message,
+        pt: "Falha na execução do plugin de descontos da App Store: " + message,
+        ru: "Ошибка выполнения плагина скидок App Store: " + message
     });
 }
 
@@ -311,6 +326,11 @@ function i18nNoValidAppConfig(hint) {
         zh: "没有有效的应用配置。请为每个应用手动添加参考价配置项，例如：" + hint,
         en: "No valid app configuration. Manually add reference price keys for each app, e.g. " + hint,
         ja: "有効なアプリ設定がありません。各アプリに参考価格キーを追加してください。例: " + hint,
-        ko: "유효한 앱 설정이 없습니다. 각 앱에 참고 가격 키를 추가하세요, 예: " + hint
+        ko: "유효한 앱 설정이 없습니다. 각 앱에 참고 가격 키를 추가하세요, 예: " + hint,
+    de: "Keine gültige App-Konfiguration. Fügen Sie für jede App Referenzpreisschlüssel hinzu, z. B. " + hint,
+        es: "No hay una configuración de aplicación válida. Añade claves de precio de referencia, por ejemplo: " + hint,
+        fr: "Aucune configuration d’app valide. Ajoutez des clés de prix de référence, par exemple : " + hint,
+        pt: "Nenhuma configuração de app válida. Adicione chaves de preço de referência, por exemplo: " + hint,
+        ru: "Нет корректной конфигурации приложения. Добавьте ключи эталонной цены, например: " + hint
     });
 }

@@ -43,6 +43,10 @@ Discount: -65%
 
 ### Changelog
 
+### v0.1.7
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 #### v0.0.1
 
 - Initial release

@@ -25,6 +25,7 @@ Fetch public activity events for a specified GitHub user, including pushes, fork
 |-----------|------|---------|-------------|
 | token | password | - | GitHub Personal Access Token |
 | limit | number | "10" | Number of events to fetch (1-100) |
+| filterSelf | string | empty | Filter out events created by the configured user (`true` / `false`) |
 
 ### How to Get GitHub Token
 
@@ -46,6 +47,21 @@ Fetch public activity events for a specified GitHub user, including pushes, fork
 - Other Events: Make repositories public, add collaborators, etc.
 
 ### Changelog
+
+#### v0.2.3
+
+- Normalize the optional token and limit inputs before sending GitHub requests.
+
+#### v0.2.2
+
+- Localized event titles, notes, and errors with all nine Nunc language codes.
+- Isolated caches by username, limit, and `filterSelf` configuration.
+- Trimmed and validated the configured username.
+
+#### v0.2.1
+
+- Marked the plugin as discontinued because GitHub activity updates are not timely.
+- Added the `filterSelf` configuration option.
 
 #### v0.0.1
 

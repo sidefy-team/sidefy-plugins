@@ -1,36 +1,36 @@
 {
-  "name": "X Posts",
-  "description": "Follow public posts from one X account at their original publication times. Duplicate the plugin to follow another account.",
-  "version": "0.2.1",
-  "author": "Nunc.",
-  "min_support_app_version": "2025.11.12",
-  "tags": [
-    "x",
-    "social media",
-    "posts",
-    "twitter"
-  ],
-  "category": "Social Media",
-  "config_options": {
-    "aiTitle": {
-      "type": "boolean",
-      "default": false,
-      "required": false,
-      "description": "Generate titles from post content using General AI. Requires AI permission and a configured General AI service. Falls back to the original text on failure."
+    "name": "X Posts",
+    "description": "Follow public posts from one X account at their original publication times. Duplicate the plugin to follow another account.",
+    "version": "0.2.2",
+    "author": "Nunc.",
+    "min_support_app_version": "2025.11.12",
+    "tags": [
+        "x",
+        "social media",
+        "posts",
+        "twitter"
+    ],
+    "category": "Social Media",
+    "config_options": {
+        "aiTitle": {
+            "type": "boolean",
+            "default": false,
+            "required": false,
+            "description": "Generate titles from post content using General AI. Requires AI permission and a configured General AI service. Falls back to the original text on failure."
+        },
+        "username": {
+            "type": "string",
+            "default": "",
+            "required": true,
+            "description": "One X username, with or without @ (for example, thsottiaux). Do not enter a profile URL."
+        }
     },
-    "username": {
-      "type": "string",
-      "default": "",
-      "required": true,
-      "description": "One X username, with or without @ (for example, thsottiaux). Do not enter a profile URL."
-    }
-  },
-  "requirements": {
-    "network": true,
-    "storage": true,
-    "ai": true,
-    "ai_decision": false,
-    "crawler": true
-  },
-  "copyable": true
+    "requirements": {
+        "network": true,
+        "storage": true,
+        "ai": true,
+        "ai_decision": false,
+        "crawler": true
+    },
+    "copyable": true
 }

@@ -196,28 +196,48 @@ var I18N_ERROR_EMPTY_STEAM_ID = {
     zh: "Steam 用户名不能为空，请在插件配置中填入您的 Steam 用户名。",
     en: "Steam username cannot be empty, please enter your Steam username in the plugin configuration.",
     ja: "Steam ユーザー名を空にすることはできません。プラグイン設定に Steam ユーザー名を入力してください。",
-    ko: "Steam 사용자 이름은 비워둘 수 없습니다. 플러그인 설정에서 Steam 사용자 이름을 입력하세요."
+    ko: "Steam 사용자 이름은 비워둘 수 없습니다. 플러그인 설정에서 Steam 사용자 이름을 입력하세요.",
+    de: "Der Steam-Benutzername darf nicht leer sein. Geben Sie ihn in den Plugin-Einstellungen ein.",
+    es: "El nombre de usuario de Steam no puede estar vacío; introdúcelo en la configuración del plugin.",
+    fr: "Le nom d’utilisateur Steam ne peut pas être vide ; saisissez-le dans la configuration du plugin.",
+    pt: "O nome de usuário Steam não pode ficar vazio; informe-o nas configurações do plugin.",
+    ru: "Имя пользователя Steam не может быть пустым. Укажите его в настройках плагина."
 };
 
 var I18N_ERROR_USER_INFO = {
     zh: "无法获取Steam用户信息，请检查您的Steam用户名是否正确。",
     en: "Unable to retrieve Steam user information. Please check if your Steam username is correct.",
     ja: "Steam ユーザー情報を取得できません。Steam ユーザー名が正しいか確認してください。",
-    ko: "Steam 사용자 정보를 가져올 수 없습니다. Steam 사용자 이름이 올바른지 확인하세요."
+    ko: "Steam 사용자 정보를 가져올 수 없습니다. Steam 사용자 이름이 올바른지 확인하세요.",
+    de: "Steam-Benutzerinformationen konnten nicht abgerufen werden. Prüfen Sie den Benutzernamen.",
+    es: "No se pudo obtener la información del usuario de Steam. Comprueba el nombre.",
+    fr: "Impossible de récupérer les informations Steam. Vérifiez le nom d’utilisateur.",
+    pt: "Não foi possível obter as informações do usuário Steam. Verifique o nome.",
+    ru: "Не удалось получить данные пользователя Steam. Проверьте имя."
 };
 
 var I18N_ERROR_STEAM_ID = {
     zh: "无法找到对应的Steam ID，请确认用户名正确且资料为公开。",
     en: "Cannot find the corresponding Steam ID. Please ensure the username is correct and the profile is public.",
     ja: "対応する Steam ID が見つかりません。ユーザー名が正しく、プロフィールが公開されていることを確認してください。",
-    ko: "해당 Steam ID를 찾을 수 없습니다. 사용자 이름이 올바르고 프로필이 공개되어 있는지 확인하세요."
+    ko: "해당 Steam ID를 찾을 수 없습니다. 사용자 이름이 올바르고 프로필이 공개되어 있는지 확인하세요.",
+    de: "Die Steam-ID wurde nicht gefunden. Prüfen Sie den Benutzernamen und ob das Profil öffentlich ist.",
+    es: "No se encontró el Steam ID. Comprueba el nombre y que el perfil sea público.",
+    fr: "Steam ID introuvable. Vérifiez le nom et que le profil est public.",
+    pt: "Não foi possível encontrar o Steam ID. Verifique o nome e se o perfil é público.",
+    ru: "Соответствующий Steam ID не найден. Проверьте имя и открытость профиля."
 };
 
 var I18N_ERROR_WISHLIST = {
     zh: "无法获取愿望单数据，请检查您的愿望单是否设置为公开。",
     en: "Unable to retrieve wishlist data. Please check if your wishlist is set to public.",
     ja: "ウィッシュリストデータを取得できません。ウィッシュリストが公開に設定されているか確認してください。",
-    ko: "위시리스트 데이터를 가져올 수 없습니다. 위시리스트가 공개로 설정되어 있는지 확인하세요."
+    ko: "위시리스트 데이터를 가져올 수 없습니다. 위시리스트가 공개로 설정되어 있는지 확인하세요.",
+    de: "Wunschlistendaten konnten nicht abgerufen werden. Prüfen Sie, ob die Wunschliste öffentlich ist.",
+    es: "No se pudieron obtener los datos de la lista de deseos. Comprueba que sea pública.",
+    fr: "Impossible de récupérer la liste de souhaits. Vérifiez qu’elle est publique.",
+    pt: "Não foi possível obter a lista de desejos. Verifique se ela é pública.",
+    ru: "Не удалось получить данные списка желаний. Проверьте, что он открыт."
 };
 
 function i18nDiscountNotes(originalPrice, finalPrice, discountPercent) {
@@ -225,7 +245,12 @@ function i18nDiscountNotes(originalPrice, finalPrice, discountPercent) {
         zh: "原价: " + originalPrice + "\n现价: " + finalPrice + "\n折扣: -" + discountPercent + "%",
         en: "Original Price: " + originalPrice + "\nCurrent Price: " + finalPrice + "\nDiscount: -" + discountPercent + "%",
         ja: "元の価格: " + originalPrice + "\n現在の価格: " + finalPrice + "\n割引: -" + discountPercent + "%",
-        ko: "원가: " + originalPrice + "\n현재 가격: " + finalPrice + "\n할인: -" + discountPercent + "%"
+        ko: "원가: " + originalPrice + "\n현재 가격: " + finalPrice + "\n할인: -" + discountPercent + "%",
+        de: "Originalpreis: " + originalPrice + "\nAktueller Preis: " + finalPrice + "\nRabatt: -" + discountPercent + "%",
+        es: "Precio original: " + originalPrice + "\nPrecio actual: " + finalPrice + "\nDescuento: -" + discountPercent + "%",
+        fr: "Prix d’origine : " + originalPrice + "\nPrix actuel : " + finalPrice + "\nRéduction : -" + discountPercent + "%",
+        pt: "Preço original: " + originalPrice + "\nPreço atual: " + finalPrice + "\nDesconto: -" + discountPercent + "%",
+        ru: "Исходная цена: " + originalPrice + "\nТекущая цена: " + finalPrice + "\nСкидка: -" + discountPercent + "%"
     });
 }
 
@@ -234,6 +259,11 @@ function i18nExecutionFailed(message) {
         zh: "Steam 愿望单插件执行失败: " + message,
         en: "Steam Wishlist plugin execution failed: " + message,
         ja: "Steam ウィッシュリストプラグインの実行に失敗しました: " + message,
-        ko: "Steam 위시리스트 플러그인 실행 실패: " + message
+        ko: "Steam 위시리스트 플러그인 실행 실패: " + message,
+        de: "Ausführung des Steam-Wunschlisten-Plugins fehlgeschlagen: " + message,
+        es: "Error al ejecutar el plugin de lista de deseos de Steam: " + message,
+        fr: "Échec de l’exécution du plugin de liste Steam : " + message,
+        pt: "Falha na execução do plugin de lista de desejos Steam: " + message,
+        ru: "Ошибка выполнения плагина списка желаний Steam: " + message
     });
 }

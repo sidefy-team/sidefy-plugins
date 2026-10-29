@@ -49,6 +49,10 @@ With `aiTitle` enabled, the generated title replaces the text after `@username �
 
 ### Changelog
 
+### v0.2.2
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 #### v0.2.1
 
 - Lower the minimum app version to 2025.11.12, matching the historical Universal Web Monitor plugin with crawler, AI, and storage requirements.

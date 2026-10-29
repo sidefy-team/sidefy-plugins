@@ -27,9 +27,13 @@ No configuration required. Plugin works out of the box.
 
 ### Changelog
 
+### v0.0.7
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 #### v0.0.6
 
-- Localized error messages with `sidefy.i18n()` (`zh` / `en` / `ja` / `ko`)
+- Localized error messages with `sidefy.i18n()` using all nine Nunc language codes
 - Added i18n constants and helpers in a `// --- i18n ---` block at the bottom of `main.js`
 
 #### v0.0.1

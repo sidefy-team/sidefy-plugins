@@ -8,7 +8,7 @@ A Sidefy plugin that displays today's sunrise and sunset times on your timeline,
 - **Daylight Duration**: Sunrise event shows total daylight hours and minutes.
 - **Custom Location**: Configurable latitude and longitude, defaults to Xi'an, China.
 - **Polar Day/Night**: Handles edge cases where the sun never rises or never sets.
-- **Multilingual Support**: Supports English and Chinese.
+- **Multilingual Support**: Supports Chinese, English, Japanese, and Korean.
 - **System Timezone**: Uses your Mac's local timezone (including DST).
 
 ## Configuration
@@ -24,6 +24,14 @@ A Sidefy plugin that displays today's sunrise and sunset times on your timeline,
 Based on the [NOAA Solar Position Calculator](https://gml.noaa.gov/grad/solcalc/). UTC offset is read from the Mac system timezone (`Date.getTimezoneOffset()`).
 
 ## Changelog
+
+### v1.0.7
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
+### v1.0.6
+
+- 补充文档：插件实际支持中文、英语、日语、韩语、德语、西班牙语、法语、葡萄牙语和俄语九种语言。
 
 ### v1.0.4
 

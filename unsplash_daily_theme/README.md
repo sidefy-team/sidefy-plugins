@@ -39,6 +39,10 @@ Brings you one beautiful, popular photo from Unsplash homepage every day, displa
 
 ### Changelog
 
+### v0.2.2
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 #### v0.2.0
 
 - **Breaking Change**: Simplified from 3 photos to 1 photo per day

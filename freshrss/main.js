@@ -21,15 +21,22 @@ function fetchEvents(config) {
         }
     }
 
-    var limit = config.limit || 50;
-    var cacheKey = "freshrss_auth_token_" + config.username;
-    var articlesCacheKey = "freshrss_articles_" + config.username + "_" + limit + "_" + (config.onlyUnread ? "unread" : "all");
+    var parsedURL = new URL(baseUrl);
+    if (parsedURL.protocol !== "https:") {
+        throw new Error(sidefy.i18n(I18N_ERROR_CONFIG));
+    }
+    var username = String(config.username).trim();
+    var onlyUnread = config.onlyUnread === true || config.onlyUnread === "true";
+    var limit = Math.max(1, Math.min(100, Number(config.limit) || 50));
+    var cacheScope = encodeURIComponent(parsedURL.origin + parsedURL.pathname + "|" + username);
+    var cacheKey = "freshrss_auth_token_" + cacheScope;
+    var articlesCacheKey = "freshrss_articles_" + cacheScope + "_" + limit + "_" + (onlyUnread ? "unread" : "all");
 
     // Helper to perform login
     function login() {
         // 将参数直接拼接到 URL 后面
         var loginUrl = baseUrl + "/accounts/ClientLogin?Email=" +
-            encodeURIComponent(config.username) +
+            encodeURIComponent(username) +
             "&Passwd=" + encodeURIComponent(config.password);
 
         sidefy.log("[FreshRSS] Logging in to: " + loginUrl.replace(/Passwd=[^&]+/, "Passwd=***"));
@@ -76,7 +83,7 @@ function fetchEvents(config) {
         var feedUrl = baseUrl + "/reader/api/0/stream/contents/reading-list?n=" + limit;
 
         // 如果配置为只显示未读,则排除已读文章
-        if (config.onlyUnread === true) {
+        if (onlyUnread) {
             feedUrl += "&xt=user/-/state/com.google/read";
             sidefy.log("[FreshRSS] Only fetching unread articles");
         } else {
@@ -136,7 +143,7 @@ function fetchEvents(config) {
     if (!data) {
         sidefy.log("[FreshRSS] No cached token or failed, performing login");
         token = login();
-        sidefy.log("[FreshRSS] Login successful, token: " + token.substring(0, 20) + "...");
+        sidefy.log("[FreshRSS] Login successful");
         data = getData(token);
     }
 
@@ -180,7 +187,7 @@ function fetchEvents(config) {
             href: link,
             isAllDay: false,
             isPointInTime: true,
-            color: sidefy.color.hash(item.origin.htmlUrl || feedTitle)
+            color: sidefy.color.hash((item.origin && item.origin.htmlUrl) || feedTitle)
         };
     });
 
@@ -197,14 +204,24 @@ var I18N_ERROR_CONFIG = {
     zh: "请配置 FreshRSS 地址、用户名和 API 密码。",
     en: "Please configure FreshRSS URL, Username, and API Password.",
     ja: "FreshRSS の URL、ユーザー名、API パスワードを設定してください。",
-    ko: "FreshRSS URL, 사용자 이름, API 비밀번호를 설정해 주세요."
+    ko: "FreshRSS URL, 사용자 이름, API 비밀번호를 설정해 주세요.",
+    de: "Bitte konfigurieren Sie FreshRSS-URL, Benutzername und API-Passwort.",
+    es: "Configura la URL, el nombre de usuario y la contraseña API de FreshRSS.",
+    fr: "Configurez l’URL FreshRSS, le nom d’utilisateur et le mot de passe API.",
+    pt: "Configure a URL, o nome de usuário e a senha da API do FreshRSS.",
+    ru: "Настройте URL FreshRSS, имя пользователя и пароль API."
 };
 
 var I18N_ERROR_LOGIN_EMPTY = {
     zh: "登录失败（响应为空）。",
     en: "Login failed (empty response)",
     ja: "ログインに失敗しました（応答が空です）。",
-    ko: "로그인에 실패했습니다(응답이 비어 있음)."
+    ko: "로그인에 실패했습니다(응답이 비어 있음).",
+    de: "Anmeldung fehlgeschlagen (leere Antwort).",
+    es: "Error de inicio de sesión (respuesta vacía).",
+    fr: "Échec de la connexion (réponse vide).",
+    pt: "Falha no login (resposta vazia).",
+    ru: "Ошибка входа (пустой ответ)."
 };
 
 function i18nLoginError(response) {
@@ -212,7 +229,12 @@ function i18nLoginError(response) {
         zh: "FreshRSS 登录错误: " + response,
         en: "FreshRSS Login Error: " + response,
         ja: "FreshRSS ログインエラー: " + response,
-        ko: "FreshRSS 로그인 오류: " + response
+        ko: "FreshRSS 로그인 오류: " + response,
+    de: "FreshRSS-Anmeldefehler: " + response,
+        es: "Error de inicio de sesión de FreshRSS: " + response,
+        fr: "Erreur de connexion FreshRSS : " + response,
+        pt: "Erro de login do FreshRSS: " + response,
+        ru: "Ошибка входа в FreshRSS: " + response
     });
 }
 
@@ -221,6 +243,11 @@ function i18nAuthParseError(detail) {
         zh: "无法解析 Auth 令牌。响应开头: " + detail,
         en: "Failed to parse Auth token. Response start: " + detail,
         ja: "Auth トークンを解析できません。応答の先頭: " + detail,
-        ko: "Auth 토큰을 분석할 수 없습니다. 응답 시작: " + detail
+        ko: "Auth 토큰을 분석할 수 없습니다. 응답 시작: " + detail,
+    de: "Auth-Token konnte nicht analysiert werden. Antwortanfang: " + detail,
+        es: "No se pudo analizar el token Auth. Inicio de la respuesta: " + detail,
+        fr: "Impossible d’analyser le jeton Auth. Début de la réponse : " + detail,
+        pt: "Não foi possível analisar o token Auth. Início da resposta: " + detail,
+        ru: "Не удалось разобрать токен Auth. Начало ответа: " + detail
     });
 }

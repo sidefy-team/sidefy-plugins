@@ -5,7 +5,7 @@
 function fetchEvents(config) {
     var targetDateStr = config.target_date;
     var eventName = config.event_name || sidefy.i18n(I18N_DEFAULT_EVENT_NAME);
-    var warningDays = config.warning_days || 3;
+    var warningDays = Math.max(0, Number(config.warning_days) || 3);
 
     if (!targetDateStr) {
         return [];
@@ -16,6 +16,9 @@ function fetchEvents(config) {
         var todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
         var targetDate = new Date(targetDateStr);
+        if (isNaN(targetDate.getTime())) {
+            throw new Error("Invalid target date");
+        }
         var targetDateStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
 
         var diffTime = targetDateStart.getTime() - todayStart.getTime();
@@ -59,7 +62,12 @@ var I18N_DEFAULT_EVENT_NAME = {
     zh: "重要日子",
     en: "Important Day",
     ja: "大切な日",
-    ko: "중요한 날"
+    ko: "중요한 날",
+    de: "Wichtiger Tag",
+    es: "Día importante",
+    fr: "Jour important",
+    pt: "Dia importante",
+    ru: "Важный день"
 };
 
 function i18nCountdownFuture(eventName, diffDays) {
@@ -67,7 +75,12 @@ function i18nCountdownFuture(eventName, diffDays) {
         zh: "距离 " + eventName + " 还有 " + diffDays + " 天",
         en: diffDays + " days until " + eventName,
         ja: eventName + "まであと" + diffDays + "日",
-        ko: eventName + "까지 " + diffDays + "일 남음"
+        ko: eventName + "까지 " + diffDays + "일 남음",
+        de: diffDays + " Tage bis " + eventName,
+        es: "Faltan " + diffDays + " días para " + eventName,
+        fr: "Encore " + diffDays + " jours avant " + eventName,
+        pt: "Faltam " + diffDays + " dias para " + eventName,
+        ru: "До " + eventName + " осталось дней: " + diffDays
     });
 }
 
@@ -76,7 +89,12 @@ function i18nCountdownToday(eventName) {
         zh: "今天是 " + eventName + "！",
         en: "Today is " + eventName + "!",
         ja: "今日は" + eventName + "！",
-        ko: "오늘은 " + eventName + "!"
+        ko: "오늘은 " + eventName + "!",
+    de: "Heute ist " + eventName + "!",
+        es: "¡Hoy es " + eventName + "!",
+        fr: "Aujourd’hui, c’est " + eventName + " !",
+        pt: "Hoje é " + eventName + "!",
+        ru: "Сегодня " + eventName + "!"
     });
 }
 
@@ -85,7 +103,12 @@ function i18nCountdownPast(eventName, absDiff) {
         zh: eventName + " 已经过去 " + absDiff + " 天",
         en: eventName + " was " + absDiff + " days ago",
         ja: eventName + "から" + absDiff + "日経過",
-        ko: eventName + "이(가) " + absDiff + "일 지남"
+        ko: eventName + "이(가) " + absDiff + "일 지남",
+        de: eventName + " war vor " + absDiff + " Tagen",
+        es: eventName + " fue hace " + absDiff + " días",
+        fr: eventName + " était il y a " + absDiff + " jours",
+        pt: eventName + " foi há " + absDiff + " dias",
+        ru: eventName + " было " + absDiff + " дней назад"
     });
 }
 
@@ -94,6 +117,11 @@ function i18nExecutionFailed(message) {
         zh: "倒计时日插件执行失败: " + message,
         en: "Countdown Day plugin execution failed: " + message,
         ja: "カウントダウン日プラグインの実行に失敗しました: " + message,
-        ko: "카운트다운 플러그인 실행 실패: " + message
+        ko: "카운트다운 플러그인 실행 실패: " + message,
+    de: "Fehler bei der Ausführung des Countdown-Plugins: " + message,
+        es: "Error al ejecutar el plugin de cuenta atrás: " + message,
+        fr: "Échec de l’exécution du plugin de compte à rebours : " + message,
+        pt: "Falha na execução do plugin de contagem regressiva: " + message,
+        ru: "Ошибка выполнения плагина обратного отсчёта: " + message
     });
 }

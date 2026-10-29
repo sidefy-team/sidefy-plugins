@@ -135,6 +135,10 @@ A: No. Events appear only while the game is currently discounted. When the sale 
 
 ### Changelog
 
+### v1.0.6
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 #### v1.0.1
 
 - Multi-region release (JP, US, CA, MX, BR, GB, DE, FR, AU)

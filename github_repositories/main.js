@@ -603,21 +603,36 @@ var I18N_STATUS_OPEN = {
     zh: "开启",
     en: "Open",
     ja: "オープン",
-    ko: "열림"
+    ko: "열림",
+    de: "Offen",
+    es: "Abierto",
+    fr: "Ouvert",
+    pt: "Aberto",
+    ru: "Открыт"
 };
 
 var I18N_STATUS_MERGED = {
     zh: "已合并",
     en: "Merged",
     ja: "マージ済み",
-    ko: "병합됨"
+    ko: "병합됨",
+    de: "Zusammengeführt",
+    es: "Fusionado",
+    fr: "Fusionné",
+    pt: "Mesclado",
+    ru: "Объединён"
 };
 
 var I18N_STATUS_CLOSED = {
     zh: "已关闭",
     en: "Closed",
     ja: "クローズ",
-    ko: "닫힘"
+    ko: "닫힘",
+    de: "Geschlossen",
+    es: "Cerrado",
+    fr: "Fermé",
+    pt: "Fechado",
+    ru: "Закрыт"
 };
 
 function i18nStarred(login, repo) {
@@ -625,7 +640,12 @@ function i18nStarred(login, repo) {
         zh: login + " 标星了 " + repo,
         en: login + " starred " + repo,
         ja: login + " が " + repo + " をスターしました",
-        ko: login + "님이 " + repo + "에 스타를 했습니다"
+        ko: login + "님이 " + repo + "에 스타를 했습니다",
+        de: login + " hat " + repo + " markiert",
+        es: login + " marcó " + repo,
+        fr: login + " a ajouté une étoile à " + repo,
+        pt: login + " adicionou estrela a " + repo,
+        ru: login + " отметил " + repo + " звездой"
     });
 }
 
@@ -634,7 +654,12 @@ function i18nReleased(repo, tag) {
         zh: repo + " 发布了 " + tag,
         en: repo + " released " + tag,
         ja: repo + " が " + tag + " をリリースしました",
-        ko: repo + "에서 " + tag + "을(를) 릴리스했습니다"
+        ko: repo + "에서 " + tag + "을(를) 릴리스했습니다",
+        de: repo + " hat " + tag + " veröffentlicht",
+        es: repo + " publicó " + tag,
+        fr: repo + " a publié " + tag,
+        pt: repo + " lançou " + tag,
+        ru: repo + " выпустил " + tag
     });
 }
 
@@ -643,7 +668,12 @@ function i18nCreatedPR(login, repo) {
         zh: login + " 在 " + repo + " 创建了拉取请求",
         en: login + " created PR in " + repo,
         ja: login + " が " + repo + " でプルリクエストを作成しました",
-        ko: login + "님이 " + repo + "에서 풀 리퀘스트를 생성했습니다"
+        ko: login + "님이 " + repo + "에서 풀 리퀘스트를 생성했습니다",
+        de: login + " hat einen Pull Request in " + repo + " erstellt",
+        es: login + " creó una solicitud de extracción en " + repo,
+        fr: login + " a créé une pull request dans " + repo,
+        pt: login + " criou um pull request em " + repo,
+        ru: login + " создал pull request в " + repo
     });
 }
 
@@ -652,7 +682,12 @@ function i18nForked(login, repo) {
         zh: login + " 分叉了 " + repo,
         en: login + " forked " + repo,
         ja: login + " が " + repo + " をフォークしました",
-        ko: login + "님이 " + repo + "를 포크했습니다"
+        ko: login + "님이 " + repo + "를 포크했습니다",
+        de: login + " hat " + repo + " geforkt",
+        es: login + " bifurcó " + repo,
+        fr: login + " a forké " + repo,
+        pt: login + " fez fork de " + repo,
+        ru: login + " создал форк " + repo
     });
 }
 
@@ -661,7 +696,12 @@ function i18nCreatedIssue(login, repo) {
         zh: login + " 在 " + repo + " 创建了议题",
         en: login + " created issue in " + repo,
         ja: login + " が " + repo + " で Issue を作成しました",
-        ko: login + "님이 " + repo + "에서 이슈를 생성했습니다"
+        ko: login + "님이 " + repo + "에서 이슈를 생성했습니다",
+        de: login + " hat ein Issue in " + repo + " erstellt",
+        es: login + " creó un issue en " + repo,
+        fr: login + " a créé une issue dans " + repo,
+        pt: login + " criou uma issue em " + repo,
+        ru: login + " создал issue в " + repo
     });
 }
 
@@ -670,6 +710,11 @@ function i18nDiscussion(login, repo) {
         zh: login + " 在 " + repo + " 发起了讨论",
         en: login + " started discussion in " + repo,
         ja: login + " が " + repo + " でディスカッションを開始しました",
-        ko: login + "님이 " + repo + "에서 토론을 시작했습니다"
+        ko: login + "님이 " + repo + "에서 토론을 시작했습니다",
+        de: login + " hat eine Diskussion in " + repo + " gestartet",
+        es: login + " inició una discusión en " + repo,
+        fr: login + " a lancé une discussion dans " + repo,
+        pt: login + " iniciou uma discussão em " + repo,
+        ru: login + " начал обсуждение в " + repo
     });
 }

@@ -52,6 +52,10 @@ Enable **Network** permission. Storage, AI, AI Decision, and Crawler permissions
 
 ## Changelog
 
+### v1.0.4
+
+- 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
+
 ### v1.0.3
 
 - Lower the minimum app version to 2025.9.0, matching existing plugins that use the same basic runtime APIs.

@@ -125,33 +125,58 @@ var I18N_USERNAME = {
     "zh": "username 请填写一个 X 用户名，不含网址",
     "en": "Enter one X username, not a URL.",
     "ja": "URLではなく、Xのユーザー名を1つ入力してください。",
-    "ko": "URL 대신 X 사용자 이름 하나를 입력하세요."
+    "ko": "URL 대신 X 사용자 이름 하나를 입력하세요.",
+    "de": "Geben Sie einen X-Benutzernamen ein, keine URL.",
+    "es": "Introduce un nombre de usuario de X, no una URL.",
+    "fr": "Saisissez un nom d’utilisateur X, pas une URL.",
+    "pt": "Insira um nome de usuário do X, não uma URL.",
+    "ru": "Введите имя пользователя X, а не URL."
 };
 
 var I18N_CRAWLER = {
     "zh": "X 页面抓取失败，请检查爬虫服务配置",
     "en": "Failed to retrieve X profile. Check crawler settings.",
     "ja": "Xプロフィールを取得できません。クローラーの設定を確認してください。",
-    "ko": "X 프로필을 가져오지 못했습니다. 크롤러 설정을 확인하세요."
+    "ko": "X 프로필을 가져오지 못했습니다. 크롤러 설정을 확인하세요.",
+    "de": "X-Profil konnte nicht abgerufen werden. Prüfen Sie die Crawler-Einstellungen.",
+    "es": "No se pudo obtener el perfil de X. Comprueba el crawler.",
+    "fr": "Impossible de récupérer le profil X. Vérifiez le crawler.",
+    "pt": "Não foi possível obter o perfil do X. Verifique o crawler.",
+    "ru": "Не удалось получить профиль X. Проверьте настройки краулера."
 };
 
 var I18N_MEDIA = {
     "zh": "查看图片或视频",
     "en": "View image or video",
     "ja": "画像または動画を見る",
-    "ko": "이미지 또는 동영상 보기"
+    "ko": "이미지 또는 동영상 보기",
+    "de": "Bild oder Video ansehen",
+    "es": "Ver imagen o vídeo",
+    "fr": "Voir l’image ou la vidéo",
+    "pt": "Ver imagem ou vídeo",
+    "ru": "Посмотреть изображение или видео"
 };
 
 var I18N_EMPTY = {
     "zh": "页面未解析到公开帖子，可能需要登录或页面结构已变化；保留已有缓存",
     "en": "No public posts could be parsed. X may require login or its layout may have changed. Existing cached posts are retained.",
     "ja": "公開ポストを解析できませんでした。ログインが必要か、ページ構造が変更された可能性があります。既存のキャッシュは保持されます。",
-    "ko": "공개 게시물을 분석하지 못했습니다. 로그인이 필요하거나 페이지 구조가 변경되었을 수 있습니다. 기존 캐시 게시물은 유지됩니다."
+    "ko": "공개 게시물을 분석하지 못했습니다. 로그인이 필요하거나 페이지 구조가 변경되었을 수 있습니다. 기존 캐시 게시물은 유지됩니다.",
+    "de": "Keine öffentlichen Beiträge konnten analysiert werden. X erfordert möglicherweise eine Anmeldung oder die Seitenstruktur wurde geändert. Vorhandene Cache-Beiträge bleiben erhalten.",
+    "es": "No se pudieron analizar publicaciones públicas. Puede requerirse iniciar sesión o haber cambiado la estructura. Se conserva la caché.",
+    "fr": "Aucun post public n’a pu être analysé. Une connexion peut être requise ou la structure a changé. Le cache est conservé.",
+    "pt": "Não foi possível analisar posts públicos. Pode ser necessário fazer login ou a estrutura mudou. O cache é mantido.",
+    "ru": "Не удалось разобрать публичные публикации. Возможно, требуется вход или изменилась структура страницы. Кэш сохранён."
 };
 
 var I18N_CACHE = {
     "zh": "缓存未写入，下次刷新可能重新抓取",
     "en": "Cache write failed; the next refresh may retrieve the profile again.",
     "ja": "キャッシュを保存できませんでした。次回の更新時に再取得する場合があります。",
-    "ko": "캐시 저장에 실패했습니다. 다음 새로고침 시 프로필을 다시 가져올 수 있습니다."
+    "ko": "캐시 저장에 실패했습니다. 다음 새로고침 시 프로필을 다시 가져올 수 있습니다.",
+    "de": "Cache konnte nicht gespeichert werden; beim nächsten Aktualisieren wird das Profil möglicherweise erneut abgerufen.",
+    "es": "No se pudo guardar la caché; el perfil puede volver a cargarse en la próxima actualización.",
+    "fr": "Échec de l’enregistrement du cache ; le profil pourra être récupéré à la prochaine actualisation.",
+    "pt": "Falha ao salvar o cache; o perfil poderá ser obtido novamente na próxima atualização.",
+    "ru": "Не удалось сохранить кэш; при следующем обновлении профиль может быть загружен снова."
 };
