@@ -1,0 +1,29 @@
+{
+  "name": "Stock Quotes",
+  "description": "Track mainland China, Hong Kong, and US stock quotes with one comma-separated symbol list. No API key required.",
+  "version": "1.0.2",
+  "author": "Nunc.",
+  "min_support_app_version": "2026.10.17",
+  "tags": [
+    "stocks",
+    "finance",
+    "quotes"
+  ],
+  "category": "Finance",
+  "config_options": {
+    "symbols": {
+      "type": "string",
+      "default": "usAAPL",
+      "required": true,
+      "description": "Comma-separated Tencent stock codes, for example usAAPL,sh600519,sz000001,hk00700. Up to 50 symbols."
+    }
+  },
+  "requirements": {
+    "network": true,
+    "storage": false,
+    "ai": false,
+    "ai_decision": false,
+    "crawler": false
+  },
+  "copyable": false
+}
