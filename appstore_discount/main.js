@@ -31,7 +31,7 @@ function fetchEvents(config) {
             var app = appList[i];
             try {
                 // 获取应用信息
-                var appUrl = "https://itunes.apple.com/lookup?id=" + app.appId + "&country=" + app.region;
+                var appUrl = "https://itunes.apple.com/lookup?id=" + encodeURIComponent(app.appId) + "&country=" + encodeURIComponent(app.region);
                 var appResponse = sidefy.http.get(appUrl);
 
                 if (!appResponse) {
@@ -194,7 +194,10 @@ function formatPrice(priceValue, sampleFormatted, currency) {
  * 从配置中解析应用监控列表（apps + {id}_* 模式）
  */
 function resolveAppList(config) {
-    var defaultRegion = (config.default_region || "us").trim().toLowerCase();
+    var defaultRegion = String(config.default_region || "us").trim().toLowerCase();
+    if (!/^[a-z]{2}$/.test(defaultRegion)) {
+        throw new Error(sidefy.i18n(I18N_INVALID_REGION));
+    }
     var appEntries = [];
 
     if (config.apps && typeof config.apps === "string") {
@@ -223,6 +226,10 @@ function resolveAppList(config) {
         var region = defaultRegion;
         if (regionRaw !== undefined && regionRaw !== null && String(regionRaw).trim() !== "") {
             region = String(regionRaw).trim().toLowerCase();
+        }
+        if (!/^[a-z]{2}$/.test(region)) {
+            sidefy.log(i18nInvalidRegionForApp(appId));
+            continue;
         }
 
         var originalPrice = Number(config[appId + "_original_price"]);
@@ -279,6 +286,9 @@ function getDiscountColor(discountPercent) {
 }
 
 // --- i18n ---
+
+var I18N_INVALID_REGION = { zh: "App Store 地区必须是两位字母代码。", en: "The App Store region must be a two-letter code.", ja: "App Store の地域は2文字のコードで指定してください。", ko: "App Store 지역은 두 글자 코드여야 합니다.", de: "Die App-Store-Region muss ein zweistelliger Code sein.", es: "La región de App Store debe ser un código de dos letras.", fr: "La région App Store doit être un code de deux lettres.", pt: "A região da App Store deve ser um código de duas letras.", ru: "Регион App Store должен быть двухбуквенным кодом." };
+function i18nInvalidRegionForApp(appId) { return sidefy.i18n({ zh: "已跳过应用 " + appId + "：地区代码无效。", en: "Skipped app " + appId + ": invalid region code.", ja: "アプリ " + appId + " をスキップしました：地域コードが無効です。", ko: "앱 " + appId + "을(를) 건너뛰었습니다: 지역 코드가 잘못되었습니다.", de: "App " + appId + " übersprungen: ungültiger Regionscode.", es: "Aplicación " + appId + " omitida: código de región no válido.", fr: "App " + appId + " ignorée : code de région invalide.", pt: "App " + appId + " ignorado: código de região inválido.", ru: "Приложение " + appId + " пропущено: недопустимый код региона." }); }
 
 var I18N_APPS_EMPTY = {
     zh: "apps 不能为空。填写逗号分隔的 App Store 应用 ID，并为每个应用手动添加 {appId}_original_price 配置项。",

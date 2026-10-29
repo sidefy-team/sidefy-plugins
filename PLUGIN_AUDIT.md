@@ -16,8 +16,8 @@ Runtime checks covered declared network, storage, general AI, and AI decision pe
 
 | Plugin | Version | Structure | Permission scan | i18n key scan |
 |---|---:|---|---|---|
-| appstore_discount | 1.0.2 | complete | passed | passed |
-| bilibili_user_videos | 0.3.9 | complete | passed | passed |
+| appstore_discount | 1.0.3 | complete | passed | passed |
+| bilibili_user_videos | 0.4.2 | complete | passed | passed |
 | countdown_day | 0.1.6 | complete | passed | passed |
 | freshrss | 1.2.4 | complete | passed | passed |
 | github_notifications | 0.2.4 | complete | passed | passed; discontinued |

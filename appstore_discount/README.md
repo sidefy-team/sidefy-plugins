@@ -51,6 +51,10 @@ The iTunes API only returns the current price — it cannot detect whether an ap
 
 ## Changelog
 
+### v1.0.3
+
+- Encode App Store query parameters and validate two-letter region codes before requesting prices.
+
 ### v1.0.2
 
 - 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
