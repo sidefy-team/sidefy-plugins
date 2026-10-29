@@ -49,6 +49,11 @@ With `aiTitle` enabled, the generated title replaces the text after `@username Â
 
 ### Changelog
 
+#### v0.2.1
+
+- Lower the minimum app version to 2025.11.12, matching the historical Universal Web Monitor plugin with crawler, AI, and storage requirements.
+- Use the sidefy runtime namespace for compatibility with older clients.
+
 #### v0.2.0
 
 - Add the optional `aiTitle` setting, disabled by default, using General AI to generate titles from post content.

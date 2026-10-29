@@ -1,9 +1,9 @@
 {
   "name": "Stock Quotes",
   "description": "Track mainland China, Hong Kong, and US stock quotes with one comma-separated symbol list. No API key required.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Nunc.",
-  "min_support_app_version": "2026.10.17",
+  "min_support_app_version": "2025.9.0",
   "tags": [
     "stocks",
     "finance",

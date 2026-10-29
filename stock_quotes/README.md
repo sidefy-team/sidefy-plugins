@@ -52,6 +52,10 @@ Enable **Network** permission. Storage, AI, AI Decision, and Crawler permissions
 
 ## Changelog
 
+### v1.0.3
+
+- Lower the minimum app version to 2025.9.0, matching existing plugins that use the same basic runtime APIs.
+
 ### v1.0.2
 
 - Disable plugin duplication.

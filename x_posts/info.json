@@ -1,9 +1,9 @@
 {
   "name": "X Posts",
   "description": "Follow public posts from one X account at their original publication times. Duplicate the plugin to follow another account.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Nunc.",
-  "min_support_app_version": "2026.10.17",
+  "min_support_app_version": "2025.11.12",
   "tags": [
     "x",
     "social media",
