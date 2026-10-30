@@ -30,7 +30,7 @@ function fetchEvents(config) {
     var limit = Math.max(1, Math.min(100, Number(config.limit) || 50));
     var cacheScope = encodeURIComponent(parsedURL.origin + parsedURL.pathname + "|" + username);
     var cacheKey = "freshrss_auth_token_" + cacheScope;
-    var articlesCacheKey = "freshrss_articles_" + cacheScope + "_" + limit + "_" + (onlyUnread ? "unread" : "all");
+    var articlesCacheKey = "freshrss_articles_v2_" + cacheScope + "_" + limit + "_" + (onlyUnread ? "unread" : "all");
 
     // Helper to perform login
     function login() {
@@ -180,6 +180,7 @@ function fetchEvents(config) {
         var feedTitle = item.origin ? item.origin.title : "FreshRSS";
 
         return {
+            attribution: (item.origin && item.origin.title) || undefined,
             title: "[" + feedTitle + "] " + item.title,
             startDate: sidefy.date.format(startDate.getTime() / 1000),
             endDate: sidefy.date.format(endDate.getTime() / 1000),

@@ -48,6 +48,11 @@ Fetch public activity events for a specified GitHub user, including pushes, fork
 
 ### Changelog
 
+#### v0.2.4
+
+- 新增可选 `attribution`，使用事件操作账号，显示为「插件名称（归属）· 扩展插件」；保留原有标题、正文及来源字段，兼容旧版 Nunc。
+- 人名或账号归属统一使用单个 `@` 前缀，清理已有前导符号及空白，空值不显示归属。
+
 #### v0.2.3
 
 - Normalize the optional token and limit inputs before sending GitHub requests.

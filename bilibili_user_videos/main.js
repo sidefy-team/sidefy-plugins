@@ -1,3 +1,8 @@
+function accountAttribution(value) {
+    var name = String(value || "").replace(/^[\s@＠]+/, "").trim();
+    return name ? "@" + name : undefined;
+}
+
 // Bilibili 用户视频插件 - 按用户 ID 缓存
 // 作者: 李慕白
 function fetchEvents(config) {
@@ -72,7 +77,7 @@ function fetchEvents(config) {
         var todayEnd = new Date(getTodayKey() + "T23:59:59").getTime() / 1000;
         return data.data.list.vlist.filter(function(v) { return v.created >= todayStart && v.created <= todayEnd; }).map(function(v) { return { t: v.title, d: v.created, b: v.bvid, p: v.pic, a: v.author, pc: v.play || 0, dc: v.video_review || 0, l: v.length }; });
     }
-    function buildEvents(storage, config) { var events = []; for (var mid in storage.data) { (storage.data[mid].vids || []).forEach(function(v) { events.push({ title: v.t, startDate: sidefy.date.format(v.d), endDate: sidefy.date.format(v.d), color: "#FB7299", icon: config.icon, notes: i18nVideoNotes(v.a, formatCount(v.pc), formatCount(v.dc), v.l), isAllDay: false, isPointInTime: true, href: "https://www.bilibili.com/video/" + encodeURIComponent(v.b), imageURL: v.p }); }); } return events; }
+    function buildEvents(storage, config) { var events = []; for (var mid in storage.data) { (storage.data[mid].vids || []).forEach(function(v) { events.push({ title: v.t, attribution: accountAttribution(v.a), startDate: sidefy.date.format(v.d), endDate: sidefy.date.format(v.d), color: "#FB7299", icon: config.icon, notes: i18nVideoNotes(v.a, formatCount(v.pc), formatCount(v.dc), v.l), isAllDay: false, isPointInTime: true, href: "https://www.bilibili.com/video/" + encodeURIComponent(v.b), imageURL: v.p }); }); } return events; }
     function formatCount(count) { if (!count) return "0"; if (count >= 100000000) return (count / 100000000).toFixed(1) + sidefy.i18n(I18N_HUNDRED_MILLION); if (count >= 10000) return (count / 10000).toFixed(1) + sidefy.i18n(I18N_TEN_THOUSAND); return String(count); }
 }
 

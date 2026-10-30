@@ -54,6 +54,10 @@ octocat/Hello-World = stars,forks  # only stars and forks
 
 ### Changelog
 
+#### v1.1.2
+
+- 新增可选 `attribution`，使用仓库全名，显示为「插件名称（归属）· 扩展插件」；保留原有标题、正文及来源字段，兼容旧版 Nunc。
+
 ### v1.1.1
 
 - 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。

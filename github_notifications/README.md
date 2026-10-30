@@ -61,6 +61,10 @@ You can configure the following types in the `notificationTypes` parameter (comm
 
 ### Changelog
 
+#### v0.2.5
+
+- 新增可选 `attribution`，使用仓库全名，显示为「插件名称（归属）· 扩展插件」；保留原有标题、正文及来源字段，兼容旧版 Nunc。
+
 #### v0.2.4
 
 - Localized event metadata, validation errors, and API errors with all nine Nunc language codes.

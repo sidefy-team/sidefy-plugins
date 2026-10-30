@@ -12,7 +12,7 @@ function fetchEvents(config) {
     // --- 每日缓存逻辑 ---
     var today = new Date();
     var dateString = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-    var cacheKey = "unsplash_daily_photo_" + dateString;
+    var cacheKey = "unsplash_daily_photo_v2_" + dateString;
 
     var cachedData = sidefy.storage.get(cacheKey);
     if (cachedData) {
@@ -56,6 +56,7 @@ function fetchEvents(config) {
         }
 
         events.push({
+            attribution: photo.user.name || photo.user.username || undefined,
             title: title,
             startDate: sidefy.date.format(eventDate.getTime() / 1000),
             endDate: sidefy.date.format(eventDate.getTime() / 1000),

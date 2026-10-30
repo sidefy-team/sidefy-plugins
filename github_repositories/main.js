@@ -30,6 +30,7 @@ function fetchEvents(config) {
         if (!cached || cached.expiresAt <= now.getTime()) {
             cached = { events: [], last: 0 };
         }
+        cached.events.forEach(function(event) { event.attribution = repo.name; });
         var interval = cached.events.length > 0 ? POPULATED_CACHE_TTL_MINUTES : EMPTY_CACHE_TTL_MINUTES;
         if (cached.last && now.getTime() - cached.last < interval * 60000) {
             appendAll(events, cached.events);
@@ -287,6 +288,7 @@ function pointEvent(opts) {
     var ts = opts.date.getTime() / 1000;
     return {
         id: opts.id || ((opts.eventType || "").replace(/^pr_.*/, "pr") + ":" + (opts.href || "")),
+        attribution: opts.attribution,
         title: opts.title,
         startDate: sidefy.date.format(ts),
         endDate: sidefy.date.format(ts),
@@ -345,6 +347,7 @@ function fetchStars(repo, headers, token) {
         var login = edge.node && edge.node.login ? edge.node.login : "unknown";
         var icon = (edge.node && edge.node.avatarUrl) || avatarUrl(login);
         events.push(pointEvent({
+            attribution: repo,
             id: "star:" + repo.toLowerCase() + ":" + login.toLowerCase() + ":" + date.toISOString(),
             title: i18nStarred(login, repo),
             date: date,
@@ -381,6 +384,7 @@ function fetchStarsRestFallback(repo, headers) {
         }
         var login = item.user && item.user.login ? item.user.login : "unknown";
         events.push(pointEvent({
+            attribution: repo,
             id: "star:" + repo.toLowerCase() + ":" + login.toLowerCase() + ":" + date.toISOString(),
             title: i18nStarred(login, repo),
             date: date,
@@ -415,6 +419,7 @@ function fetchReleases(repo, headers) {
             notes = notes + "\n\n" + release.body;
         }
         events.push(pointEvent({
+            attribution: repo,
             title: i18nReleased(repo, release.tag_name),
             date: date,
             color: release.prerelease ? "#FF9500" : "#34C759",
@@ -452,6 +457,7 @@ function fetchPullRequests(repo, headers) {
         var login = pr.user && pr.user.login ? pr.user.login : "unknown";
         var status = prStatus(pr);
         events.push(pointEvent({
+            attribution: repo,
             title: "[" + status.label + "] " + i18nCreatedPR(login, repo),
             date: date,
             color: status.color,
@@ -495,6 +501,7 @@ function fetchForks(repo, headers) {
         }
         var login = fork.owner && fork.owner.login ? fork.owner.login : "unknown";
         events.push(pointEvent({
+            attribution: repo,
             title: i18nForked(login, repo),
             date: date,
             color: "#AF52DE",
@@ -531,6 +538,7 @@ function fetchIssues(repo, headers) {
         var login = issue.user && issue.user.login ? issue.user.login : "unknown";
         var open = issue.state === "open";
         events.push(pointEvent({
+            attribution: repo,
             title: "[" + sidefy.i18n(open ? I18N_STATUS_OPEN : I18N_STATUS_CLOSED) + "] " +
                 i18nCreatedIssue(login, repo),
             date: date,
@@ -581,6 +589,7 @@ function fetchDiscussions(repo, headers, token) {
             notes = notes + "\n\n" + discussion.body;
         }
         events.push(pointEvent({
+            attribution: repo,
             title: i18nDiscussion(login, repo),
             date: date,
             color: "#FF9500",

@@ -1,3 +1,8 @@
+function accountAttribution(value) {
+    var name = String(value || "").replace(/^[\s@＠]+/, "").trim();
+    return name ? "@" + name : undefined;
+}
+
 // GitHub 个人事件插件 - 获取指定用户的公开活动
 function fetchEvents(config) {
     var events = [];
@@ -16,7 +21,7 @@ function fetchEvents(config) {
     if (limit < 1) limit = 1;
     if (limit > 100) limit = 100;
 
-    var cacheKey = "github_user_events_" + username + "_" + limit + "_" + (filterSelf ? "filtered" : "all");
+    var cacheKey = "github_user_events_v2_" + username + "_" + limit + "_" + (filterSelf ? "filtered" : "all");
 
     try {
         // 检查缓存 - 简化处理
@@ -71,6 +76,7 @@ function fetchEvents(config) {
             var href = generateEventUrl(event);
 
             events.push({
+                attribution: accountAttribution((event.actor && event.actor.login) || username),
                 title: title,
                 startDate: sidefy.date.format(eventTime.getTime() / 1000),
                 endDate: sidefy.date.format(eventTime.getTime() / 1000),

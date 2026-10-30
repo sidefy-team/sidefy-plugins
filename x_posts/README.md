@@ -49,6 +49,11 @@ With `aiTitle` enabled, the generated title replaces the text after `@username �
 
 ### Changelog
 
+#### v0.2.3
+
+- 新增可选 `attribution`，使用X 账号，显示为「插件名称（归属）· 扩展插件」；保留原有标题、正文及来源字段，兼容旧版 Nunc。
+- 人名或账号归属统一使用单个 `@` 前缀，清理已有前导符号及空白，空值不显示归属。
+
 ### v0.2.2
 
 - 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。

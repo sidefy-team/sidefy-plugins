@@ -40,6 +40,10 @@ Each RSS feed source is automatically assigned a unique color based on its URL u
 
 ### Changelog
 
+#### v1.2.5
+
+- 新增可选 `attribution`，使用订阅源名称，显示为「插件名称（归属）· 扩展插件」；保留原有标题、正文及来源字段，兼容旧版 Nunc。
+
 ### v1.2.4
 
 - Validate the FreshRSS URL and require HTTPS.

@@ -1,3 +1,8 @@
+function accountAttribution(value) {
+    var name = String(value || "").replace(/^[\s@＠]+/, "").trim();
+    return name ? "@" + name : undefined;
+}
+
 /**
  * Steam 愿望单打折监听插件
  * 每30分钟检查一次用户的 Steam 愿望单中游戏的打折信息，并在时间线中显示打折游戏。
@@ -20,7 +25,7 @@ function fetchEvents(config) {
     var dateKey = today.getFullYear() + "" +
         String(today.getMonth() + 1).padStart(2, '0') +
         String(today.getDate()).padStart(2, '0');
-    var cacheKey = "steam_wishlist_discount_v11_" + steamId + "_" + dateKey;
+    var cacheKey = "steam_wishlist_discount_v12_" + steamId + "_" + dateKey;
 
     var cachedData = sidefy.storage.get(cacheKey);
     if (cachedData) {
@@ -145,6 +150,7 @@ function fetchEvents(config) {
                 var notes = i18nDiscountNotes(game.originalPrice, game.finalPrice, game.discountPercent);
 
                 var gameEvent = {
+                    attribution: accountAttribution(steamId),
                     title: game.name + " (-" + game.discountPercent + "%)",
                     startDate: sidefy.date.format(timestamp),
                     endDate: sidefy.date.format(timestamp),

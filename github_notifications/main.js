@@ -25,7 +25,7 @@ function fetchEvents(config) {
         });
     }
 
-    var cacheKey = "github_notifications_" + (showParticipating ? "participating" : "all") + "_" + limit;
+    var cacheKey = "github_notifications_v2_" + (showParticipating ? "participating" : "all") + "_" + limit;
 
     try {
         // 检查缓存
@@ -88,6 +88,7 @@ function fetchEvents(config) {
             var localEndTime = new Date(localStartTime.getTime() + 30 * 60 * 1000); // 30分钟后结束
 
             var event = {
+                attribution: notification.repository.full_name || undefined,
                 title: title,
                 startDate: sidefy.date.format(localStartTime.getTime() / 1000),
                 endDate: sidefy.date.format(localEndTime.getTime() / 1000),

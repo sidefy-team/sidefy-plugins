@@ -1,3 +1,8 @@
+function accountAttribution(value) {
+    var name = String(value || "").replace(/^[\s@＠]+/, "").trim();
+    return name ? "@" + name : undefined;
+}
+
 function fetchEvents(config) {
     var events = [];
     var articleIds = String(config.articleId || "114211").split(/[\s,，]+/).filter(Boolean);
@@ -43,7 +48,7 @@ function fetchArticleTitle(articleId) {
 
 function fetchArticleComments(articleId, articleTitle, pageSize, events) {
     try {
-        var cacheKey = "article_comments_v15_" + articleId;
+        var cacheKey = "article_comments_v16_" + articleId;
         var cachedEvents = sidefy.storage.get(cacheKey);
         if (Array.isArray(cachedEvents)) {
             Array.prototype.push.apply(events, cachedEvents);
@@ -184,6 +189,7 @@ function makeCommentEvent(item, text, articleId, articleTitle, quoted) {
     }
 
     return {
+        attribution: accountAttribution(cleanText(user.nickname)),
         title: nickname + ": " + text.slice(0, 70) + (text.length > 70 ? "…" : ""),
         startDate: sidefy.date.format(timestamp),
         endDate: sidefy.date.format(timestamp),

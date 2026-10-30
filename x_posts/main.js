@@ -1,3 +1,8 @@
+function accountAttribution(value) {
+    var name = String(value || "").replace(/^[\s@＠]+/, "").trim();
+    return name ? "@" + name : undefined;
+}
+
 function fetchEvents(config) {
     var username = String(config.username || "").trim().replace(/^@/, "");
     if (!/^[A-Za-z0-9_]{1,15}$/.test(username)) throw new Error(sidefy.i18n(I18N_USERNAME));
@@ -65,6 +70,7 @@ function fetchEvents(config) {
         var characters = Array.from(title);
         var event = {
             title: "@" + username + " · " + (characters.length > 64 ? characters.slice(0, 64).join("") + "…" : title),
+            attribution: accountAttribution(username),
             notes: post.text,
             startDate: stamp,
             endDate: stamp,

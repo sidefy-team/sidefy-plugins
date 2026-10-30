@@ -1,3 +1,8 @@
+function accountAttribution(value) {
+    var name = String(value || "").replace(/^[\s@＠]+/, "").trim();
+    return name ? "@" + name : undefined;
+}
+
 /**
  * V2EX 未读提醒插件
  * 解析 V2EX 私有 Atom Feed 并在时间线中显示提醒。
@@ -60,6 +65,7 @@ function fetchEvents(config) {
 
                 newEvents.push({
                     id: buildEventId(entryId, published, link, authorName),
+                    attribution: accountAttribution(authorName),
                     title: displayTitle,
                     startDate: startDate,
                     endDate: endDate,
