@@ -49,9 +49,9 @@ SOL $150.23 ↗ +3.45% (24h)
 
 Alerts stay visible for as long as the condition is true. Empty, nonnumeric, non-finite, and negative thresholds are ignored. Missing 24h changes display as unavailable and do not trigger percentage alerts.
 
-Prices use two decimal places at or above $1 and four significant digits below $1; very small prices use scientific notation. Notes show the full local update date and time. Cached quotes are marked stale when a refresh fails, the quote is older than the configured interval, or its update time is unknown. Existing threshold highlights may remain on stale quotes.
+Prices use two decimal places at or above $1 and four significant digits below $1; very small prices use scientific notation. Notes show the full local update date and time.
 
-Failed requests and unknown token IDs respect the configured retry interval. Adding a token triggers an immediate refresh. Alert and stale labels follow the app language.
+Failed requests and unknown token IDs respect the configured retry interval. Adding a token triggers an immediate refresh. Alert labels follow the app language.
 
 ## How to Find CoinGecko Token IDs
 
@@ -65,6 +65,11 @@ Failed requests and unknown token IDs respect the configured retry interval. Add
 CoinGecko API: `https://api.coingecko.com/api/v3/simple/price`
 
 ## Changelog
+
+### v1.1.6
+
+- Remove stale labels and notices while retaining full update timestamps.
+- Show CoinGecko as the data source in event details.
 
 ### v1.1.5
 

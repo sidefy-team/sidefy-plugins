@@ -77,9 +77,6 @@ function fetchEvents(config) {
 
         if (needFetch) {
             state.attemptedAt = nowTs;
-            tokens.forEach(function (id) {
-                if (state.coins[id]) state.coins[id].refreshFailed = true;
-            });
             try {
                 var url = "https://api.coingecko.com/api/v3/simple/price?ids=" +
                     tokens.map(encodeURIComponent).join(",") +
@@ -100,7 +97,6 @@ function fetchEvents(config) {
                                 price: Number(item.usd),
                                 change24h: finiteNumber(item.usd_24h_change),
                                 updatedAt: validTimestamp(item.last_updated_at, nowTs),
-                                refreshFailed: false,
                                 symbolResolved: prev.symbolResolved || false
                             };
                         }
@@ -150,10 +146,9 @@ function fetchEvents(config) {
             var price = Number(coin.price);
             var change24h = finiteNumber(coin.change24h);
             var updatedAt = finiteNumber(coin.updatedAt);
-            var stale = coin.refreshFailed || !updatedAt || nowTs - updatedAt >= intervalMinutes * 60000;
             var notes = sidefy.i18n(I18N_UPDATED_LABEL) +
-                (updatedAt ? formatTimestamp(updatedAt) : sidefy.i18n(I18N_UNKNOWN));
-            if (stale) notes += "\n" + sidefy.i18n(I18N_STALE_NOTE);
+                (updatedAt ? formatTimestamp(updatedAt) : sidefy.i18n(I18N_UNKNOWN)) +
+                "\n" + sidefy.i18n(I18N_SOURCE);
 
             var color = "#4285f4";
             var changeText = "";
@@ -203,8 +198,6 @@ function fetchEvents(config) {
                 }
                 title = "[" + sidefy.i18n(I18N_ALERT) + "] " + title + " (" + alertTexts.join(", ") + ")";
             }
-
-            if (stale) title = "[" + sidefy.i18n(I18N_STALE) + "] " + title;
 
             events.push({
                 title: title,
@@ -269,10 +262,10 @@ function formatTimestamp(timestamp) {
 
 var I18N_ALERT = { zh: "提醒", en: "ALERT", ja: "アラート", ko: "알림" };
 var I18N_UNKNOWN = { zh: "暂无数据", en: "Unavailable", ja: "データなし", ko: "데이터 없음" };
-var I18N_STALE = { zh: "非实时", en: "STALE", ja: "未更新", ko: "갱신 지연" };
-var I18N_STALE_NOTE = {
-    zh: "数据已过期、更新失败或更新时间未知；价格及提醒仅供参考。",
-    en: "Data is outdated, refresh failed, or update time is unknown; prices and alerts may be stale.",
-    ja: "データが古い、更新に失敗した、または更新時刻が不明です。価格とアラートは参考情報です。",
-    ko: "데이터가 오래되었거나 갱신에 실패했거나 갱신 시간이 없습니다. 가격과 알림은 참고용입니다."
+
+var I18N_SOURCE = {
+    zh: "数据来源：CoinGecko",
+    en: "Source: CoinGecko",
+    ja: "データ提供: CoinGecko",
+    ko: "출처: CoinGecko"
 };
