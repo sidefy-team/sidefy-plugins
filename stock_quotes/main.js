@@ -43,14 +43,13 @@ function fetchEvents(config) {
         }
         function signed(value) { return (value > 0 ? "+" : "") + value.toFixed(2); }
         var priceLine = sidefy.i18n(I18N_PRICE) + fields[3];
-        if (numberAt(4) !== null) priceLine += "　" + sidefy.i18n(I18N_PREVIOUS) + fields[4];
+        if (numberAt(4) !== null) priceLine += " · " + sidefy.i18n(I18N_PREVIOUS) + fields[4];
         var notes = [
             sidefy.i18n(I18N_SYMBOL) + code,
             priceLine,
-            sidefy.i18n(I18N_PERCENT) + signed(percent) + "%" + "　" + sidefy.i18n(I18N_CHANGE) + signed(change),
+            sidefy.i18n(I18N_PERCENT) + signed(percent) + "% · " + sidefy.i18n(I18N_CHANGE) + signed(change),
             sidefy.i18n(I18N_TIME) + quoteTime + " · " + zone,
-            sidefy.i18n(I18N_SOURCE),
-            sidefy.i18n(I18N_DELAY)
+            sidefy.i18n(I18N_SOURCE)
         ];
         events.push({
             title: fields[1] + " (" + code + ") " + fields[3] + " " + currency + " · " + signed(percent) + "%",
@@ -197,18 +196,6 @@ var I18N_SOURCE = {
     fr: "Source : Tencent Finance",
     pt: "Fonte: Tencent Finance",
     ru: "Источник: Tencent Finance"
-};
-
-var I18N_DELAY = {
-    zh: "最新可用报价，可能延迟；休市时显示上一交易日行情。",
-    en: "Latest available quote; may be delayed. Closed markets show the last trading session.",
-    ja: "直近の株価です。遅延する場合があり、休場時は直近取引日の株価を表示します。",
-    ko: "최근 제공 시세이며 지연될 수 있습니다. 휴장 시 마지막 거래일 시세를 표시합니다.",
-    de: "Letzter verfügbarer Kurs, möglicherweise verzögert. Bei geschlossenen Märkten wird die letzte Sitzung angezeigt.",
-    es: "Cotización disponible más reciente; puede estar retrasada. En mercados cerrados se muestra la última sesión.",
-    fr: "Dernier cours disponible, potentiellement retardé. Les marchés fermés affichent la dernière séance.",
-    pt: "Cotação disponível mais recente; pode estar atrasada. Mercados fechados exibem a última sessão.",
-    ru: "Последняя доступная котировка может быть задержана. Для закрытых рынков показана последняя сессия."
 };
 
 var I18N_PREVIOUS = {

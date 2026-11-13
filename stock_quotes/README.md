@@ -52,6 +52,10 @@ Enable **Network** permission. Storage, AI, AI Decision, and Crawler permissions
 
 ## Changelog
 
+### v1.0.7
+
+- Add separators between paired quote fields and remove the delay notice from event details.
+
 ### v1.0.6
 
 - Keep the currency in the title and remove repeated units from quote details.
