@@ -42,12 +42,12 @@ function fetchEvents(config) {
             quoteTime = quoteTime.slice(0,4)+"-"+quoteTime.slice(4,6)+"-"+quoteTime.slice(6,8)+" "+quoteTime.slice(8,10)+":"+quoteTime.slice(10,12)+":"+quoteTime.slice(12,14);
         }
         function signed(value) { return (value > 0 ? "+" : "") + value.toFixed(2); }
-        var priceLine = sidefy.i18n(I18N_PRICE) + fields[3] + " " + currency;
-        if (numberAt(4) !== null) priceLine += "　" + sidefy.i18n(I18N_PREVIOUS) + fields[4] + " " + currency;
+        var priceLine = sidefy.i18n(I18N_PRICE) + fields[3];
+        if (numberAt(4) !== null) priceLine += "　" + sidefy.i18n(I18N_PREVIOUS) + fields[4];
         var notes = [
             sidefy.i18n(I18N_SYMBOL) + code,
             priceLine,
-            sidefy.i18n(I18N_PERCENT) + signed(percent) + "%" + "　" + sidefy.i18n(I18N_CHANGE) + signed(change) + " " + currency,
+            sidefy.i18n(I18N_PERCENT) + signed(percent) + "%" + "　" + sidefy.i18n(I18N_CHANGE) + signed(change),
             sidefy.i18n(I18N_TIME) + quoteTime + " · " + zone,
             sidefy.i18n(I18N_SOURCE),
             sidefy.i18n(I18N_DELAY)

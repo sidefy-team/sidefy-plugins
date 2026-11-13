@@ -52,6 +52,10 @@ Enable **Network** permission. Storage, AI, AI Decision, and Crawler permissions
 
 ## Changelog
 
+### v1.0.6
+
+- Keep the currency in the title and remove repeated units from quote details.
+
 ### v1.0.5
 
 - Group latest price and previous close on one line, and percentage change and price change on the next.
