@@ -52,6 +52,10 @@ Enable **Network** permission. Storage, AI, AI Decision, and Crawler permissions
 
 ## Changelog
 
+### v1.0.5
+
+- Group latest price and previous close on one line, and percentage change and price change on the next.
+
 ### v1.0.4
 
 - 补齐 i18n 文案，新增德语、西班牙语、法语、葡萄牙语和俄语支持。
